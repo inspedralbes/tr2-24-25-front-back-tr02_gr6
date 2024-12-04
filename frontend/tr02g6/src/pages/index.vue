@@ -1,5 +1,5 @@
 <template>
-  <HelloWorld />
+  <LoginIRegister />
 </template>
 
 <script setup>
