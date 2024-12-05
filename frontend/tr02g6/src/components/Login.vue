@@ -8,13 +8,34 @@
       ></v-img>
         </slot>
   
-        <v-form @submit.prevent="submitLogin()" ref="form">
+        <v-form @submit.prevent="submitLogin()" ref="form">  
       <v-card
         class="mx-auto pa-12 pb-8"
         elevation="8"
         max-width="448"
         rounded="lg"
       >
+
+      <!-- <div class="text-subtitle-1 text-medium-emphasis">Institut</div>
+  
+        <v-text-field
+                v-model="institut"
+          density="compact"
+          :placeholder="buscarInstitut"
+          :rules="[v => !!v || 'Item is required']"
+          prepend-inner-icon="mdi-city"
+          variant="outlined"
+        ></v-text-field>
+        <v-btn class="ma-5" 
+        block
+          color="blue"
+          size="large"
+          variant="tonal"
+          height="50"
+          min-width="50"
+        >CERCA INSTITUT</v-btn> -->
+
+
         <div class="text-subtitle-1 text-medium-emphasis">Email</div>
   
         <v-text-field
@@ -27,7 +48,7 @@
         ></v-text-field>
   
         <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between">
-          Contraseña
+          Contrasenya
   
          
         </div>
@@ -59,7 +80,8 @@
     </div>
   </template>
   <script setup>
-      import { ref } from 'vue'
+
+import { ref, onMounted } from "vue";
   
       defineProps({
           identifierPlaceholder: {
@@ -68,7 +90,10 @@
           },
           passwordPlaceholder: {
               type: String,
-              default: 'Enter your password',
+              default: 'Insereix contrasenya',
+          }, buscarInstitut: {
+              type: String,
+              default: 'Institut',
           }
       })
   
