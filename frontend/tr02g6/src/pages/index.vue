@@ -1,5 +1,5 @@
 <template>
-  <HelloWorld />
+  <Formulario_personalidad />
 </template>
 
 <script setup>
