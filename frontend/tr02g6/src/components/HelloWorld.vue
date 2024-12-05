@@ -1,157 +1,82 @@
 <template>
-  <v-container class="fill-height">
-    <v-responsive
-      class="align-centerfill-height mx-auto"
-      max-width="900"
-    >
-      <v-img
-        class="mb-4"
-        height="150"
-        src="@/assets/logo.png"
-      />
+  <v-app id="inspire">
+    <v-system-bar>
+    </v-system-bar>
 
-      <div class="text-center">
-        <div class="text-body-2 font-weight-light mb-n1">Welcome to</div>
+    <v-navigation-drawer v-model="drawer">
+      <v-sheet
+        class="pa-4"
+        color="grey-lighten-4"
+      >
+        <v-avatar
+          class="mb-4"
+          color="grey-darken-1"
+          size="64"
+        ></v-avatar>
 
-        <h1 class="text-h2 font-weight-bold">Vuetify</h1>
-      </div>
+        <div>john@google.com</div>
+      </v-sheet>
 
-      <div class="py-4" />
+      <v-divider></v-divider>
 
-      <v-row>
-        <v-col cols="12">
-          <v-card
-            class="py-4"
-            color="surface-variant"
-            image="https://cdn.vuetifyjs.com/docs/images/one/create/feature.png"
-            prepend-icon="mdi-rocket-launch-outline"
-            rounded="lg"
-            variant="outlined"
+      <v-list>
+        <v-list-item v-for="[icon, text] in links" :key="icon" :prepend-icon="icon" :title="text" link ></v-list-item>
+      </v-list>
+    </v-navigation-drawer>
+
+    <v-main>
+      <v-container
+        class="py-8 px-6"
+        fluid
+      >
+        <v-row>
+          <v-col
+            v-for="card in cards"
+            :key="card"
+            cols="12"
           >
-            <template #image>
-              <v-img position="top right" />
-            </template>
+            <v-card>
+              <v-list lines="two">
+                <v-list-subheader :title="card"></v-list-subheader>
 
-            <template #title>
-              <h2 class="text-h5 font-weight-bold">Get started</h2>
-            </template>
+                <template v-for="n in 6" :key="n">
+                  <v-list-item>
+                    <template v-slot:prepend>
+                      <v-avatar color="grey-darken-1"></v-avatar>
+                    </template>
 
-            <template #subtitle>
-              <div class="text-subtitle-1">
-                Replace this page by removing <v-kbd>{{ `<HelloWorld />` }}</v-kbd> in <v-kbd>pages/index.vue</v-kbd>.
-              </div>
-            </template>
+                    <v-list-item-title :title="`Message ${n}`"></v-list-item-title>
 
-            <v-overlay
-              opacity=".12"
-              scrim="primary"
-              contained
-              model-value
-              persistent
-            />
-          </v-card>
-        </v-col>
+                    <v-list-item-subtitle title="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nihil repellendus distinctio similique"></v-list-item-subtitle>
+                  </v-list-item>
 
-        <v-col cols="6">
-          <v-card
-            append-icon="mdi-open-in-new"
-            class="py-4"
-            color="surface-variant"
-            href="https://vuetifyjs.com/"
-            prepend-icon="mdi-text-box-outline"
-            rel="noopener noreferrer"
-            rounded="lg"
-            subtitle="Learn about all things Vuetify in our documentation."
-            target="_blank"
-            title="Documentation"
-            variant="text"
-          >
-            <v-overlay
-              opacity=".06"
-              scrim="primary"
-              contained
-              model-value
-              persistent
-            />
-          </v-card>
-        </v-col>
-
-        <v-col cols="6">
-          <v-card
-            append-icon="mdi-open-in-new"
-            class="py-4"
-            color="surface-variant"
-            href="https://vuetifyjs.com/introduction/why-vuetify/#feature-guides"
-            prepend-icon="mdi-star-circle-outline"
-            rel="noopener noreferrer"
-            rounded="lg"
-            subtitle="Explore available framework Features."
-            target="_blank"
-            title="Features"
-            variant="text"
-          >
-            <v-overlay
-              opacity=".06"
-              scrim="primary"
-              contained
-              model-value
-              persistent
-            />
-          </v-card>
-        </v-col>
-
-        <v-col cols="6">
-          <v-card
-            append-icon="mdi-open-in-new"
-            class="py-4"
-            color="surface-variant"
-            href="https://vuetifyjs.com/components/all"
-            prepend-icon="mdi-widgets-outline"
-            rel="noopener noreferrer"
-            rounded="lg"
-            subtitle="Discover components in the API Explorer."
-            target="_blank"
-            title="Components"
-            variant="text"
-          >
-            <v-overlay
-              opacity=".06"
-              scrim="primary"
-              contained
-              model-value
-              persistent
-            />
-          </v-card>
-        </v-col>
-
-        <v-col cols="6">
-          <v-card
-            append-icon="mdi-open-in-new"
-            class="py-4"
-            color="surface-variant"
-            href="https://discord.vuetifyjs.com"
-            prepend-icon="mdi-account-group-outline"
-            rel="noopener noreferrer"
-            rounded="lg"
-            subtitle="Connect with Vuetify developers."
-            target="_blank"
-            title="Community"
-            variant="text"
-          >
-            <v-overlay
-              opacity=".06"
-              scrim="primary"
-              contained
-              model-value
-              persistent
-            />
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-responsive>
-  </v-container>
+                  <v-divider
+                    v-if="n !== 6"
+                    :key="`divider-${n}`"
+                    inset
+                  ></v-divider>
+                </template>
+              </v-list>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-main>
+  </v-app>
 </template>
 
 <script setup>
-  //
+  import { ref } from 'vue'
+
+  const cards = ['Today', 'Yesterday']
+  const links = [
+    ['mdi-inbox-arrow-down', '1 ESO'],
+    ['mdi-inbox-arrow-down', '2 ESO'],
+    ['mdi-inbox-arrow-down', '3 ESO'],
+    ['mdi-inbox-arrow-down', '4 ESO'],
+    ['mdi-inbox-arrow-down', 'PFI'],
+  ]
+
+  const drawer = ref(null)
 </script>
+
