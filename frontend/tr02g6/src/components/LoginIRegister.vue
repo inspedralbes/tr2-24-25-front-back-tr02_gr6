@@ -16,40 +16,65 @@
                         src="https://icones.pro/wp-content/uploads/2021/02/icone-utilisateur-bleu.png"
                       ></v-img>
                     </slot>
-                    <v-row align="center" justify="center">
-                      <v-col cols="12" sm="8">
+                    <v-form @submit.prevent="handleLogin" ref="form">
+                      <v-card
+                        class="mx-auto pa-12 pb-8"
+                        elevation="8"
+                        max-width="448"
+                        rounded="lg"
+                      >
+                        <div class="text-subtitle-1 text-medium-emphasis">
+                          Email
+                        </div>
                         <v-text-field
-                          label="Email"
-                          outlined
-                          dense
-                          color="blue"
                           v-model="professor.email"
-                          class="mt-16"
-                        />
+                          density="compact"
+                          :placeholder="identifierPlaceholder"
+                          :rules="[(v) => !!v || 'Aquest camp és obligatori']"
+                          prepend-inner-icon="mdi-email-outline"
+                          variant="outlined"
+                        ></v-text-field>
+
+                        <div
+                          class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between"
+                        >
+                          Contraseña
+                        </div>
+
                         <v-text-field
-                          label="Contrasenya"
-                          outlined
-                          dense
-                          color="blue"
-                          type="password"
                           v-model="professor.contrasenya"
-                        />
-                        <v-row>
-                          <v-col cols="12" sm="7">
-                            <v-checkbox
-                              label="Recorda'm-ho"
-                              class="mt-n1"
-                              color="blue"
-                            />
-                          </v-col>
-                        </v-row>
-                        <v-btn color="blue" dark block tile>Log in</v-btn>
-                      </v-col>
-                    </v-row>
+                          :append-inner-icon="
+                            visible ? 'mdi-eye-off' : 'mdi-eye'
+                          "
+                          :type="visible ? 'text' : 'password'"
+                          density="compact"
+                          :placeholder="passwordPlaceholder"
+                          :rules="[(v) => !!v || 'Aquest camp és obligatori']"
+                          prepend-inner-icon="mdi-lock-outline"
+                          variant="outlined"
+                          @click:append-inner="visible = !visible"
+                        ></v-text-field>
+
+                        <v-btn
+                          block
+                          class="mb-8"
+                          color="blue"
+                          size="large"
+                          variant="tonal"
+                          type="submit"
+                        >
+                          Log In
+                        </v-btn>
+
+                        <v-alert v-if="errorMessage" type="error" class="mt-3">
+                          {{ errorMessage }}
+                        </v-alert>
+                      </v-card>
+                    </v-form>
                   </v-card-text>
                 </v-col>
                 <v-col cols="12" md="6" class="blue rounded-bl-xl">
-                  <div style="text-align: center; padding: 180px 0;">
+                  <div style="text-align: center; padding: 180px 0">
                     <v-card-text class="white--text">
                       <h3 class="text-center">Encara no tens un compte?</h3>
                     </v-card-text>
@@ -65,7 +90,7 @@
             <v-window-item :value="2">
               <v-row>
                 <v-col cols="12" md="6" class="blue rounded-br-xl">
-                  <div style="text-align: center; padding: 180px 0;">
+                  <div style="text-align: center; padding: 180px 0">
                     <v-card-text class="white--text">
                       <h3 class="text-center">Ja tens un compte?</h3>
                     </v-card-text>
@@ -76,46 +101,76 @@
                 </v-col>
                 <v-col cols="12" md="6">
                   <v-card-text class="mt-3">
-                    <h4 class="text-center">Creat un compte</h4>
+                    <h4 class="text-center">Crea un cuenta</h4>
                     <v-row align="center" justify="center">
                       <v-col cols="12" sm="8">
                         <v-row>
+                          <!-- Nombre -->
                           <v-col cols="12" sm="6">
+                            <div class="text-subtitle-1 text-medium-emphasis">
+                              Nombre
+                            </div>
                             <v-text-field
-                              label="Nom"
-                              outlined
-                              dense
-                              color="blue"
                               v-model="professor.nom"
+                              density="compact"
+                              :placeholder="'Nom'"
+                              :rules="[
+                                (v) => !!v || 'Aquest camp és obligatori',
+                              ]"
+                              prepend-inner-icon="mdi-account-outline"
+                              variant="outlined"
                               class="mt-4"
                             />
                           </v-col>
                           <v-col cols="12" sm="6">
+                            <div class="text-subtitle-1 text-medium-emphasis">
+                              Apellido
+                            </div>
                             <v-text-field
-                              label="Cognom"
-                              outlined
-                              dense
-                              color="blue"
                               v-model="professor.cognoms"
+                              density="compact"
+                              :placeholder="'Cognom'"
+                              :rules="[
+                                (v) => !!v || 'Aquest camp és obligatori',
+                              ]"
+                              prepend-inner-icon="mdi-account-outline"
+                              variant="outlined"
                               class="mt-4"
                             />
                           </v-col>
                         </v-row>
+
+                        <div class="text-subtitle-1 text-medium-emphasis">
+                          Email
+                        </div>
                         <v-text-field
-                          label="Email"
-                          outlined
-                          dense
-                          color="blue"
                           v-model="professor.email"
+                          density="compact"
+                          :placeholder="'email@example.com'"
+                          :rules="[(v) => !!v || 'Aquest camp és obligatori']"
+                          prepend-inner-icon="mdi-email-outline"
+                          variant="outlined"
+                          class="mt-4"
                         />
+
+                        <div class="text-subtitle-1 text-medium-emphasis">
+                          Contraseña
+                        </div>
                         <v-text-field
-                          label="Contrasenya"
-                          outlined
-                          dense
-                          color="blue"
-                          type="password"
                           v-model="professor.contrassenya"
+                          :append-inner-icon="
+                            visible ? 'mdi-eye-off' : 'mdi-eye'
+                          "
+                          :type="visible ? 'text' : 'password'"
+                          density="compact"
+                          :placeholder="'Insereix contrasenya'"
+                          :rules="[(v) => !!v || 'Aquest camp és obligatori']"
+                          prepend-inner-icon="mdi-lock-outline"
+                          variant="outlined"
+                          class="mt-4"
+                          @click:append-inner="visible = !visible"
                         />
+
                         <v-btn
                           class="mb-5"
                           color="blue"
@@ -141,7 +196,8 @@
 
 <script setup>
 import { ref, reactive } from "vue";
-import { callPostProf } from "@/services/communicationManager";
+import { callPostProf, callGetProf } from "@/services/communicationManager";
+import { useRouter } from "vue-router";
 
 const step = ref(1);
 
@@ -149,11 +205,31 @@ const professor = reactive({
   nom: "",
   cognoms: "",
   email: "",
-  contrassenya: ""
-})
+  contrassenya: "",
+});
+
+const visible = ref(false);
+const errorMessage = ref("");
+const router = useRouter();
+
+const identifierPlaceholder = "email@example.com";
+const passwordPlaceholder = "Ingrese su contraseña";
+
+async function handleLogin() {
+  try {
+    const data = await callGetProf(professor.email, professor.contrasenya);
+    if (data && data.email) {
+      router.push("/home");
+    } else {
+      errorMessage.value = "Correo o contraseña incorrectos.";
+    }
+  } catch (error) {
+    errorMessage.value = "Error al iniciar sesión. Inténtalo más tarde.";
+    console.error("Error al iniciar sesión:", error);
+  }
+}
 
 async function handleRegister() {
-  console.log(professor)
   if (
     !professor.nom ||
     !professor.cognoms ||
@@ -165,15 +241,12 @@ async function handleRegister() {
   }
 
   try {
-    console.log(professor)
     const response = await callPostProf(professor);
     console.log("Profesor registrado exitosamente:", response);
 
-    alert("Registro exitoso!");
     step.value = 1;
   } catch (error) {
     console.error("Error durante el registro:", error);
-    alert("Hubo un error al registrar el usuario.");
   }
 }
 </script>

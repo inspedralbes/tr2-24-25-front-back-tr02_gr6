@@ -101,33 +101,29 @@ app.get("/getClasses", async (req, res) => {
 
 
 app.post("/registreProf", async (req, res) => {
-  console.log('Cuerpo de la solicitud:', req.body); 
-  
-  const { email, contrassenya, nom, cognoms } = req.body;
-
-  if (!email || !contrassenya || !nom || !cognoms) {
-    return res.status(400).send("Datos incompletos");
-  }
-
-  let connection;
-  try {
-    connection = await mysql.createConnection(dbConfig);
-    await connection.execute(
-      "INSERT INTO Tutors (email, contrassenya, nom, cognoms) VALUES (?, ?, ?, ?)",
-      [email, contrassenya, nom, cognoms]
-    );
-    res.status(201).send("Profesor registrado exitosamente");
-  } catch (err) {
-    console.error("Error al registrar tutor:", err);
-    res.status(500).send("Error al registrar tutor");
-  } finally {
-    if (connection) {
-      await connection.end();
+    const { email, contrassenya, nom, cognoms } = req.body;
+    if (!email || !contrassenya || !nom || !cognoms) {
+      return res.status(400).json({ error: "Datos incompletos" }); // Devuelve JSON en caso de error
     }
-  }
-});
-
-
+  
+    let connection;
+    try {
+      connection = await mysql.createConnection(dbConfig);
+      await connection.execute(
+        "INSERT INTO Tutors (email, contrassenya, nom, cognoms) VALUES (?, ?, ?, ?)",
+        [email, contrassenya, nom, cognoms]
+      );
+      res.status(201).json({ message: "Profesor registrado exitosamente" }); // Devuelve JSON al registrar con éxito
+    } catch (err) {
+      console.error("Error al registrar tutor:", err);
+      res.status(500).json({ error: "Error al registrar tutor" }); // Devuelve JSON en caso de error del servidor
+    } finally {
+      if (connection) {
+        await connection.end();
+      }
+    }
+  });
+  
 
 // ------------------------ LOGIN -------------------------
 app.post("/loginAlum", async (req, res) => {
