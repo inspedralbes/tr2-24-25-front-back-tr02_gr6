@@ -40,12 +40,67 @@ async function testDatabaseConnection() {
 }
 testDatabaseConnection();
 
+//-------------------------CLASSES----------------------------
+app.get("/getClasses", async (req,res) => {
+  let connection;
+  try {
+    connection = await mysql.createConnection(dbConfig);
+    const [rows] = await connection.query("SELECT * FROM classes");
+    res.json(rows);
+  } catch (err) {
+    console.error("Error al obtener alumnos:", err);
+    res.status(500).send("Error al obtener datos de alumnos");
+  } finally {
+    if (connection) {
+      await connection.end();
+    }
+  }
+});
+
+app.get("/classes/:course_code", async (req,res) => {
+  let connection;
+  const courseCode = req.params.course_code;
+  try {
+    connection = await mysql.createConnection(dbConfig);
+    const [rows] = await connection.query(`SELECT c.id_classe, c.classe 
+             FROM classes c
+             JOIN courses co ON c.id_course = co.id_course
+             WHERE co.course_code = ?`,
+            [courseCode])
+
+    res.json(rows);
+  } catch (err) {
+    console.error("Error al obtener alumnos:", err);
+    res.status(500).send("Error al obtener datos de alumnos");
+  } finally {
+    if (connection) {
+      await connection.end();
+    }
+  }
+})
+
 // ------------------------ USUARIOS -------------------------
 app.get("/getAlum", async (req, res) => {
   let connection;
   try {
     connection = await mysql.createConnection(dbConfig);
     const [rows] = await connection.query("SELECT * FROM alumnes");
+    res.json(rows);
+  } catch (err) {
+    console.error("Error al obtener alumnos:", err);
+    res.status(500).send("Error al obtener datos de alumnos");
+  } finally {
+    if (connection) {
+      await connection.end();
+    }
+  }
+});
+
+app.get("/getTutor", async (req,res) => {
+  let connection;
+  try {
+    connection = await mysql.createConnection(dbConfig);
+    const [rows] = await connection.query("SELECT * FROM tutors");
     res.json(rows);
   } catch (err) {
     console.error("Error al obtener alumnos:", err);
@@ -178,3 +233,4 @@ app.post("/loginAlum", async (req, res) => {
 server.listen(port, () => {
   console.log(`Server corrents a ${port}`);
 });
+

@@ -64,6 +64,8 @@
 import { ref } from "vue";
 import { callGetProf } from "@/services/communicationManager";
 import { useRouter } from "vue-router";
+import { useUserStore } from '@/stores/userStore';
+const userStore = useUserStore();
 
 // Definir los props (por si quieres personalizar los textos)
 defineProps({
@@ -89,7 +91,8 @@ const handleLogin = async () => {
     const data = await callGetProf(identifier.value, password.value);
 
     if (data && data.email) {
-      router.push("/home");
+            userStore.setEmail(data.email);
+            router.push("/home");
     } else {
       errorMessage.value = "Correo o contraseña incorrectos.";
     }

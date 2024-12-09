@@ -9,7 +9,10 @@
 
 <v-navigation-drawer>
       <v-avatar ma="5"class="mb-4" color="grey-darken-1" size="64"></v-avatar>
-  <v-list-item title="alvaroperez@inspedralbes.cat" subtitle="Profesor"></v-list-item>
+      <v-list-item 
+  :title="userStore.email" 
+  subtitle="Profesor/a">
+</v-list-item>
   <v-divider></v-divider>
   <v-list-item v-for="[icon, text] in links"
           :key="icon"
@@ -23,6 +26,8 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/userStore';
+const userStore = useUserStore();
 
 const links = [
   ['mdi-inbox-arrow-down', '1 ESO'],
@@ -32,7 +37,6 @@ const links = [
   ['mdi-inbox-arrow-down', 'PFI'],
 ]
 
-const drawer = ref(false)
 const router = useRouter() 
 
 const goToCourse = (course) => {

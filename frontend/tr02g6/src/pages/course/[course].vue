@@ -1,4 +1,5 @@
 <template>
+  
     <v-container>
       <h1>Gestió de {{ reformattedCourse }}</h1>
       <v-row>
@@ -9,6 +10,8 @@
           </v-card>
         </v-col>
       </v-row>
+      <br>
+      <br>
       <v-btn color="primary" @click="addClass">Afegir Classe</v-btn>
     </v-container>
   </template>
@@ -19,21 +22,53 @@
   
   const route = useRoute()
   const formattedCourse = ref(route.params.course)
-  const reformattedCourse = formattedCourse.value.toUpperCase().replace('', ' ')
+  const reformattedCourse = formattedCourse.value.toUpperCase().replace('', '  ')
 
   const classes = ref([]) 
   
-  const mockData = {
-    '1eso': [{ id_classe: 1, classe: '1 eso a' }, { id_classe: 2, classe: '1rESOB' }],
-    '2eso': [{ id_classe: 3, classe: '2nESOA' }, { id_classe: 4, classe: '2nESOB' }],
-    '3eso': [{ id_classe: 5, classe: '3rESOA' }, { id_classe: 6, classe: '3rESOB' }],
-    '4eso': [{ id_classe: 7, classe: '4tESOA' }, { id_classe: 8, classe: '4tESOB' }],
-    'pfi': [{ id_classe: 9, classe: 'PFIA' }, { id_classe: 10, classe: 'PFIB' }],
-  }
-  
-  onMounted(() => {
-    classes.value = mockData[formattedCourse.value] 
-  })
+   const fetchClasses = async () => {
+    try {
+      console.log(formattedCourse.value)
+      const response = await fetch(`http://localhost:3001/classes/${formattedCourse.value}`)
+      if (!response.ok) throw new Error('Error al obtener datos');
+        classes.value = await response.json();
+    } catch (error) {
+        console.error('Error al realizar la solicitud:', error);
+    }
+  };
+
+    const afegirClasse = async () => {
+    const classeData = {
+        id_classe: this.preguntes.length, 
+        classe: this.nuevaPregunta,
+        id_course: this.nuevasRespostes,
+      };
+
+      try {
+        const response = await fetch(`http://localhost:3001/classes/${formattedCourse.value}`,{
+        method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(classeData),
+        });
+
+        if (response.ok) {
+          const preguntaAgregada = await response.json();
+          this.preguntes.push(preguntaAgregada); // Agregar a la lista
+          this.limpiarFormulario();
+        } else {
+          console.error('Error al afegir');
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+
+
+  onMounted(fetchClasses)
+
   const generateRandomId = () => {
   return Math.random().toString(36).substring(2, 11)
 }
@@ -45,5 +80,5 @@ const addClass = () => {
     classes.value.push({ id_classe: newId, classe: newClass }) 
   }
 }
-  </script>
-  
+
+</script>
