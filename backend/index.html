@@ -1,0 +1,99 @@
+<!---  HTML per debugar que els sockets i processos funcionin  ---->
+
+<!DOCTYPE html>
+<html lang="ca">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Serveis</title>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+
+<body>
+    <h1>Control de Serveis</h1>
+    <label for="contrassenya">Contrassenya:</label>
+    <input type="password" id="contrassenya" placeholder="Introdueix la contrassenya" />
+    <button id="processosBtn">Obtenir Processos</button>
+    <h2>Respostes del servidor:</h2>
+    <textarea id="resposta" rows="10" cols="50" readonly></textarea>
+    <div id="processosContainer"></div>
+
+    <script>
+        const socket = io(); // Conexión a Socket.io
+
+        // Función para obtenir la contrassenya del camp d'entrada
+        function obtenirContrassenya() {
+            return document.getElementById('contrassenya').value;
+        }
+
+        // Botó per obtenir l'estat dels processos
+        document.getElementById('processosBtn').addEventListener('click', () => {
+            const contrassenya = obtenirContrassenya();
+            fetch(`/processos?contrassenya=${contrassenya}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Error en l’autenticació');
+                    return response.json();
+                })
+                .then(data => {
+                    mostrarProcessos(data); // Cridar a la funció per mostrar processos
+                })
+                .catch(error => {
+                    document.getElementById('resposta').value = 'Error al obtenir processos: ' + error.message;
+                    console.error('Error:', error);
+                });
+        });
+
+        // Funció per mostrar processos amb botons d'aturar i encendre
+        function mostrarProcessos(processos) {
+            const container = document.getElementById('processosContainer');
+            container.innerHTML = ''; // Netejar contingut anterior
+
+            for (const [nom, info] of Object.entries(processos)) {
+                const div = document.createElement('div');
+                div.innerHTML = `<strong>${info.nom}</strong> - Actiu: ${info.actiu}`;
+
+                const buttonEncendre = document.createElement('button');
+                buttonEncendre.innerText = 'Encendre';
+                buttonEncendre.onclick = () => {
+                    socket.emit('encendre', obtenirContrassenya(), nom);
+                };
+
+                const buttonAturar = document.createElement('button');
+                buttonAturar.innerText = 'Parar';
+                buttonAturar.onclick = () => {
+                    socket.emit('parar', obtenirContrassenya(), nom);
+                };
+
+                if (info.actiu) {
+                    div.appendChild(buttonAturar);
+                } else {
+                    div.appendChild(buttonEncendre);
+                }
+
+                container.appendChild(div);
+            }
+        }
+
+        // Maneig de resposta del socket
+        socket.on('resposta', (missatge) => {
+            document.getElementById('resposta').value += `${missatge}\n`; // Afegir missatge al textarea
+
+            // Actualitzar l'estat dels processos després d'una acció
+            const contrassenya = obtenirContrassenya();
+            fetch(`/processos?contrassenya=${contrassenya}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Error en l’autenticació');
+                    return response.json();
+                })
+                .then(data => {
+                    mostrarProcessos(data); // Refrescar els processos
+                })
+                .catch(error => {
+                    console.error('Error al actualitzar processos:', error);
+                });
+        });
+    </script>
+</body>
+
+</html>
