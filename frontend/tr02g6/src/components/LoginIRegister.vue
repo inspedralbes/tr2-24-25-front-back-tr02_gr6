@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-row align="center" justify="center">
+    <v-row justify-align="center" >
       <v-col cols="12" sm="10">
         <v-card class="elevation-6 mt-10">
           <v-window v-model="step">
@@ -38,7 +38,7 @@
                         <div
                           class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between"
                         >
-                          Contraseña
+                          Contrasenya
                         </div>
 
                         <v-text-field
@@ -101,14 +101,15 @@
                 </v-col>
                 <v-col cols="12" md="6">
                   <v-card-text class="mt-3">
-                    <h4 class="text-center">Crea un cuenta</h4>
-                    <v-row align="center" justify="center">
+                    <h4 class="text-center">Crea un compte</h4>
+                    <v-spacer class="ma-7"></v-spacer>
+                    <v-row justify-align="center">
                       <v-col cols="12" sm="8">
                         <v-row>
                           <!-- Nombre -->
                           <v-col cols="12" sm="6">
                             <div class="text-subtitle-1 text-medium-emphasis">
-                              Nombre
+                              Nom
                             </div>
                             <v-text-field
                               v-model="professor.nom"
@@ -124,7 +125,7 @@
                           </v-col>
                           <v-col cols="12" sm="6">
                             <div class="text-subtitle-1 text-medium-emphasis">
-                              Apellido
+                              Cognom
                             </div>
                             <v-text-field
                               v-model="professor.cognoms"
@@ -154,7 +155,7 @@
                         />
 
                         <div class="text-subtitle-1 text-medium-emphasis">
-                          Contraseña
+                          Contrasenya
                         </div>
                         <v-text-field
                           v-model="professor.contrassenya"
@@ -213,7 +214,7 @@ const errorMessage = ref("");
 const router = useRouter();
 
 const identifierPlaceholder = "email@example.com";
-const passwordPlaceholder = "Ingrese su contraseña";
+const passwordPlaceholder = "Insereix contrasenya";
 
 async function handleLogin() {
   try {
@@ -221,11 +222,11 @@ async function handleLogin() {
     if (data && data.email) {
       router.push("/home");
     } else {
-      errorMessage.value = "Correo o contraseña incorrectos.";
+      errorMessage.value = "Email o contrasenya incorrectes.";
     }
   } catch (error) {
-    errorMessage.value = "Error al iniciar sesión. Inténtalo más tarde.";
-    console.error("Error al iniciar sesión:", error);
+    errorMessage.value = "Error al iniciar sessió. Si us plau, torna a intentar-ho.";
+    console.error("Error al iniciar sessió:", error);
   }
 }
 
@@ -236,17 +237,17 @@ async function handleRegister() {
     !professor.email ||
     !professor.contrassenya
   ) {
-    alert("Por favor, completa todos los campos.");
+    alert("Si us plau, omple tos els camps.");
     return;
   }
 
   try {
     const response = await callPostProf(professor);
-    console.log("Profesor registrado exitosamente:", response);
+    console.log("Professor registrat correctament:", response);
 
     step.value = 1;
   } catch (error) {
-    console.error("Error durante el registro:", error);
+    console.error("Error durant el registre:", error);
   }
 }
 </script>
