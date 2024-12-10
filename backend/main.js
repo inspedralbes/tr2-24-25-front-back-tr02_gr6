@@ -1,11 +1,13 @@
 const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
-const port = 22555;
 const http = require('http')
 const { fork } = require('child_process');
 const contrassenya = "hola";
 const { Server } = require('socket.io');
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, './.env')});
+const port = process.env.PORT_MAIN;
 
 const app = express();
 app.use(cors());
