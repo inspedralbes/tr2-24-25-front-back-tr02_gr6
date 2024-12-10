@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const mysql = require('mysql2');
 const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '../../.env')});
+require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 const port = process.env.PORT_BBDD;
 
 const app = express();
@@ -33,12 +33,12 @@ app.get("/auth", (req, res) => {
     contrassenyaEnviada = req.query.contrassenya
     for (const tutor of tutorsContrassenya) {
         if (tutor.contrassenya == contrassenyaEnviada && tutor.email == correuEnviat) {
-            return res.json({ resposta: "profeAutenticat" })
+            return res.json({ resposta: "profeAutenticat", email: tutor.email })
         }
     };
     for (const alumne of alumnesContrassenya) {
         if (alumne.contrassenya == contrassenyaEnviada && alumne.email == correuEnviat) {
-            return res.json({ resposta: "alumneAutenticat" })
+            return res.json({ resposta: "alumneAutenticat", email: alumne.email })
         }
     };
     return res.json({ resposta: "noAutenticat" })
@@ -89,6 +89,63 @@ app.post("/classe", (req, res) => {
             connection.release();
         });
     });
+});
+
+app.post("/registre", (req, res) => {
+    const nouUser = {
+        email: req.query.email,
+        nom: req.query.nom,
+        cognoms: req.query.cognoms,
+        contrassenya: req.query.contrassenya
+    };
+
+    if (esProfe(nouUser.email)){
+        pool.getConnection((err, connection) => {
+            if (err) {
+                console.error('Error getting connection from pool:', err);
+                res.status(500).send("Error al obtenir connexió");
+                return;
+            }
+    
+            const query = `INSERT INTO Tutors (email, contrassenya, nom, cognoms) VALUES (?, ?, ?, ?)`;
+    
+    
+            connection.query(query, [nouUser.email, nouUser.contrassenya, nouUser.nom, nouUser.cognoms], (err, results) => {
+                if (err) {
+                    console.error('Error:', err);
+                    res.status(500).json({ error: "Error en crear el professor" });
+                } else {
+                    getTutors(connection);
+                    res.json({ missatge: "Tutor afegit" });
+                    console.log(`Tutor: ${nouUser.nom} afegit correctament!`)
+                }
+                connection.release();
+            });
+        });
+    } else {
+        pool.getConnection((err, connection) => {
+            if (err) {
+                console.error('Error getting connection from pool:', err);
+                res.status(500).send("Error al obtenir connexió");
+                return;
+            }
+    
+            const query = `INSERT INTO Alumnes (email, contrassenya, nom, cognoms) VALUES (?, ?, ?, ?)`;
+    
+    
+            connection.query(query, [nouUser.email, nouUser.contrassenya, nouUser.nom, nouUser.cognoms], (err, results) => {
+                if (err) {
+                    console.error('Error:', err);
+                    res.status(500).json({ error: "Error en crear l'alumne" });
+                } else {
+                    getTutors(connection);
+                    res.json({ missatge: "Alumne afegit" });
+                    console.log(`Alumne: ${nouUser.nom} afegit correctament!`)
+                }
+                connection.release();
+            });
+        });
+    }
 });
 
 app.delete("/classe", (req, res) => {
@@ -214,6 +271,11 @@ function generarCodiAleatori() {
         codi += lletres[indexAleatori];
     }
     return codi;
+}
+
+function esProfe(email) {
+    const teNumeros = /\d/;
+    return !teNumeros.test(email);
 }
 
 

@@ -1,4 +1,5 @@
 const URL = import.meta.env.VITE_API_ROUTE;
+const URL_AUTH = import.meta.env.VITE_API_ROUTE_AUTH;
 
 
   export async function callPostProf(profesor) {
@@ -10,7 +11,7 @@ const URL = import.meta.env.VITE_API_ROUTE;
     // formProfesor.append('email', profesor.email);
     // formProfesor.append('contrassenya', profesor.contrassenya);
    
-    const response = await fetch(`${URL}/registreProf`, {
+    const response = await fetch(`${URL}/registre`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -32,7 +33,7 @@ const URL = import.meta.env.VITE_API_ROUTE;
 
   export async function callGetClasses() {
     try {
-      const response = await fetch(`${URL}/getClasses`, {
+      const response = await fetch(`${URL}/classes`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -55,7 +56,7 @@ const URL = import.meta.env.VITE_API_ROUTE;
   
   export async function callGetProf(email,password) {
     try {
-      const response = await fetch(`${URL}/getProf?email=${email}&password=${password}`);
+      const response = await fetch(`${URL_AUTH}/auth?email=${email}&contrassenya=${password}`);
       if (!response.ok) {
         throw new Error(`Error en la solicitud: ${response.status}`);
       }

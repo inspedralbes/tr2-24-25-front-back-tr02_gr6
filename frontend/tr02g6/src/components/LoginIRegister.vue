@@ -125,12 +125,12 @@
                           </v-col>
                           <v-col cols="12" sm="6">
                             <div class="text-subtitle-1 text-medium-emphasis">
-                              Cognom
+                              Cognoms
                             </div>
                             <v-text-field
                               v-model="professor.cognoms"
                               density="compact"
-                              :placeholder="'Cognom'"
+                              :placeholder="'Cognoms'"
                               :rules="[
                                 (v) => !!v || 'Aquest camp és obligatori',
                               ]"
@@ -242,7 +242,9 @@ async function handleRegister() {
   }
 
   try {
+    console.log(professor)
     const response = await callPostProf(professor);
+    console.log(professor)
     console.log("Professor registrat correctament:", response);
 
     step.value = 1;
