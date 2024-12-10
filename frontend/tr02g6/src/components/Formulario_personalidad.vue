@@ -2,11 +2,12 @@
 <script setup>
 import { ref, watch } from 'vue'
 const requiredRule = [
-  v => !!v || 'Este campo es obligatorio',
+  usuario => !!usuario || 'Este campo es obligatorio',
 
 ];
 const correos = ref(['correo1', 'correo2', 'correo3', 'correo4', 'correo'])
 const nombre = ref(['Luis', 'Pedro', 'Pablo', 'Pablow', 'Pablo3'])
+const usuario = ref();
 const cae_bien = ref([]);
 const cae_no_bien = ref([]);
 const difunde_rumores = ref([]);
@@ -19,6 +20,8 @@ const victima_empujones = ref([]);
 const victima_insultar = ref([]);
 const victima_no_deja_participar = ref([]);
 const amigos = ref([]);
+const terminosycondiciones = ref(false);
+const dialog = ref(false);
 const limitSelections = (selectedItems) => {
   if (selectedItems.length > 3) {
     selectedItems.shift();
@@ -49,8 +52,15 @@ function validarform() {
   if (!valido) {
     alert("Todos los campos deben tener exactamente 3 selecciones.");
   }
+  else if (usuario.value == null) {
+    alert('Debe seleccionar un correo.');
+  }
+  else if (!terminosycondiciones.value) {
+    alert('Debe aceptar los terminos y condiciones.');
+  }
  else{
   const formData = {
+    usuario: usuario.value,
     cae_bien: cae_bien.value,
     cae_no_bien: cae_no_bien.value,
     difunde_rumores: difunde_rumores.value,
@@ -65,17 +75,20 @@ function validarform() {
     amigos: amigos.value,
   };
   console.log("Formulario enviado con éxito:", formData);
+  dialog.value = true;
 }
 };
 
 </script>
 
-<template>
-  <v-card elevation="16">
+<template id="cuerpo">
+  <div id="formulario">
     <v-card-title>CESC- Conducta y Experiencias Sociales en Clase (ESO)</v-card-title>
     <v-select
+      v-model="usuario"
       label="Correo"
       :rules="requiredRule"
+      :items="correos"
     />
     <v-card-text>Es obligatorio seleccionar tres opciones en cada pregunta</v-card-text>
     <div id="preguntasTest">
@@ -101,7 +114,7 @@ function validarform() {
 
       <v-select
         v-model="cae_no_bien"
-        :items="correos"
+        :items="nombre"
         label="¿Quién NO me cae bien?"
         :rules="requiredRule"
         :multiple="true"
@@ -121,6 +134,7 @@ function validarform() {
 
       <v-select
         v-model="difunde_rumores"
+        :items="nombre"
         label="¿Quién difunde rumores?"
         :rules="requiredRule"
         :multiple="true"
@@ -140,6 +154,7 @@ function validarform() {
 
       <v-select
         v-model="ayuda_demás"
+        :items="nombre"
         label="¿Quien ayuda a los demás?"
         :rules="requiredRule"
         :multiple="true"
@@ -159,6 +174,7 @@ function validarform() {
 
       <v-select
         v-model="da_empujones"
+        :items="nombre"
         label="¿Quien da empujones?"
         :rules="requiredRule"
         :multiple="true"
@@ -178,25 +194,27 @@ function validarform() {
 
       <v-select
         v-model="no_deja_participar"
+        :items="nombre"
         label="¿Quien no deja participar?"
         :rules="requiredRule"
         :multiple="true"
       />
       <v-text-field
         disabled
-        :label="da_empujones[0]"
+        :label="no_deja_participar[0]"
       />
       <v-text-field
         disabled
-        :label="da_empujones[1]"
+        :label="no_deja_participar[1]"
       />
       <v-text-field
         disabled
-        :label="da_empujones[2]"
+        :label="no_deja_participar[2]"
       />
 
       <v-select
         v-model="anima_demas"
+        :items="nombre"
         label="¿Quien anima a los demás?"
         :rules="requiredRule"
         :multiple="true"
@@ -216,6 +234,7 @@ function validarform() {
 
       <v-select
         v-model="insulta"
+        :items="nombre"
         label="¿Quien insulta?"
         :rules="requiredRule"
         :multiple="true"
@@ -235,6 +254,7 @@ function validarform() {
 
       <v-select
         v-model="victima_empujones"
+        :items="nombre"
         label="¿A quién dan empujones?"
         :rules="requiredRule"
         :multiple="true"
@@ -254,6 +274,7 @@ function validarform() {
 
       <v-select
         v-model="victima_insultar"
+        :items="nombre"
         label="¿A quién insultan o ridiculizan?"
         :rules="requiredRule"
         :multiple="true"
@@ -273,6 +294,7 @@ function validarform() {
 
       <v-select
         v-model="victima_no_deja_participar"
+        :items="nombre"
         label="¿A quién no dejan participar?"
         :rules="requiredRule"
         :multiple="true"
@@ -292,6 +314,7 @@ function validarform() {
 
       <v-select
         v-model="amigos"
+        :items="nombre"
         label="¿Quienes son mis amigos/amigas?"
         :rules="requiredRule"
         :multiple="true"
@@ -309,30 +332,54 @@ function validarform() {
         :label="amigos[2]"
       />
     </div>
+    <v-checkbox
+      v-model="terminosycondiciones"
+      label="He leído y acepto los términos y condiciones."
+    />
     <v-btn
       type="submit"
       @click="validarform"
     >
       Enviar
     </v-btn>
-  </v-card>
+    <v-dialog
+      v-model="dialog"
+      width="auto"
+    >
+      <v-card
+        id="mensajeagradecimiento"
+        max-width="400"
+        text="Los datos introducidos son completamente privados."
+        title="¡Gracias por participar!"
+      >
+        <template v-slot:actions>
+          <v-btn
+            text="Vale"
+            @click="dialog = false"
+          ></v-btn>
+        </template>
+      </v-card>
+    </v-dialog>
+  </div>
 </template>
 
 <style scoped>
-.v-card {
-  margin: 20px;
+#formulario {
+  background: linear-gradient(rgb(255, 254, 205), rgb(187, 252, 255), rgb(246, 219, 255));
 }
-
 #preguntasTest {
   display: grid;
   grid-template-columns: 1.5fr 1fr 1fr 1fr;
 }
 
-#preguntasTest>* {
+#preguntasTest >* {
   margin: 5px;
 }
 
-.v-card>* {
+#formulario > * {
   margin: 5px
+}
+#mensajeagradecimiento {
+  background-image: url("https://i.pinimg.com/736x/89/94/46/8994461746191a7480ceea961a045852.jpg");
 }
 </style>
