@@ -1,5 +1,5 @@
 <template>
-  <LoginIRegister />
+  <Formulario_personalidad />
 </template>
 
 <script setup>
