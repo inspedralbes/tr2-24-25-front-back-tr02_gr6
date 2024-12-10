@@ -33,12 +33,12 @@ app.get("/auth", (req, res) => {
     contrassenyaEnviada = req.query.contrassenya
     for (const tutor of tutorsContrassenya) {
         if (tutor.contrassenya == contrassenyaEnviada && tutor.email == correuEnviat) {
-            return res.json({ resposta: "profeAutenticat", email: tutor.email })
+            return res.json({ resposta: "profeAutenticat"})
         }
     };
     for (const alumne of alumnesContrassenya) {
         if (alumne.contrassenya == contrassenyaEnviada && alumne.email == correuEnviat) {
-            return res.json({ resposta: "alumneAutenticat", email: alumne.email })
+            return res.json({ resposta: "alumneAutenticat"})
         }
     };
     return res.json({ resposta: "noAutenticat" })

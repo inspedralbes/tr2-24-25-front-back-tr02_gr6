@@ -24,12 +24,12 @@ app.get("/auth", async (req, res) => {
     if (auth.resposta == "profeAutenticat") {
         sessionId = uuidv4();
         sessionsProfeAutenticades.push(sessionId);
-        return res.json({sessionId, email: auth.email});
+        return res.json({sessionId});
     }
     if (auth.resposta == "alumneAutenticat") {
         sessionId = uuidv4();
         sessionsAlumneAutenticades.push(sessionId);
-        return res.json({sessionId: sessionId, email: auth.email});
+        return res.json({sessionId});
     }
     if (auth.resposta == "noAutenticat") {
         return res.json({Error: "No Autenticat"});

@@ -219,7 +219,7 @@ const passwordPlaceholder = "Insereix contrasenya";
 async function handleLogin() {
   try {
     const data = await callGetProf(professor.email, professor.contrasenya);
-    if (data && data.email) {
+    if (data && data.sessionId) {
       router.push("/home");
     } else {
       errorMessage.value = "Email o contrasenya incorrectes.";
