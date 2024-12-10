@@ -1,12 +1,13 @@
 const express = require('express');
 const cors = require('cors');
-const port = 22557;
 const fetch = globalThis.fetch;
 const { v4: uuidv4 } = require('uuid');
 module.exports = { isAuthProfe, isAuthAlumne};
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env')});
 const URL = process.env.URL;
+const port = process.env.PORT_AUTH;
+const portBBDD = process.env.PORT_BBDD;
 
 let sessionsProfeAutenticades = []
 let sessionsAlumneAutenticades = []
@@ -37,7 +38,7 @@ app.get("/auth", async (req, res) => {
 
 async function getSQL(endpoint, params = {}) {
     const queryParams = new URLSearchParams(params).toString();
-    const url = queryParams ? `${URL}:26666/${endpoint}?${queryParams}` : `${URL}:26666/${endpoint}`;
+    const url = queryParams ? `${URL}:${portBBDD}/${endpoint}?${queryParams}` : `${URL}:${portBBDD}/${endpoint}`;
 
     const resposta = await fetch(url, {
         method: 'GET',

@@ -1,12 +1,13 @@
 const express = require('express');
 const cors = require('cors');
-const port = 22556;
 const fetch = globalThis.fetch;
 const { isAuthProfe } = require('../autenticacio/index');
 const { isAuthAlumne } = require('../autenticacio/index');
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env')});
 const URL = process.env.URL;
+const port = process.env.PORT_ENDPOINTS;
+const portBBDD = process.env.PORT_BBDD;
 
 const app = express();
 app.use(cors());
@@ -104,7 +105,7 @@ app.put("/classes", async (req, res) => {
 
 async function getSQL(endpoint, params = {}) {
     const queryParams = new URLSearchParams(params).toString();
-    const url = queryParams ? `${URL}:26666/${endpoint}?${queryParams}` : `${URL}:26666/${endpoint}`;
+    const url = queryParams ? `${URL}:${portBBDD}/${endpoint}?${queryParams}` : `${URL}:${portBBDD}/${endpoint}`;
 
     const resposta = await fetch(url, {
         method: 'GET',
@@ -118,7 +119,7 @@ async function getSQL(endpoint, params = {}) {
 
 async function postSQL(endpoint, params = {}) {
     const queryParams = new URLSearchParams(params).toString();
-    const url = queryParams ? `${URL}:26666/${endpoint}?${queryParams}` : `${URL}:26666/${endpoint}`;
+    const url = queryParams ? `${URL}:${portBBDD}/${endpoint}?${queryParams}` : `${URL}:${portBBDD}/${endpoint}`;
 
     const resposta = await fetch(url, {
         method: 'POST',
@@ -131,7 +132,7 @@ async function postSQL(endpoint, params = {}) {
 
 async function deleteSQL(endpoint, params = {}) {
     const queryParams = new URLSearchParams(params).toString();
-    const url = queryParams ? `${URL}:26666/${endpoint}?${queryParams}` : `${URL}:26666/${endpoint}`;
+    const url = queryParams ? `${URL}:${portBBDD}/${endpoint}?${queryParams}` : `${URL}:${portBBDD}/${endpoint}`;
 
     const resposta = await fetch(url, {
         method: 'DELETE',
@@ -145,7 +146,7 @@ async function deleteSQL(endpoint, params = {}) {
 
 async function putSQL(endpoint, params = {}) {
     const queryParams = new URLSearchParams(params).toString();
-    const url = queryParams ? `${URL}:26666/${endpoint}?${queryParams}` : `${URL}:26666/${endpoint}`;
+    const url = queryParams ? `${URL}:${portBBDD}/${endpoint}?${queryParams}` : `${URL}:${portBBDD}/${endpoint}`;
 
     const resposta = await fetch(url, {
         method: 'PUT',

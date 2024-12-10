@@ -1,9 +1,9 @@
 const express = require('express');
 const cors = require('cors');
-const port = 26666;
 const mysql = require('mysql2');
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env')});
+const port = process.env.PORT_BBDD;
 
 const app = express();
 app.use(cors());
