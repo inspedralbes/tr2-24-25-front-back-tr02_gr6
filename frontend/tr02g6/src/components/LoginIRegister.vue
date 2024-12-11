@@ -199,6 +199,7 @@
 import { ref, reactive } from "vue";
 import { callPostProf, callGetProf } from "@/services/communicationManager";
 import { useRouter } from "vue-router";
+import { el } from "vuetify/locale";
 
 const step = ref(1);
 
@@ -242,12 +243,13 @@ async function handleRegister() {
   }
 
   try {
-    console.log(professor)
     const response = await callPostProf(professor);
-    console.log(professor)
-    console.log("Professor registrat correctament:", response);
-
-    step.value = 1;
+    if (response.error == "Usat."){
+      alert("Correu en ús.");
+    } else {
+      console.log("Usuari registrat correctament:", response);
+      step.value = 1; 
+    }
   } catch (error) {
     console.error("Error durant el registre:", error);
   }

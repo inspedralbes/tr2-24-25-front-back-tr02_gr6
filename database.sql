@@ -22,7 +22,8 @@ CREATE TABLE Tutors (
 
 -- Els camps seran null fins que s'emplenin els qüestionaris
 CREATE TABLE Alumnes (
-    email VARCHAR(50) PRIMARY KEY NOT NULL,
+    id_alumne INT NOT NULL AUTO_INCREMENT,
+    email VARCHAR(50) NOT NULL,
     contrassenya VARCHAR(20) NOT NULL,
     nom VARCHAR(50),
     cognoms VARCHAR(50),
@@ -40,6 +41,7 @@ CREATE TABLE Alumnes (
     esAillat INT,
     esAmic INT,
     questionari JSON,
+    PRIMARY KEY (id_alumne),
     FOREIGN KEY (id_classe) REFERENCES Classes (id_classe)
 );
 

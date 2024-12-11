@@ -107,15 +107,11 @@ app.put("/classes", async (req, res) => {
 app.post("/registre", async (req, res) => {
     try {
         const { email, contrassenya, nom, cognoms } = req.body;
-        console.log(email);
-        console.log(nom);
-        console.log(cognoms);
-        console.log(contrassenya);
         if (!nom || !email || !cognoms || !contrassenya) {
             return res.status(400).send("Falten paràmetres");
         }
-        const classes = await postSQL("registre", { email, nom, cognoms, contrassenya });
-        res.json(classes)
+        const missatge = await postSQL("registre", { email, nom, cognoms, contrassenya });
+        res.send(missatge)
     } catch(error){
         console.log("Error /registre: " + error);
         return res.status(500).send("Falten paràmetres");
