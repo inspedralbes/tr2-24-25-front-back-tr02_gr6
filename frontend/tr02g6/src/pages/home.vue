@@ -40,7 +40,7 @@ const links = [
 const router = useRouter() 
 
 const goToCourse = (course) => {
-  const formattedCourse = course.toLowerCase().replace(' ', '')
+  const formattedCourse = course.toUpperCase().replace(' ', '')
   router.push(`/course/${formattedCourse}`) 
 }
 </script>
