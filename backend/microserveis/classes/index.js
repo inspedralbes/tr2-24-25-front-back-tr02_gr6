@@ -18,6 +18,8 @@ const dbConfig = {
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
 };
+let sessionsProfeAutenticades = []
+let sessionsAlumneAutenticades = []
 
 app.get("/classes", async (req, res) => {
   const sessionId = req.query.sessionId;
@@ -108,6 +110,9 @@ process.on("message", (message) => {
     app.listen(port, () => {
       console.log(`Microservei Classes corrent al port ${port}`);
     });
+    sessionsProfeAutenticades.push("root");
+    sessionsAlumneAutenticades.push("root");
+
   }
   if (message.action === "stop") {
     process.send("exit");

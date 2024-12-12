@@ -200,6 +200,8 @@ import { ref, reactive } from "vue";
 import { callPostProf, callGetProf } from "@/services/communicationManager";
 import { useRouter } from "vue-router";
 import { el } from "vuetify/locale";
+import { useAuthStore } from '@/stores/authStore';
+const authStore = useAuthStore();
 
 const step = ref(1);
 
@@ -221,6 +223,7 @@ async function handleLogin() {
   try {
     const data = await callGetProf(professor.email, professor.contrasenya);
     if (data && data.sessionId) {
+      authStore.setSessionId(data.sessionId); 
       router.push("/home");
     } else {
       errorMessage.value = "Email o contrasenya incorrectes.";

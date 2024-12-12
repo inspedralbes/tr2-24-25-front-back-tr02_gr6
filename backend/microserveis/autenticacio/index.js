@@ -51,6 +51,9 @@ async function getSQL(endpoint, params = {}) {
 }
 
 function isAuthProfe(sessionId) {
+    console.log("Sesiones activas de profesores:", sessionsProfeAutenticades); 
+    console.log("Session ID recibido:", sessionId);
+
     for (const sessio of sessionsProfeAutenticades) {
         if (sessio == sessionId) {
             return true;

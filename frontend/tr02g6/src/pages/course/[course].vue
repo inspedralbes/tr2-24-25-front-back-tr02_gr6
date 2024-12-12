@@ -18,6 +18,7 @@
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 const URL = import.meta.env.VITE_API_ROUTE_CLASS;
+import { useAuthStore } from '@/stores/authStore';
 
 const route = useRoute();
 const formattedCourse = ref(route.params.course);
@@ -38,10 +39,11 @@ if (match) {
 const classes = ref([]);
 
 const fetchClasses = async () => {
+  const authStore = useAuthStore();
   try {
     console.log("Fetching classes for course:", formattedCourse.value);
     const response = await fetch(
-      `${URL}/classes/${formattedCourse.value}`
+      `${URL}/classes/${formattedCourse.value}?sessionId=${authStore.sessionId}`
     );
     if (!response.ok) {
       const errorText = await response.text();
