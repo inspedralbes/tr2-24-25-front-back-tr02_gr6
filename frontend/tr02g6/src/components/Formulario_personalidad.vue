@@ -1,6 +1,7 @@
 <!-- eslint-disable no-undef -->
 <script setup>
-import { ref, watch } from 'vue'
+import { getAlumnes } from '@/services/communicationManager';
+import { onMounted, ref, watch } from 'vue'
 const requiredRule = [
   correo => !!correo || 'Este campo es obligatorio',
 
@@ -80,16 +81,23 @@ listaarrays.forEach((array) => {
 }
 };*/
 
-async function fecthGetCorreos() {
+async function fecthGetAlumnos() {
   try {
-    correos.value = await getcorreos();
+    const llista_alumnes = await getAlumnes();
+    correos.value = llista_alumnes.email;
+    alumnos.value = llista_alumnes.nom;
+    console.log(llista_alumnes);
   }
   catch (error) {
     console.error('Error al obtener correos', error);
   }
 }
 
-async function fecthGetAlumnos() {
+onMounted(()=> {
+  fecthGetAlumnos();
+});
+
+/*async function fecthGetAlumnos() {
   try {
     alumnos.value = await getAlumnos();
   }
@@ -146,7 +154,7 @@ async function fetchPostResultats() {
   catch (error) {
     console.error('Hubo problemas al enviar los resultados.', error);
   }
-  }
+  }*/
 </script>
 
 <template id="cuerpo">
@@ -156,14 +164,14 @@ async function fetchPostResultats() {
       v-model="correo"
       label="Correo"
       :rules="requiredRule"
-      :items="fecthGetCorreos"
+      :items="correos"
     />
     <v-card-text>Es obligatorio seleccionar tres opciones en cada pregunta</v-card-text>
     <div id="preguntasTest">
       <v-select
         v-model="cae_bien"
         label="¿Quién me cae bien?"
-        :items="fecthGetAlumnos"
+        :items="alumnos"
         :rules="requiredRule"
         :multiple="true"
       />
@@ -182,7 +190,7 @@ async function fetchPostResultats() {
 
       <v-select
         v-model="cae_no_bien"
-        :items="fecthGetAlumnos"
+        :items="alumnos"
         label="¿Quién NO me cae bien?"
         :rules="requiredRule"
         :multiple="true"
@@ -202,7 +210,7 @@ async function fetchPostResultats() {
 
       <v-select
         v-model="difunde_rumores"
-        :items="fecthGetAlumnos"
+        :items="alumnos"
         label="¿Quién difunde rumores?"
         :rules="requiredRule"
         :multiple="true"
@@ -222,7 +230,7 @@ async function fetchPostResultats() {
 
       <v-select
         v-model="ayuda_demás"
-        :items="fecthGetAlumnos"
+        :items="alumnos"
         label="¿Quien ayuda a los demás?"
         :rules="requiredRule"
         :multiple="true"
@@ -242,7 +250,7 @@ async function fetchPostResultats() {
 
       <v-select
         v-model="da_empujones"
-        :items="fecthGetAlumnos"
+        :items="alumnos"
         label="¿Quien da empujones?"
         :rules="requiredRule"
         :multiple="true"
@@ -262,7 +270,7 @@ async function fetchPostResultats() {
 
       <v-select
         v-model="no_deja_participar"
-        :items="fecthGetAlumnos"
+        :items="alumnos"
         label="¿Quien no deja participar?"
         :rules="requiredRule"
         :multiple="true"
@@ -282,7 +290,7 @@ async function fetchPostResultats() {
 
       <v-select
         v-model="anima_demas"
-        :items="fecthGetAlumnos"
+        :items="alumnos"
         label="¿Quien anima a los demás?"
         :rules="requiredRule"
         :multiple="true"
@@ -302,7 +310,7 @@ async function fetchPostResultats() {
 
       <v-select
         v-model="insulta"
-        :items="fecthGetAlumnos"
+        :items="alumnos"
         label="¿Quien insulta?"
         :rules="requiredRule"
         :multiple="true"
@@ -322,7 +330,7 @@ async function fetchPostResultats() {
 
       <v-select
         v-model="victima_empujones"
-        :items="fecthGetAlumnos"
+        :items="alumnos"
         label="¿A quién dan empujones?"
         :rules="requiredRule"
         :multiple="true"
@@ -342,7 +350,7 @@ async function fetchPostResultats() {
 
       <v-select
         v-model="victima_insultar"
-        :items="fecthGetAlumnos"
+        :items="alumnos"
         label="¿A quién insultan o ridiculizan?"
         :rules="requiredRule"
         :multiple="true"
@@ -362,7 +370,7 @@ async function fetchPostResultats() {
 
       <v-select
         v-model="victima_no_deja_participar"
-        :items="fecthGetAlumnos"
+        :items="alumnos"
         label="¿A quién no dejan participar?"
         :rules="requiredRule"
         :multiple="true"
@@ -382,7 +390,7 @@ async function fetchPostResultats() {
 
       <v-select
         v-model="amigos"
-        :items="fecthGetAlumnos"
+        :items="alumnos"
         label="¿Quienes son mis amigos/amigas?"
         :rules="requiredRule"
         :multiple="true"
