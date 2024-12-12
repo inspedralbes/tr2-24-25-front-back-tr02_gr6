@@ -15,15 +15,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { useRoute } from "vue-router";
-const URL = import.meta.env.VITE_API_ROUTE_CLASS;
+import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import { callFetchClasses, callAddClass } from '@/services/communicationManager';
+import { useSessionStore } from "@/stores/sessionStore";
 
 const route = useRoute();
 const formattedCourse = ref(route.params.course);
 let reformattedCourse = '0';
 
-const courseValue = formattedCourse.value.toUpperCase(); 
+const courseValue = formattedCourse.value.toUpperCase();
 
 const match = courseValue.match(/\d+/);
 
@@ -38,57 +39,44 @@ if (match) {
 const classes = ref([]);
 
 const fetchClasses = async () => {
+  const sessionStore = useSessionStore();
+  const sessionId = sessionStore.sessionId;
+
+  if (!sessionId) {
+    console.error("No session ID available.");
+    return;
+  }
+
   try {
     console.log("Fetching classes for course:", formattedCourse.value);
-    const response = await fetch(
-      `${URL}/classes/${formattedCourse.value}`
-    );
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Error al obtener datos de clases: ${errorText}`);
-    }
-    classes.value = await response.json();
+    const data = await callFetchClasses(formattedCourse.value, sessionId);
+    classes.value = data;
   } catch (error) {
     console.error("Error al realizar la solicitud:", error.message);
   }
 };
 
 
-const afegirClasse = async (nomNouClasse) => {
-  try {
+const addClass = async () => {
+  const nomNouClasse = prompt('INTRODUEIX EL NOM DE LA NOVA CLASSE:');
+  if (nomNouClasse) {
     const classeData = {
       classe: nomNouClasse,
       codi_random: generateRandomCode(),
-      id_curs: reformattedCourse
+      id_curs: reformattedCourse,
     };
 
-    const response = await fetch(`${URL}/classes`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(classeData),
-    });
-
-    if (!response.ok) throw new Error("Error al afegir la classe");
-
-    const addedClass = await response.json();
-    classes.value.push(addedClass);
-    fetchClasses()
-  } catch (error) {
-    console.error("Error al agregar clase:", error);
+    try {
+      await callAddClass(classeData);
+      fetchClasses();
+    } catch (error) {
+      console.error(error.message);
+    }
   }
 };
 
 const generateRandomCode = () => {
   return Math.random().toString(36).substring(2, 12);
-};
-
-const addClass = () => {
-  const nomNouClasse = prompt("INTRODUEIX EL NOM DE LA NOVA CLASSE:");
-  if (nomNouClasse) {
-    afegirClasse(nomNouClasse);
-  }
 };
 
 onMounted(fetchClasses);
