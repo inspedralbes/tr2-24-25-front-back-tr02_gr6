@@ -46,15 +46,39 @@ app.get("/auth", (req, res) => {
 
 
 app.get("/classes", (req, res) => {
-    res.json(classes);
+    pool.getConnection((err, connection) => {
+        if (err) {
+            console.error('Error getting connection from pool:', err);
+            res.status(500).send("Error al obtenir connexió");
+            return;
+        }
+        getClasses(connection);
+        res.json(classes);
+    });
 });
 
 app.get("/tutors", (req, res) => {
-    res.json(tutors);
+    pool.getConnection((err, connection) => {
+        if (err) {
+            console.error('Error getting connection from pool:', err);
+            res.status(500).send("Error al obtenir connexió");
+            return;
+        }
+        getTutors(connection);
+        res.json(tutors);
+    });
 });
 
 app.get("/alumnes", (req, res) => {
-    res.json(alumnes);
+    pool.getConnection((err, connection) => {
+        if (err) {
+            console.error('Error getting connection from pool:', err);
+            res.status(500).send("Error al obtenir connexió");
+            return;
+        }
+        getAlumnes(connection);
+        res.json(alumnes);
+    });
 });
 
 app.post("/classe", (req, res) => {
@@ -99,52 +123,59 @@ app.post("/registre", (req, res) => {
         contrassenya: req.query.contrassenya
     };
 
-    if (esProfe(nouUser.email)){
-        pool.getConnection((err, connection) => {
-            if (err) {
-                console.error('Error getting connection from pool:', err);
-                res.status(500).send("Error al obtenir connexió");
-                return;
-            }
-    
-            const query = `INSERT INTO Tutors (email, contrassenya, nom, cognoms) VALUES (?, ?, ?, ?)`;
-    
-    
-            connection.query(query, [nouUser.email, nouUser.contrassenya, nouUser.nom, nouUser.cognoms], (err, results) => {
+    if (!jaExisteix(nouUser)){
+        if (esProfe(nouUser.email)){
+            pool.getConnection((err, connection) => {
                 if (err) {
-                    console.error('Error:', err);
-                    res.status(500).json({ error: "Error en crear el professor" });
-                } else {
-                    getTutors(connection);
-                    res.json({ missatge: "Tutor afegit" });
-                    console.log(`Tutor: ${nouUser.nom} afegit correctament!`)
+                    console.error('Error getting connection from pool:', err);
+                    res.status(500).send("Error al obtenir connexió");
+                    return;
                 }
-                connection.release();
+        
+                const query = `INSERT INTO Tutors (email, contrassenya, nom, cognoms) VALUES (?, ?, ?, ?)`;
+        
+        
+                connection.query(query, [nouUser.email, nouUser.contrassenya, nouUser.nom, nouUser.cognoms], (err, results) => {
+                    if (err) {
+                        console.error('Error:', err);
+                        res.status(500).json({ error: "Error en crear el professor" });
+                    } else {
+                        getTutors(connection);
+                        getTutorsContrassenya(connection);
+                        res.json({ missatge: "Tutor afegit" });
+                        console.log(`Tutor: ${nouUser.nom} afegit correctament!`)
+                    }
+                    connection.release();
+                });
             });
-        });
+        } else {
+            pool.getConnection((err, connection) => {
+                if (err) {
+                    console.error('Error getting connection from pool:', err);
+                    res.status(500).send("Error al obtenir connexió");
+                    return;
+                }
+        
+                const query = `INSERT INTO Alumnes (email, contrassenya, nom, cognoms) VALUES (?, ?, ?, ?)`;
+        
+        
+                connection.query(query, [nouUser.email, nouUser.contrassenya, nouUser.nom, nouUser.cognoms], (err, results) => {
+                    if (err) {
+                        console.error('Error:', err);
+                        res.status(500).json({ error: "Error en crear l'alumne" });
+                    } else {
+                        getAlumnes(connection);
+                        getAlumnesContrassenya(connection);
+                        res.json({ missatge: "Alumne afegit" });
+                        console.log(`Alumne: ${nouUser.nom} afegit correctament!`)
+                    }
+                    connection.release();
+                });
+            });
+        }
     } else {
-        pool.getConnection((err, connection) => {
-            if (err) {
-                console.error('Error getting connection from pool:', err);
-                res.status(500).send("Error al obtenir connexió");
-                return;
-            }
-    
-            const query = `INSERT INTO Alumnes (email, contrassenya, nom, cognoms) VALUES (?, ?, ?, ?)`;
-    
-    
-            connection.query(query, [nouUser.email, nouUser.contrassenya, nouUser.nom, nouUser.cognoms], (err, results) => {
-                if (err) {
-                    console.error('Error:', err);
-                    res.status(500).json({ error: "Error en crear l'alumne" });
-                } else {
-                    getTutors(connection);
-                    res.json({ missatge: "Alumne afegit" });
-                    console.log(`Alumne: ${nouUser.nom} afegit correctament!`)
-                }
-                connection.release();
-            });
-        });
+        res.status(500).json({error: "Usat."});
+        console.log("Aquest correu ja està en us.")
     }
 });
 
@@ -234,7 +265,7 @@ function getTutors(connection) {
 }
 
 function getAlumnes(connection) {
-    connection.query('SELECT email, nom, cognoms, id_classe FROM alumnes', (err, results) => {
+    connection.query('SELECT id_alumne, email, nom, cognoms, id_classe FROM alumnes', (err, results) => {
         if (err) {
             console.error('Error:', err);
         } else {
@@ -276,6 +307,20 @@ function generarCodiAleatori() {
 function esProfe(email) {
     const teNumeros = /\d/;
     return !teNumeros.test(email);
+}
+
+function jaExisteix(nouUser){
+    for (const tutor of tutorsContrassenya) {
+        if (tutor.email == nouUser.email) {
+            return true;
+        }
+    };
+    for (const alumne of alumnesContrassenya) {
+        if (alumne.email == nouUser.email) {
+            return true;
+        }
+    };
+    return false;
 }
 
 

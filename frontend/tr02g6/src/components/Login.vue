@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <div justify="center" class="align-center justify-center">
     <slot name="logo">
       <v-img
@@ -86,23 +86,9 @@ const password = ref("");
 const errorMessage = ref("");
 const router = useRouter();  
 
-const handleLogin = async () => {
-  try {
-    const data = await callGetProf(identifier.value, password.value);
 
-    if (data && data.email) {
-            userStore.setEmail(data.email);
-            router.push("/home");
-    } else {
-      errorMessage.value = "Correo o contraseña incorrectos.";
-    }
-  } catch (error) {
-    errorMessage.value = "Error al iniciar sesión. Inténtalo más tarde.";
-    console.error("Error al iniciar sesión:", error);
-  }
-};
 
 </script>
 
 <style scoped>
-</style>
+</style> -->
