@@ -51,17 +51,18 @@ async function getSQL(endpoint, params = {}) {
 }
 
 function isAuthProfe(sessionId) {
+    sessionsProfeAutenticades.push(sessionId);
     for (const sessio of sessionsProfeAutenticades) {
         if (sessio === sessionId) {
             return true; 
         }
     }
-    sessionsProfeAutenticades.push(sessionId);
-    return true; 
+    return false
 }
 
 
 function isAuthAlumne(sessionId) {
+    sessionsAlumneAutenticades.push(sessionId);
     for (const sessio of sessionsAlumneAutenticades) {
         if (sessio == sessionId) {
             return true;
