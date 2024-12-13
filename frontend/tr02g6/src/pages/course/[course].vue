@@ -13,18 +13,25 @@
       <br>
       <br>
       <v-btn color="primary" @click="addClass">Afegir Classe</v-btn>
+      <v-btn @click="navegarapantalla">Formulario</v-btn>
     </v-container>
   </template>
   
   <script setup>
   import { ref, onMounted } from 'vue'
-  import { useRoute } from 'vue-router'
+  import { useRoute,useRouter } from 'vue-router'
   
   const route = useRoute()
+  const router = useRouter()
+
   const formattedCourse = ref(route.params.course)
   const reformattedCourse = formattedCourse.value.toUpperCase().replace('', '  ')
 
   const classes = ref([]) 
+
+  const navegarapantalla = () =>{
+  router.push('/formPage')
+} 
   
    const fetchClasses = async () => {
     try {
@@ -80,5 +87,6 @@ const addClass = () => {
     classes.value.push({ id_classe: newId, classe: newClass }) 
   }
 }
+
 
 </script>
