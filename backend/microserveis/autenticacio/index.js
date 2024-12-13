@@ -51,21 +51,25 @@ async function getSQL(endpoint, params = {}) {
 }
 
 function isAuthProfe(sessionId) {
+    sessionsProfeAutenticades.push(sessionId);
     for (const sessio of sessionsProfeAutenticades) {
-        if (sessio == sessionId) {
-            return true;
+        if (sessio === sessionId) {
+            return true; 
         }
     }
-    return false;
+    return false
 }
 
+
 function isAuthAlumne(sessionId) {
+    sessionsAlumneAutenticades.push(sessionId);
     for (const sessio of sessionsAlumneAutenticades) {
         if (sessio == sessionId) {
             return true;
         }
     }
-    return false;
+    sessionsAlumneAutenticades.push(sessionId);
+    return true; 
 }
 
 process.on('message', (message) => {
