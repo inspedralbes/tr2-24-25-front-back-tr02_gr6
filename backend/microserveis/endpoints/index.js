@@ -15,10 +15,11 @@ app.use(express.json());
 
 app.get("/classes", async (req, res) => {
     sessionId = req.query.sessionId;
-    if (!req.query.sessionId) {
-        return res.send("No Autenticat");
+    userId = req.query.userId;
+    if (!req.query.sessionId || !req.query.userId) {
+        return res.send("Falten Camps");
     }
-    if (!isAuthProfe(sessionId)) {
+    if (!isAuthProfe(sessionId, userId)) {
         return res.send("No Autenticat");
     } else {
         const classes = await getSQL("classes");
@@ -28,10 +29,11 @@ app.get("/classes", async (req, res) => {
 
 app.get("/tutors", async (req, res) => {
     sessionId = req.query.sessionId;
-    if (!req.query.sessionId) {
+    userId = req.query.userId;
+    if (!req.query.sessionId || !req.query.userId) {
         return res.send("No Autenticat");
     }
-    if (!isAuthProfe(sessionId)) {
+    if (!isAuthProfe(sessionId, userId)) {
         return res.send("No Autenticat");
     } else {
         const tutors = await getSQL("tutors");
@@ -41,10 +43,11 @@ app.get("/tutors", async (req, res) => {
 
 app.get("/alumnes", async (req, res) => {
     sessionId = req.query.sessionId;
-    if (!req.query.sessionId) {
+    userId = req.query.userId;
+    if (!req.query.sessionId || !req.query.userId) {
         return res.send("No Autenticat");
     }
-    if (!isAuthProfe(sessionId)) {
+    if (!isAuthProfe(sessionId, userId)) {
         return res.send("No Autenticat");
     } else {
         const alumnes = await getSQL("alumnes");
@@ -54,10 +57,11 @@ app.get("/alumnes", async (req, res) => {
 
 app.post("/classes", async (req, res) => {
     sessionId = req.query.sessionId;
-    if (!req.query.sessionId) {
+    userId = req.query.userId;
+    if (!req.query.sessionId || !req.query.userId) {
         return res.send("No Autenticat");
     }
-    if (!isAuthProfe(sessionId)) {
+    if (!isAuthProfe(sessionId,  userId)) {
         return res.send("No Autenticat");
     } else {
         const nomClasse = req.query.nomClasse;
@@ -71,10 +75,11 @@ app.post("/classes", async (req, res) => {
 
 app.delete("/classes", async (req, res) => {
     sessionId = req.query.sessionId;
-    if (!req.query.sessionId) {
+    userId = req.query.userId;
+    if (!req.query.sessionId || !req.query.userId) {
         return res.send("No Autenticat");
     }
-    if (!isAuthProfe(sessionId)) {
+    if (!isAuthProfe(sessionId,  userId)) {
         return res.send("No Autenticat");
     } else {
         const idClasse = req.query.idClasse;
@@ -88,10 +93,11 @@ app.delete("/classes", async (req, res) => {
 
 app.put("/classes", async (req, res) => {
     sessionId = req.query.sessionId;
-    if (!req.query.sessionId) {
+    userId = req.query.userId;
+    if (!req.query.sessionId || !req.query.userId) {
         return res.send("No Autenticat");
     }
-    if (!isAuthProfe(sessionId)) {
+    if (!isAuthProfe(sessionId,  userId)) {
         return res.send("No Autenticat");
     } else {
         const nomClasse = req.query.nomClasse;

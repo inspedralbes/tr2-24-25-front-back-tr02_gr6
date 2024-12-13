@@ -33,12 +33,12 @@ app.get("/auth", (req, res) => {
     contrassenyaEnviada = req.query.contrassenya
     for (const tutor of tutorsContrassenya) {
         if (tutor.contrassenya == contrassenyaEnviada && tutor.email == correuEnviat) {
-            return res.json({ resposta: "profeAutenticat"})
+            return res.json({ resposta: "profeAutenticat", tutorId: tutor.id_profe})
         }
     };
     for (const alumne of alumnesContrassenya) {
         if (alumne.contrassenya == contrassenyaEnviada && alumne.email == correuEnviat) {
-            return res.json({ resposta: "alumneAutenticat"})
+            return res.json({ resposta: "alumneAutenticat", alumneId: alumne.id_alumne})
         }
     };
     return res.json({ resposta: "noAutenticat" })
@@ -140,9 +140,10 @@ app.post("/registre", (req, res) => {
                         console.error('Error:', err);
                         res.status(500).json({ error: "Error en crear el professor" });
                     } else {
+                        const tutorId = results.insertId;
                         getTutors(connection);
                         getTutorsContrassenya(connection);
-                        res.json({ missatge: "Tutor afegit" });
+                        res.json({ missatge: "Tutor afegit", tutorId: tutorId });
                         console.log(`Tutor: ${nouUser.nom} afegit correctament!`)
                     }
                     connection.release();
@@ -164,9 +165,10 @@ app.post("/registre", (req, res) => {
                         console.error('Error:', err);
                         res.status(500).json({ error: "Error en crear l'alumne" });
                     } else {
+                        const alumneId = results.insertId;
                         getAlumnes(connection);
                         getAlumnesContrassenya(connection);
-                        res.json({ missatge: "Alumne afegit" });
+                        res.json({ missatge: "Alumne afegit", alumneId: alumneId });
                         console.log(`Alumne: ${nouUser.nom} afegit correctament!`)
                     }
                     connection.release();
@@ -275,7 +277,7 @@ function getAlumnes(connection) {
 }
 
 function getTutorsContrassenya(connection) {
-    connection.query('SELECT email, contrassenya FROM tutors', (err, results) => {
+    connection.query('SELECT id_profe, email, contrassenya FROM tutors', (err, results) => {
         if (err) {
             console.error('Error:', err);
         } else {
@@ -285,7 +287,7 @@ function getTutorsContrassenya(connection) {
 }
 
 function getAlumnesContrassenya(connection) {
-    connection.query('SELECT email, contrassenya FROM alumnes', (err, results) => {
+    connection.query('SELECT id_alumne, email, contrassenya FROM alumnes', (err, results) => {
         if (err) {
             console.error('Error:', err);
         } else {
