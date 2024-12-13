@@ -125,12 +125,12 @@
                           </v-col>
                           <v-col cols="12" sm="6">
                             <div class="text-subtitle-1 text-medium-emphasis">
-                              Cognom
+                              Cognoms
                             </div>
                             <v-text-field
                               v-model="professor.cognoms"
                               density="compact"
-                              :placeholder="'Cognom'"
+                              :placeholder="'Cognoms'"
                               :rules="[
                                 (v) => !!v || 'Aquest camp és obligatori',
                               ]"
@@ -199,6 +199,7 @@
 import { ref, reactive } from "vue";
 import { callPostProf, callGetProf } from "@/services/communicationManager";
 import { useRouter } from "vue-router";
+import { el } from "vuetify/locale";
 
 const step = ref(1);
 
@@ -219,7 +220,7 @@ const passwordPlaceholder = "Insereix contrasenya";
 async function handleLogin() {
   try {
     const data = await callGetProf(professor.email, professor.contrasenya);
-    if (data && data.email) {
+    if (data && data.sessionId) {
       router.push("/home");
     } else {
       errorMessage.value = "Email o contrasenya incorrectes.";
@@ -243,9 +244,12 @@ async function handleRegister() {
 
   try {
     const response = await callPostProf(professor);
-    console.log("Professor registrat correctament:", response);
-
-    step.value = 1;
+    if (response.error == "Usat."){
+      alert("Correu en ús.");
+    } else {
+      console.log("Usuari registrat correctament:", response);
+      step.value = 1; 
+    }
   } catch (error) {
     console.error("Error durant el registre:", error);
   }

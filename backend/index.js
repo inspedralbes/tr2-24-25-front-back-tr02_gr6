@@ -13,16 +13,12 @@ const io = socketIo(server, {
   },
 });
 
-
 dotenv.config();
-
 
 const port = process.env.PORT || 3000;
 
-
 app.use(express.json({ limit: "200mb" }));
 app.use(cors());
-
 
 const dbConfig = {
   host: process.env.DB_HOST,
@@ -31,7 +27,6 @@ const dbConfig = {
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
 };
-
 
 async function testDatabaseConnection() {
   try {
@@ -45,18 +40,84 @@ async function testDatabaseConnection() {
 }
 testDatabaseConnection();
 
+//-------------------------CLASSES----------------------------
+app.get("/getClasses", async (req,res) => {
+  let connection;
+  try {
+    connection = await mysql.createConnection(dbConfig);
+    const [rows] = await connection.query("SELECT * FROM classes");
+    res.json(rows);
+  } catch (err) {
+    console.error("Error al obtener alumnos:", err);
+    res.status(500).send("Error al obtener datos de alumnos");
+  } finally {
+    if (connection) {
+      await connection.end();
+    }
+  }
+});
+
+app.get("/classes/:course_code", async (req,res) => {
+  let connection;
+  const courseCode = req.params.course_code;
+  try {
+    connection = await mysql.createConnection(dbConfig);
+    const [rows] = await connection.query(`SELECT c.id_classe, c.classe 
+             FROM classes c
+             JOIN courses co ON c.id_course = co.id_course
+             WHERE co.course_code = ?`,
+            [courseCode])
+
+    res.json(rows);
+  } catch (err) {
+    console.error("Error al obtener alumnos:", err);
+    res.status(500).send("Error al obtener datos de alumnos");
+  } finally {
+    if (connection) {
+      await connection.end();
+    }
+  }
+})
 
 // ------------------------ USUARIOS -------------------------
+app.get("/getAlum", async (req, res) => {
+  let connection;
+  try {
+    connection = await mysql.createConnection(dbConfig);
+    const [rows] = await connection.query("SELECT * FROM alumnes");
+    res.json(rows);
+  } catch (err) {
+    console.error("Error al obtener alumnos:", err);
+    res.status(500).send("Error al obtener datos de alumnos");
+  } finally {
+    if (connection) {
+      await connection.end();
+    }
+  }
+});
 
+app.get("/getTutor", async (req,res) => {
+  let connection;
+  try {
+    connection = await mysql.createConnection(dbConfig);
+    const [rows] = await connection.query("SELECT * FROM tutors");
+    res.json(rows);
+  } catch (err) {
+    console.error("Error al obtener alumnos:", err);
+    res.status(500).send("Error al obtener datos de alumnos");
+  } finally {
+    if (connection) {
+      await connection.end();
+    }
+  }
+});
 
 app.get("/getProf", async (req, res) => {
   const { email, password } = req.query;  
 
-
   if (!email || !password) {
     return res.status(400).send("Faltan parámetros");
   }
-
 
   let connection;
   try {
@@ -65,7 +126,6 @@ app.get("/getProf", async (req, res) => {
       "SELECT email, contrassenya FROM tutors WHERE email = ? AND contrassenya = ?",
       [email, password]
     );
-
 
     if (rows.length > 0) {
       res.json(rows[0]);  
@@ -82,58 +142,68 @@ app.get("/getProf", async (req, res) => {
   }
 });
 
-app.get("/getClasses", async (req, res) => {
-  let connection;
-  try {
-    connection = await mysql.createConnection(dbConfig);
-    const [rows] = await connection.query("SELECT id_classe, classe FROM classes");
-    res.json(rows);
-  } catch (err) {
-    console.error("Error al obtener clases:", err);
-    res.status(500).send("Error al obtener clases");
-  } finally {
-    if (connection) {
-      await connection.end();
-    }
-  }
-});
+
+
 // ------------------------ REGISTRO -------------------------
+app.post("/registreAlum", async (req, res) => {
+  const user = req.body;
 
-
-app.post("/registreProf", async (req, res) => {
-    const { email, contrassenya, nom, cognoms } = req.body;
-    if (!email || !contrassenya || !nom || !cognoms) {
-      return res.status(400).json({ error: "Datos incompletos" }); // Devuelve JSON en caso de error
-    }
-  
+  if (user.email && user.contrassenya) {
     let connection;
     try {
       connection = await mysql.createConnection(dbConfig);
       await connection.execute(
-        "INSERT INTO Tutors (email, contrassenya, nom, cognoms) VALUES (?, ?, ?, ?)",
-        [email, contrassenya, nom, cognoms]
+        "INSERT INTO alumnes (email, contrassenya) VALUES (?, ?)",
+        [user.email, user.contrassenya]
       );
-      res.status(201).json({ message: "Profesor registrado exitosamente" }); // Devuelve JSON al registrar con éxito
+      const [rows] = await connection.query("SELECT * FROM alumnes");
+      res.json(rows);
     } catch (err) {
-      console.error("Error al registrar tutor:", err);
-      res.status(500).json({ error: "Error al registrar tutor" }); // Devuelve JSON en caso de error del servidor
+      console.error("Error al registrar alumno:", err);
+      res.status(500).send("Error al registrar alumno");
     } finally {
       if (connection) {
         await connection.end();
       }
     }
-  });
-  
+  } else {
+    res.status(400).send("Datos incompletos");
+  }
+});
+
+app.post("/registreProf", async (req, res) => {
+  const user = req.body;
+
+  if (user.email && user.contrassenya) {
+    let connection;
+    try {
+      connection = await mysql.createConnection(dbConfig);
+      await connection.execute(
+        "INSERT INTO tutors (email, contrassenya) VALUES (?, ?)",
+        [user.email, user.contrassenya]
+      );
+      const [rows] = await connection.query("SELECT * FROM tutors");
+      res.json(rows);
+    } catch (err) {
+      console.error("Error al registrar tutor:", err);
+      res.status(500).send("Error al registrar tutor");
+    } finally {
+      if (connection) {
+        await connection.end();
+      }
+    }
+  } else {
+    res.status(400).send("Datos incompletos");
+  }
+});
 
 // ------------------------ LOGIN -------------------------
 app.post("/loginAlum", async (req, res) => {
   const user = req.body;
 
-
   if (!user.email || !user.contrassenya) {
     return res.status(400).send("Datos incompletos");
   }
-
 
   let connection;
   try {
@@ -143,12 +213,10 @@ app.post("/loginAlum", async (req, res) => {
       [user.email, user.contrassenya]
     );
 
-
     if (results.length === 0) {
       console.error("No se encontró el usuario");
       return res.status(404).json({ message: "No se ha encontrado la cuenta" });
     }
-
 
     console.log("Login exitoso");
     res.status(200).json({ message: "Login exitoso", user: results[0] });
@@ -162,7 +230,7 @@ app.post("/loginAlum", async (req, res) => {
   }
 });
 
-
 server.listen(port, () => {
   console.log(`Server corrents a ${port}`);
 });
+

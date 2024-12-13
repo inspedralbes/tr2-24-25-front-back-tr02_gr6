@@ -14,3 +14,14 @@ Un cop comenceu heu de canviar aquesta explicació amb la corresponent al vostre
  * Adreça del prototip gràfic del projecte (Penpot, figma, moqups...)
  * URL de producció (quan la tingueu)
  * Estat: (explicació d'en quin punt està)
+
+backend\.env :
+DB_HOST=
+DB_PORT=
+DB_USER=
+DB_PASSWORD=
+DB_NAME=
+PORT_MAIN=
+PORT_ENDPOINTS=
+PORT_AUTH=
+PORT_BBDD=
