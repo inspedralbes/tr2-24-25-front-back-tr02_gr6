@@ -11,16 +11,18 @@
     </v-row>
     <br><br>
     <v-btn color="primary" @click="addClass">Afegir Classe</v-btn>
+    <v-btn @click="navegarapantalla">Formulario</v-btn>
   </v-container>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { callFetchClasses, callAddClass } from '@/services/communicationManager';
 import { useSessionStore } from "@/stores/sessionStore";
 
 const route = useRoute();
+const router = useRouter();
 const formattedCourse = ref(route.params.course);
 let reformattedCourse = '0';
 
@@ -66,41 +68,20 @@ const addClass = async () => {
       id_curs: reformattedCourse,
     };
 
-      try {
-        const response = await fetch(`http://localhost:3001/classes/${formattedCourse.value}`,{
-        method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(classeData),
-        });
-
-        if (response.ok) {
-          const preguntaAgregada = await response.json();
-          this.preguntes.push(preguntaAgregada); // Agregar a la lista
-          this.limpiarFormulario();
-        } else {
-          console.error('Error al afegir');
-        }
-      } catch (error) {
-        console.error(error);
-      }
+    try {
+      await callAddClass(classeData);
+      fetchClasses();
+    } catch (error) {
+      console.error(error.message);
     }
-
-
-
-  onMounted(fetchClasses)
-
-  const generateRandomId = () => {
-  return Math.random().toString(36).substring(2, 11)
-}
-
-const addClass = () => {
-  const newClass = prompt('Introduce el nombre de la nueva clase:')
-  if (newClass) {
-    const newId = generateRandomId() 
-    classes.value.push({ id_classe: newId, classe: newClass }) 
   }
-}
+};
 
+const generateRandomCode = () => {
+  return Math.random().toString(36).substring(2, 12);
+};
+const navegarapantalla = () =>{
+  router.push('/formPage')
+}
+onMounted(fetchClasses);
 </script>

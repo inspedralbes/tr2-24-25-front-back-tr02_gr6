@@ -4,7 +4,9 @@ import { useAuthStore } from "@/stores/userauth";
 const URL = import.meta.env.VITE_API_ROUTE;
 const URL_AUTH = import.meta.env.VITE_API_ROUTE_AUTH;
 const URL_CLASS = import.meta.env.VITE_API_ROUTE_CLASS;
-import { useSessionStore } from '@/stores/sessionStore';const authStore = useAuthStore();
+const URL_FORMULARI = import.meta.env.VITE_API_ROUTE_FORMULARI;
+import { useSessionStore } from '@/stores/sessionStore';
+const authStore = useAuthStore();
 
 export async function callPostProf(profesor) {
   // const formProfesor = new FormData();
@@ -57,7 +59,7 @@ export async function callPostProf(profesor) {
     }
   }
   
-  export async function callGetProf(email,password) {
+  /*export async function callGetProf(email,password) {
     try {
       const response = await fetch(`${URL_AUTH}/auth?email=${email}&contrassenya=${password}`);
       if (!response.ok) {
@@ -71,7 +73,7 @@ export async function callPostProf(profesor) {
       console.error("Error en Communication Manager:", error);
       throw error;
     }
-  }
+  }*/
 
   export async function callFetchClasses(course) {
     try {
@@ -126,7 +128,7 @@ export async function callPostProf(profesor) {
     }
   }
   
-export async function callGetClasses() {
+/*export async function callGetClasses() {
   try {
     const response = await fetch(`${URL}/classes`, {
       method: "GET",
@@ -147,7 +149,7 @@ export async function callGetClasses() {
     console.error("Error en Communication Manager:", error.message);
     throw error;
   }
-}
+}*/
 
 export async function callGetProf(email, password) {
   try {
@@ -165,7 +167,9 @@ export async function callGetProf(email, password) {
   }
 }
 export async function getAlumnes() {
-  const alumnes = await fetch(`${URL}/alumnes?sessionId=root`);
+  const sessionStore = useSessionStore();
+      const sessionId = sessionStore.sessionId; 
+  const alumnes = await fetch(`${URL_FORMULARI}/alumnes?sessionId=${sessionId}`);
   try {
     const llista_alumnes = await alumnes.json();
     return llista_alumnes
