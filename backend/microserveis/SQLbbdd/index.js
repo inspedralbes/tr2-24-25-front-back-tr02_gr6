@@ -33,12 +33,12 @@ app.get("/auth", (req, res) => {
     contrassenyaEnviada = req.query.contrassenya
     for (const tutor of tutorsContrassenya) {
         if (tutor.contrassenya == contrassenyaEnviada && tutor.email == correuEnviat) {
-            return res.json({ resposta: "profeAutenticat", tutorId: tutor.id_profe})
+            return res.json({ resposta: "profeAutenticat", tutorId: tutor.id_profe })
         }
     };
     for (const alumne of alumnesContrassenya) {
         if (alumne.contrassenya == contrassenyaEnviada && alumne.email == correuEnviat) {
-            return res.json({ resposta: "alumneAutenticat", alumneId: alumne.id_alumne})
+            return res.json({ resposta: "alumneAutenticat", alumneId: alumne.id_alumne })
         }
     };
     return res.json({ resposta: "noAutenticat" })
@@ -81,7 +81,36 @@ app.get("/alumnes", (req, res) => {
     });
 });
 
-app.post("/classe", (req, res) => {
+app.get("/classes/:course_code", (req, res) => {
+    const codi_curs = req.params.course_code;
+
+    pool.getConnection((err, connection) => {
+        if (err) {
+            console.error('Error getting connection from pool:', err);
+            res.status(500).send("Error al obtenir connexió");
+        }
+
+        connection.query(
+            `SELECT c.id_classe, c.classe, c.codi_random
+             FROM classes c
+             JOIN cursos co ON c.id_curs = co.id_curs
+             WHERE co.nom_curs = ?`,
+            [codi_curs],
+            (err, results) => {
+                connection.release();
+
+                if (err) {
+                    console.error("Error en la consulta:", err);
+                    return res.status(500).send({ error: "Error al obtenir dades" });
+                }
+
+                res.json(results);
+            }
+        );
+    });
+});
+
+app.post("/classes", (req, res) => {
     if (!req.query.nomClasse) {
         return res.status(400).send("Falta el paràmetre nomClasse");
     }
@@ -115,6 +144,7 @@ app.post("/classe", (req, res) => {
     });
 });
 
+
 app.post("/registre", (req, res) => {
     const nouUser = {
         email: req.query.email,
@@ -123,18 +153,18 @@ app.post("/registre", (req, res) => {
         contrassenya: req.query.contrassenya
     };
 
-    if (!jaExisteix(nouUser)){
-        if (esProfe(nouUser.email)){
+    if (!jaExisteix(nouUser)) {
+        if (esProfe(nouUser.email)) {
             pool.getConnection((err, connection) => {
                 if (err) {
                     console.error('Error getting connection from pool:', err);
                     res.status(500).send("Error al obtenir connexió");
                     return;
                 }
-        
+
                 const query = `INSERT INTO Tutors (email, contrassenya, nom, cognoms) VALUES (?, ?, ?, ?)`;
-        
-        
+
+
                 connection.query(query, [nouUser.email, nouUser.contrassenya, nouUser.nom, nouUser.cognoms], (err, results) => {
                     if (err) {
                         console.error('Error:', err);
@@ -156,10 +186,10 @@ app.post("/registre", (req, res) => {
                     res.status(500).send("Error al obtenir connexió");
                     return;
                 }
-        
+
                 const query = `INSERT INTO Alumnes (email, contrassenya, nom, cognoms) VALUES (?, ?, ?, ?)`;
-        
-        
+
+
                 connection.query(query, [nouUser.email, nouUser.contrassenya, nouUser.nom, nouUser.cognoms], (err, results) => {
                     if (err) {
                         console.error('Error:', err);
@@ -176,7 +206,7 @@ app.post("/registre", (req, res) => {
             });
         }
     } else {
-        res.status(500).json({error: "Usat."});
+        res.status(500).json({ error: "Usat." });
         console.log("Aquest correu ja està en us.")
     }
 });
@@ -311,7 +341,7 @@ function esProfe(email) {
     return !teNumeros.test(email);
 }
 
-function jaExisteix(nouUser){
+function jaExisteix(nouUser) {
     for (const tutor of tutorsContrassenya) {
         if (tutor.email == nouUser.email) {
             return true;

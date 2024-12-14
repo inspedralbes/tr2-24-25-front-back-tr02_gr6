@@ -74,13 +74,13 @@ import { useSessionStore } from '@/stores/sessionStore';
     try {
       const sessionStore = useSessionStore();
       const sessionId = sessionStore.sessionId; 
-  
-      if (!sessionId) {
-        throw new Error('No hay sessionId almacenado');
-      }
-  
-      const response = await fetch(`${URL_CLASS}/classes/${course}?sessionId=${sessionId}`);
-      if (!response.ok) {
+      const userId = sessionStore.userId
+      if (!sessionId || !userId) {
+        throw new Error('No hay sessionId o userId almacenado');
+    }
+
+    const response = await fetch(`${URL_CLASS}/classes/${course}?sessionId=${sessionId}&userId=${userId}`);
+    if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Error al obtener datos de clases: ${errorText}`);
       }
@@ -95,31 +95,31 @@ import { useSessionStore } from '@/stores/sessionStore';
   }
   export async function callAddClass(classeData) {
     try {
-      const sessionStore = useSessionStore();
-      const sessionId = sessionStore.sessionId; 
-  
-      if (!sessionId) {
-        throw new Error('No hay sessionId almacenado');
-      }
-  
-      const response = await fetch(`${URL_CLASS}/classes?sessionId=${sessionId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(classeData),
-      });
-  
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Error al agregar clase: ${errorText}`);
-      }
-  
-      const data = await response.json();
-      return data;
+        const sessionStore = useSessionStore();
+        const sessionId = sessionStore.sessionId;
+        const userId = sessionStore.userId;
+
+        if (!sessionId || !userId) {
+            throw new Error('No hay sessionId o userId almacenado');
+        }
+
+        const response = await fetch(`${URL_CLASS}/classes?sessionId=${sessionId}&userId=${userId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(classeData),
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Error al agregar clase: ${errorText}`);
+        }
+
+        const data = await response.json();
+        return data;
     } catch (error) {
-      console.error("Error en Communication Manager:", error);
-      throw error;
+        console.error("Error en Communication Manager:", error);
+        throw error;
     }
-  }
-  
+}

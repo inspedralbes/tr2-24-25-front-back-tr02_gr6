@@ -27,6 +27,22 @@ app.get("/classes", async (req, res) => {
     }
 });
 
+app.get("/classes/:course_code", async (req, res) => {
+    sessionId = req.query.sessionId;
+    userId = req.query.userId;
+    if (!req.query.sessionId || !req.query.userId) {
+        return res.send("Falten Camps");
+    }
+    if (!isAuthProfe(sessionId, userId)) {
+        return res.send("No Autenticat");
+    } else {
+
+    const courseCode = req.params.course_code;
+        const classes = await getSQL("classes/" + courseCode);
+        res.json(classes);
+}
+});
+
 app.get("/tutors", async (req, res) => {
     sessionId = req.query.sessionId;
     userId = req.query.userId;
@@ -65,10 +81,11 @@ app.post("/classes", async (req, res) => {
         return res.send("No Autenticat");
     } else {
         const nomClasse = req.query.nomClasse;
-        if (!nomClasse) {
+        const id_curs = req.query.id_curs;
+        if (!nomClasse || !id_curs) {
             return res.status(400).send("Falta paràmetre nomClasse");
-        }
-        const classes = await postSQL("classe", { nomClasse });
+            }
+            const classes = await postSQL("classes", { nomClasse, id_curs });
         res.json(classes);
     }
 });
