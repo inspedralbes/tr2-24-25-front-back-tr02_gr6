@@ -77,31 +77,32 @@ app.post("/classes", async (req, res) => {
     if (!req.query.sessionId || !req.query.userId) {
         return res.send("No Autenticat");
     }
-    if (!isAuthProfe(sessionId,  userId)) {
-        return res.send("No Autenticat");
-    } else {
-        const nomClasse = req.query.nomClasse;
-        const id_curs = req.query.id_curs;
-        if (!nomClasse || !id_curs) {
-            return res.status(400).send("Falta paràmetre nomClasse");
-            }
-            const classes = await postSQL("classes", { nomClasse, id_curs });
-        res.json(classes);
+
+    if (!isAuthProfe(sessionId, userId)) {
+        return res.json("No Autenticat");
     }
+
+    const { classe, codi_random, id_curs } = req.body;
+
+    if (!classe || !codi_random || !id_curs) {
+        return res.json("Falten camps");
+    }
+        const classes = await postSQL("classes", { classe, codi_random, id_curs });
+        res.json(classes);
 });
 
 app.delete("/classes", async (req, res) => {
     sessionId = req.query.sessionId;
     userId = req.query.userId;
     if (!req.query.sessionId || !req.query.userId) {
-        return res.send("No Autenticat");
+        return res.json("No Autenticat");
     }
     if (!isAuthProfe(sessionId,  userId)) {
-        return res.send("No Autenticat");
+        return res.json("No Autenticat");
     } else {
         const idClasse = req.query.idClasse;
         if (!idClasse) {
-            return res.status(400).send("Falta paràmetre idClasse");
+            return res.json("Falta paràmetre idClasse");
         }
         const classes = await deleteSQL("classe", { idClasse });
         res.json(classes);
@@ -165,6 +166,7 @@ async function postSQL(endpoint, params = {}) {
         headers: {
             'Content-Type': 'application/json',
         },
+        body: JSON.stringify(params),
     });
     return await resposta.json();
 }

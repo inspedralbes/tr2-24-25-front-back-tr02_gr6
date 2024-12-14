@@ -100,15 +100,15 @@ import { useSessionStore } from '@/stores/sessionStore';
         const userId = sessionStore.userId;
 
         if (!sessionId || !userId) {
-            throw new Error('No hay sessionId o userId almacenado');
+            throw new Error("No hay sessionId o userId almacenado");
         }
 
         const response = await fetch(`${URL_CLASS}/classes?sessionId=${sessionId}&userId=${userId}`, {
-            method: 'POST',
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
             },
-            body: JSON.stringify(classeData),
+            body: JSON.stringify(classeData), 
         });
 
         if (!response.ok) {
@@ -119,7 +119,7 @@ import { useSessionStore } from '@/stores/sessionStore';
         const data = await response.json();
         return data;
     } catch (error) {
-        console.error("Error en Communication Manager:", error);
+        console.error("Error en callAddClass:", error);
         throw error;
     }
 }

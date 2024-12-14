@@ -6,12 +6,31 @@
         <v-card class="mb-4">
           <v-card-title>{{ classe.classe }}</v-card-title>
           <v-card-subtitle>ID: {{ classe.codi_random }}</v-card-subtitle>
+          <v-card-actions>
+            <v-btn @click="details(user)">INFOc:</v-btn>
+          </v-card-actions>
         </v-card>
       </v-col>
     </v-row>
     <br><br>
-    <v-btn color="primary" @click="addClass">Afegir Classe</v-btn>
+    <v-btn color="primary" @click="details">Afegir Classe</v-btn>
+
   </v-container>
+  <v-dialog v-model="dialog" max-width="600">
+    <v-card prepend-icon="mdi-account" title="Crear classe">
+      <v-card-text>
+        <v-row dense>
+          <v-col>
+            <v-text-field label="Nom de la classe (obligatori)" v-model="nomNouClasse" required></v-text-field>
+            <v-btn text="Tancar" variant="plain" @click="dialog = false"></v-btn>
+
+            <v-btn color="primary" text="Crear" variant="tonal" @click="hideDetails"></v-btn>
+          </v-col>
+        </v-row>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
+
 </template>
 
 <script setup>
@@ -20,10 +39,11 @@ import { useRoute } from 'vue-router';
 import { callFetchClasses, callAddClass } from '@/services/communicationManager';
 import { useSessionStore } from "@/stores/sessionStore";
 
+const dialog = ref(false);
 const route = useRoute();
 const formattedCourse = ref(route.params.course);
 let reformattedCourse = '0';
-
+const nomNouClasse = ref('');
 const courseValue = formattedCourse.value.toUpperCase();
 
 const match = courseValue.match(/\d+/);
@@ -57,23 +77,33 @@ const fetchClasses = async () => {
 };
 
 
-const addClass = async () => {
-  const nomNouClasse = prompt('INTRODUEIX EL NOM DE LA NOVA CLASSE:');
-  if (nomNouClasse) {
+const details = async () => {
+  dialog.value = true;
+}
+
+const hideDetails = async () => {
+  if (!nomNouClasse.value.trim()) {
+        console.error("El nom de la classe és obligatori.");
+        return;
+    }
     const classeData = {
-      classe: nomNouClasse,
+      classe: nomNouClasse.value,
       codi_random: generateRandomCode(),
       id_curs: reformattedCourse,
     };
+    console.log("Enviando datos al backend:", classeData);
+
 
     try {
       await callAddClass(classeData);
-      fetchClasses();
-    } catch (error) {
+         nomNouClasse.value = ''; 
+         dialog.value = false;
+         fetchClasses();
+
+        } catch (error) {
       console.error(error.message);
     }
-  }
-};
+  };
 
 const generateRandomCode = () => {
   return Math.random().toString(36).substring(2, 12);

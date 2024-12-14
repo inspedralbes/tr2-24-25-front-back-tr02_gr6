@@ -4,10 +4,9 @@ const mysql = require('mysql2');
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 const port = process.env.PORT_BBDD;
-
 const app = express();
 app.use(cors());
-
+app.use(express.json());
 var classes = [];
 var tutors = [];
 var alumnes = [];
@@ -111,35 +110,31 @@ app.get("/classes/:course_code", (req, res) => {
 });
 
 app.post("/classes", (req, res) => {
-    if (!req.query.nomClasse) {
-        return res.status(400).send("Falta el paràmetre nomClasse");
-    }
+    const { classe, codi_random, id_curs } = req.body;
 
-    const novaClasse = {
-        nomClasse: req.query.nomClasse,
-        codiAleatori: generarCodiAleatori()
-    };
+    if (!classe || !codi_random || !id_curs) {
+        return res.json("Faltan paràmetres: classe, codi_random o id_curs");
+    }
 
     pool.getConnection((err, connection) => {
         if (err) {
             console.error('Error getting connection from pool:', err);
             res.status(500).send("Error al obtenir connexió");
-            return;
+return;
         }
 
-        const query = `INSERT INTO Classes (classe, codi_random) VALUES (?, ?)`;
+        const query = `INSERT INTO Classes (classe, codi_random, id_curs) VALUES (?, ?, ?)`;
 
+        connection.query(query, [classe, codi_random, id_curs], (err, results) => {
 
-        connection.query(query, [novaClasse.nomClasse, novaClasse.codiAleatori], (err, results) => {
             if (err) {
                 console.error('Error:', err);
                 res.status(500).json({ error: "Error en crear la classe" });
-            } else {
-                getClasses(connection);
-                res.json({ missatge: "classe creada" });
-                console.log(`Classe: ${novaClasse.nomClasse} afegida correctament!`)
             }
+
+            res.json({ mensaje: "Classe creada", id_classe: results.insertId });
             connection.release();
+
         });
     });
 });
