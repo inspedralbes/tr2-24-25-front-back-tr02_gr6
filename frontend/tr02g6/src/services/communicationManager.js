@@ -169,8 +169,9 @@ export async function callGetProf(email, password) {
 }
 export async function getAlumnes() {
   const sessionStore = useSessionStore();
-  const sessionId = sessionStore.sessionId; 
-  const alumnes = await fetch(`${URL_FORMULARI}/alumnes?sessionId=${sessionId}`);
+  const sessionId = sessionStore.sessionId;
+   const userId = sessionStore.userId; 
+  const alumnes = await fetch(`${URL_FORMULARI}/alumnes?sessionId=${sessionId}&userId=${userId}`);
   try {
     const llista_alumnes = await alumnes.json();
     return llista_alumnes
