@@ -222,7 +222,13 @@ const passwordPlaceholder = "Insereix contrasenya";
 async function handleLogin() {
   try {
     const data = await callGetProf(professor.email, professor.contrasenya);
-    if (data && data.sessionId) {
+    if (data && data.sessionId ) {
+      const sessionStore = useSessionStore(); 
+      sessionStore.setSessionId(data.sessionId);
+      sessionStore.setUserId(data.tutorId || data.alumneId); 
+      const emailStore = useUserStore();
+      emailStore.setEmail(professor.email);
+      console.log()
       router.push("/home");
     } else {
       errorMessage.value = "Email o contrasenya incorrectes.";

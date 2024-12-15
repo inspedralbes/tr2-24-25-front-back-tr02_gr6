@@ -2,11 +2,19 @@ CREATE DATABASE tr6;
 
 USE tr6;
 
+CREATE TABLE cursos (
+    id_curs INT NOT NULL,
+    curs_nom VARCHAR(10) NOT NULL,
+    PRIMARY KEY (id_curs)
+);
+
 CREATE TABLE Classes (
     id_classe INT NOT NULL AUTO_INCREMENT,
     classe VARCHAR(10) NOT NULL,
     codi_random VARCHAR(10),
-    PRIMARY KEY (id_classe)
+    id_curs INT,
+    PRIMARY KEY (id_classe),
+    FOREIGN KEY (id_curs) REFERENCES cursos (id_curs)
 );
 
 CREATE TABLE Tutors (
@@ -19,6 +27,7 @@ CREATE TABLE Tutors (
     PRIMARY KEY (id_profe),
     FOREIGN KEY (id_classe) REFERENCES Classes (id_classe)
 );
+
 
 -- Els camps seran null fins que s'emplenin els qüestionaris
 CREATE TABLE Alumnes (

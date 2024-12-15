@@ -4,10 +4,9 @@ const mysql = require('mysql2');
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 const port = process.env.PORT_BBDD;
-
 const app = express();
 app.use(cors());
-
+app.use(express.json());
 var classes = [];
 var tutors = [];
 var alumnes = [];
@@ -33,12 +32,12 @@ app.get("/auth", (req, res) => {
     contrassenyaEnviada = req.query.contrassenya
     for (const tutor of tutorsContrassenya) {
         if (tutor.contrassenya == contrassenyaEnviada && tutor.email == correuEnviat) {
-            return res.json({ resposta: "profeAutenticat"})
+            return res.json({ resposta: "profeAutenticat", tutorId: tutor.id_profe })
         }
     };
     for (const alumne of alumnesContrassenya) {
         if (alumne.contrassenya == contrassenyaEnviada && alumne.email == correuEnviat) {
-            return res.json({ resposta: "alumneAutenticat"})
+            return res.json({ resposta: "alumneAutenticat", alumneId: alumne.id_alumne })
         }
     };
     return res.json({ resposta: "noAutenticat" })
@@ -81,39 +80,65 @@ app.get("/alumnes", (req, res) => {
     });
 });
 
-app.post("/classe", (req, res) => {
-    if (!req.query.nomClasse) {
-        return res.status(400).send("Falta el paràmetre nomClasse");
-    }
-
-    const novaClasse = {
-        nomClasse: req.query.nomClasse,
-        codiAleatori: generarCodiAleatori()
-    };
+app.get("/classes/:course_code", (req, res) => {
+    const codi_curs = req.params.course_code;
 
     pool.getConnection((err, connection) => {
         if (err) {
             console.error('Error getting connection from pool:', err);
             res.status(500).send("Error al obtenir connexió");
-            return;
         }
 
-        const query = `INSERT INTO Classes (classe, codi_random) VALUES (?, ?)`;
+        connection.query(
+            `SELECT c.id_classe, c.classe, c.codi_random
+             FROM classes c
+             JOIN cursos co ON c.id_curs = co.id_curs
+             WHERE co.nom_curs = ?`,
+            [codi_curs],
+            (err, results) => {
+                connection.release();
 
+                if (err) {
+                    console.error("Error en la consulta:", err);
+                    return res.status(500).send({ error: "Error al obtenir dades" });
+                }
 
-        connection.query(query, [novaClasse.nomClasse, novaClasse.codiAleatori], (err, results) => {
+                res.json(results);
+            }
+        );
+    });
+});
+
+app.post("/classes", (req, res) => {
+    const { classe, codi_random, id_curs } = req.body;
+
+    if (!classe || !codi_random || !id_curs) {
+        return res.json("Faltan paràmetres: classe, codi_random o id_curs");
+    }
+
+    pool.getConnection((err, connection) => {
+        if (err) {
+            console.error('Error getting connection from pool:', err);
+            res.status(500).send("Error al obtenir connexió");
+return;
+        }
+
+        const query = `INSERT INTO Classes (classe, codi_random, id_curs) VALUES (?, ?, ?)`;
+
+        connection.query(query, [classe, codi_random, id_curs], (err, results) => {
+
             if (err) {
                 console.error('Error:', err);
                 res.status(500).json({ error: "Error en crear la classe" });
-            } else {
-                getClasses(connection);
-                res.json({ missatge: "classe creada" });
-                console.log(`Classe: ${novaClasse.nomClasse} afegida correctament!`)
             }
+
+            res.json({ mensaje: "Classe creada", id_classe: results.insertId });
             connection.release();
+
         });
     });
 });
+
 
 app.post("/registre", (req, res) => {
     const nouUser = {
@@ -123,26 +148,27 @@ app.post("/registre", (req, res) => {
         contrassenya: req.query.contrassenya
     };
 
-    if (!jaExisteix(nouUser)){
-        if (esProfe(nouUser.email)){
+    if (!jaExisteix(nouUser)) {
+        if (esProfe(nouUser.email)) {
             pool.getConnection((err, connection) => {
                 if (err) {
                     console.error('Error getting connection from pool:', err);
                     res.status(500).send("Error al obtenir connexió");
                     return;
                 }
-        
+
                 const query = `INSERT INTO Tutors (email, contrassenya, nom, cognoms) VALUES (?, ?, ?, ?)`;
-        
-        
+
+
                 connection.query(query, [nouUser.email, nouUser.contrassenya, nouUser.nom, nouUser.cognoms], (err, results) => {
                     if (err) {
                         console.error('Error:', err);
                         res.status(500).json({ error: "Error en crear el professor" });
                     } else {
+                        const tutorId = results.insertId;
                         getTutors(connection);
                         getTutorsContrassenya(connection);
-                        res.json({ missatge: "Tutor afegit" });
+                        res.json({ missatge: "Tutor afegit", tutorId: tutorId });
                         console.log(`Tutor: ${nouUser.nom} afegit correctament!`)
                     }
                     connection.release();
@@ -155,18 +181,19 @@ app.post("/registre", (req, res) => {
                     res.status(500).send("Error al obtenir connexió");
                     return;
                 }
-        
+
                 const query = `INSERT INTO Alumnes (email, contrassenya, nom, cognoms) VALUES (?, ?, ?, ?)`;
-        
-        
+
+
                 connection.query(query, [nouUser.email, nouUser.contrassenya, nouUser.nom, nouUser.cognoms], (err, results) => {
                     if (err) {
                         console.error('Error:', err);
                         res.status(500).json({ error: "Error en crear l'alumne" });
                     } else {
+                        const alumneId = results.insertId;
                         getAlumnes(connection);
                         getAlumnesContrassenya(connection);
-                        res.json({ missatge: "Alumne afegit" });
+                        res.json({ missatge: "Alumne afegit", alumneId: alumneId });
                         console.log(`Alumne: ${nouUser.nom} afegit correctament!`)
                     }
                     connection.release();
@@ -174,7 +201,7 @@ app.post("/registre", (req, res) => {
             });
         }
     } else {
-        res.status(500).json({error: "Usat."});
+        res.status(500).json({ error: "Usat." });
         console.log("Aquest correu ja està en us.")
     }
 });
@@ -275,7 +302,7 @@ function getAlumnes(connection) {
 }
 
 function getTutorsContrassenya(connection) {
-    connection.query('SELECT email, contrassenya FROM tutors', (err, results) => {
+    connection.query('SELECT id_profe, email, contrassenya FROM tutors', (err, results) => {
         if (err) {
             console.error('Error:', err);
         } else {
@@ -285,7 +312,7 @@ function getTutorsContrassenya(connection) {
 }
 
 function getAlumnesContrassenya(connection) {
-    connection.query('SELECT email, contrassenya FROM alumnes', (err, results) => {
+    connection.query('SELECT id_alumne, email, contrassenya FROM alumnes', (err, results) => {
         if (err) {
             console.error('Error:', err);
         } else {
@@ -309,7 +336,7 @@ function esProfe(email) {
     return !teNumeros.test(email);
 }
 
-function jaExisteix(nouUser){
+function jaExisteix(nouUser) {
     for (const tutor of tutorsContrassenya) {
         if (tutor.email == nouUser.email) {
             return true;

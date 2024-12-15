@@ -1,16 +1,12 @@
 import { defineStore } from 'pinia';
 
-export const useSessionStore = defineStore('session', {
+export const useIdStore = defineStore('auth', {
   state: () => ({
-    sessionId: null,
-    userId: null,
+    sessionId: null, 
   }),
   actions: {
     setSessionId(id) {
       this.sessionId = id;
-    },
-    setUserId(userId) { 
-      this.userId = userId;
     },
     clearSessionId() {
       this.sessionId = null;
