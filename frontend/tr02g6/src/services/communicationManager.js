@@ -1,12 +1,12 @@
 
-import { useAuthStore } from "@/stores/userauth";
+//import { useAuthStore } from "@/stores/userauth";
 
 const URL = import.meta.env.VITE_API_ROUTE;
 const URL_AUTH = import.meta.env.VITE_API_ROUTE_AUTH;
 const URL_CLASS = import.meta.env.VITE_API_ROUTE_CLASS;
 const URL_FORMULARI = import.meta.env.VITE_API_ROUTE_FORMULARI;
 import { useSessionStore } from '@/stores/sessionStore';
-const authStore = useAuthStore();
+//const authStore = useAuthStore();
 
 export async function callPostProf(profesor) {
   // const formProfesor = new FormData();

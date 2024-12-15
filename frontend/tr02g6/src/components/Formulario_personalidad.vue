@@ -97,14 +97,6 @@ onMounted(()=> {
   fecthGetAlumnos();
 });
 
-/*async function fecthGetAlumnos() {
-  try {
-    alumnos.value = await getAlumnos();
-  }
-  catch (error) {
-    console.error('Error al obtener correos', error);
-  }
-}
 
 async function fetchPostResultats() {
   try {
@@ -154,7 +146,7 @@ async function fetchPostResultats() {
   catch (error) {
     console.error('Hubo problemas al enviar los resultados.', error);
   }
-  }*/
+  }
 </script>
 
 <template id="cuerpo">
