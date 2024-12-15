@@ -127,15 +127,55 @@ export async function callPostProf(profesor) {
         console.error("Error en callAddClass:", error);
         throw error;
     }
-    export async function getAlumnes() {
-      const sessionStore = useSessionStore();
-          const sessionId = sessionStore.sessionId; 
-      const alumnes = await fetch(`${URL_FORMULARI}/alumnes?sessionId=${sessionId}`);
-      try {
-        const llista_alumnes = await alumnes.json();
-        return llista_alumnes
-      } catch (error) {
-        console.error('Error al obtener datos:', error);
-      }
+  }
+  
+/*export async function callGetClasses() {
+  try {
+    const response = await fetch(`${URL}/classes`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error en la solicitud: ${response.status} ${response.statusText}`);
     }
+
+    const data = await response.json();
+    console.log("Clases obtenidas:", data);
+
+    return data;
+  } catch (error) {
+    console.error("Error en Communication Manager:", error.message);
+    throw error;
+  }
+}*/
+
+export async function callGetProf(email, password) {
+  try {
+    const response = await fetch(`${URL_AUTH}/auth?email=${email}&contrassenya=${password}`);
+    if (!response.ok) {
+      throw new Error(`Error en la solicitud: ${response.status}`);
+    }
+    const data = await response.json();
+
+
+    return data;
+  } catch (error) {
+    console.error("Error en Communication Manager:", error);
+    throw error;
+  }
 }
+export async function getAlumnes() {
+  const sessionStore = useSessionStore();
+  const sessionId = sessionStore.sessionId; 
+  const alumnes = await fetch(`${URL_FORMULARI}/alumnes?sessionId=${sessionId}`);
+  try {
+    const llista_alumnes = await alumnes.json();
+    return llista_alumnes
+  } catch (error) {
+    console.error('Error al obtener datos:', error);
+  }
+}
+
