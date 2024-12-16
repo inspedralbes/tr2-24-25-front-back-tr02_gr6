@@ -81,7 +81,7 @@ app.get("/alumnes", (req, res) => {
 });
 
 app.get("/alumnesClasseProfe", (req, res) => {
-    const profe_id = req.query.profe_id;
+    const profe_id = req.query.userId;
 
     if (!profe_id) {
         return res.status(400).json({ error: "Falta el paràmetre profe_id" });
@@ -94,10 +94,41 @@ app.get("/alumnesClasseProfe", (req, res) => {
         }
 
         const query = `
-            SELECT a.id_alumne, a.email, a.nom, a.cognoms, a.id_classe
+            SELECT a.id_alumne, a.email, a.nom, a.cognoms
             FROM Alumnes a
             INNER JOIN Tutors t ON a.id_classe = t.id_classe
             WHERE t.id_profe = ?
+        `;
+
+        connection.query(query, [profe_id], (err, results) => {
+            connection.release();
+            if (err) {
+                console.error("Error executant la consulta:", err);
+                return res.status(500).json({ error: "Error en retornar els alumnes" });
+            }
+            if (results.length === 0) {
+                return res.status(404).json({ message: "No s'han trobat alumnes per aquest professor" });
+            }
+            res.json(results);
+        });
+    });
+});
+
+app.get("/JSON", (req, res) => {
+    const profe_id = req.query.userId;
+
+    if (!profe_id) {
+        return res.status(400).json({ error: "Falta el paràmetre profe_id" });
+    }
+
+    pool.getConnection((err, connection) => {
+        if (err) {
+            console.error("Error obtenint connexió del pool:", err);
+            return res.status(500).send("Error al obtenir connexió");
+        }
+
+        const query = `
+            SELECT questionari FROM Alumnes WHERE id_alumne = ?
         `;
 
         connection.query(query, [profe_id], (err, results) => {
@@ -128,7 +159,7 @@ app.get("/alumnesClasseAlumne", (req, res) => {
         }
 
         const query = `
-            SELECT a.id_alumne, a.email, a.nom, a.cognoms, a.id_classe
+            SELECT a.id_alumne, a.email, a.nom, a.cognoms
             FROM Alumnes a
             WHERE a.id_classe = (
                 SELECT id_classe
@@ -469,11 +500,11 @@ app.put("/classe", (req, res) => {
     });
 });
 
-app.post("/formulari", (req, res) => {
+app.put("/formulari", (req, res) => {
     const id_alumne = req.query.userId
-    const formulari = req.query.formulari;
+    const formulari = JSON.stringify(req.query.formulari);
 
-    if (!formulari || id_alumne) {
+    if (!formulari || !id_alumne) {
         return res.json("Falten paràmetres");
     }
 
@@ -484,7 +515,7 @@ app.post("/formulari", (req, res) => {
             return;
         }
 
-        const query = `INSERT INTO Alumnes (questionari) VALUES (?) WHERE id_alumne = (?)`;
+        const query = `UPDATE Alumnes SET questionari = ? WHERE id_alumne = ?;`;
 
         connection.query(query, [formulari, id_alumne], (err, results) => {
 

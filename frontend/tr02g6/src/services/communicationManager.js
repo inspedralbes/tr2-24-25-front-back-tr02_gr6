@@ -115,8 +115,8 @@ export async function callPostProf(profesor) {
             throw new Error("No hay sessionId o userId almacenado");
         }
 
-        const response = await fetch(`${URL_FORMULARI}/formulari?sessionId=${sessionId}&userId=${userId}`, {
-            method: "POST",
+        const response = await fetch(`${URL}/formulari?sessionId=${sessionId}&userId=${userId}`, {
+            method: "PUT",
             headers: {
                 "Content-Type": "application/json",
             },
@@ -178,7 +178,9 @@ export async function getAlumnes() {
   const sessionStore = useSessionStore();
   const sessionId = sessionStore.sessionId;
   const userId = sessionStore.userId; 
-  const alumnes = await fetch(`${URL_FORMULARI}/alumnesClasse?sessionId=${sessionId}&userId=${userId}`);
+  console.log(sessionId);
+  console.log(userId);
+  const alumnes = await fetch(`${URL}/alumnesClasse?sessionId=${sessionId}&userId=${userId}`);
   try {
     const llista_alumnes = await alumnes.json();
     return llista_alumnes

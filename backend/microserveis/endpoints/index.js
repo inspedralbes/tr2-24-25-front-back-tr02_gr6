@@ -31,10 +31,10 @@ app.get("/classes/:course_code", async (req, res) => {
     sessionId = req.query.sessionId;
     userId = req.query.userId;
     if (!req.query.sessionId || !req.query.userId) {
-        return res.send("Falten Camps");
+        return res.json({missatge: "Falten camps"});;
     }
     if (!isAuthProfe(sessionId, userId)) {
-        return res.send("No Autenticat");
+        return res.json({missatge: "No Autenticat"});
     } else {
 
     const courseCode = req.params.course_code;
@@ -47,10 +47,10 @@ app.get("/tutors", async (req, res) => {
     sessionId = req.query.sessionId;
     userId = req.query.userId;
     if (!req.query.sessionId || !req.query.userId) {
-        return res.send("No Autenticat");
+        return res.json({missatge: "No Autenticat"});
     }
     if (!isAuthProfe(sessionId, userId)) {
-        return res.send("No Autenticat");
+        return res.json({missatge: "No Autenticat"});
     } else {
         const tutors = await getSQL("tutors");
         res.json(tutors);
@@ -61,10 +61,10 @@ app.get("/alumnes", async (req, res) => {
     sessionId = req.query.sessionId;
     userId = req.query.userId;
     if (!req.query.sessionId || !req.query.userId) {
-        return res.send("No Autenticat");
+        return res.json({missatge: "No Autenticat"});
     }
     if (!isAuthProfe(sessionId, userId)) {
-        return res.send("No Autenticat");
+        return res.json({missatge: "No Autenticat"});
     } else {
         const alumnes = await getSQL("alumnes");
         res.json(alumnes);
@@ -75,7 +75,7 @@ app.get("/alumnesClasse", async (req, res) => {
     sessionId = req.query.sessionId;
     userId = req.query.userId;
     if (!req.query.sessionId || !req.query.userId) {
-        return res.send("No Autenticat");
+        return res.json({missatge: "No Autenticat"});
     }
     if (isAuthProfe(sessionId, userId)) {
         const alumnes = await getSQL("alumnesClasseProfe", { userId });
@@ -98,13 +98,13 @@ app.post("/classes", async (req, res) => {
     }
 
     if (!isAuthProfe(sessionId, userId)) {
-        return res.json("No Autenticat");
+        res.json({missatge: "No Autenticat"});
     }
 
     const { classe, codi_random, id_curs } = req.body;
 
     if (!classe || !codi_random || !id_curs) {
-        return res.json("Falten camps");
+        res.json({missatge: "Falten camps"});
     }
         const classes = await postSQL("classes", { classe, codi_random, id_curs });
         res.json(classes);
@@ -114,14 +114,14 @@ app.delete("/classes", async (req, res) => {
     sessionId = req.query.sessionId;
     userId = req.query.userId;
     if (!req.query.sessionId || !req.query.userId) {
-        return res.json("No Autenticat");
+        res.json({missatge: "No Autenticat"});
     }
     if (!isAuthProfe(sessionId,  userId)) {
-        return res.json("No Autenticat");
+        res.json({missatge: "No Autenticat"});;
     } else {
         const idClasse = req.query.idClasse;
         if (!idClasse) {
-            return res.json("Falta paràmetre idClasse");
+            res.json({missatge: "Falta el paràmetre idClasse"});
         }
         const classes = await deleteSQL("classe", { idClasse });
         res.json(classes);
@@ -164,23 +164,25 @@ app.put("/afegirClasse", async (req, res) => {
 });
 
 
-app.post("/formulari", async (req, res) => {
+app.put("/formulari", async (req, res) => {
     sessionId = req.query.sessionId;
     userId = req.query.userId;
     if (!req.query.sessionId || !req.query.userId) {
-        return res.send("No Autenticat");
+        return res.json({missatge: "No Autenticat"});
     }
 
     if (!isAuthAlumne(sessionId, userId)) {
-        return res.json("No Autenticat");
+        return res.json({missatge: "No Autenticat"});
     }
 
-    const formulari = req.body;
+    const formulariEstringuejar = req.body;
+    const formulari = JSON.stringify(formulariEstringuejar)
 
     if (!formulari) {
-        return res.json("Falten camps");
+        returnres.json({missatge: "Falten camps"});
     }
-        const resposta = await postSQL("formulari", { userId, formulari });
+        
+        const resposta = await putSQL("formulari", { userId, formulari });
         res.json(resposta);
 });
 
