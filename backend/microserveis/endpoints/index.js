@@ -132,10 +132,10 @@ app.put("/classes", async (req, res) => {
     sessionId = req.query.sessionId;
     userId = req.query.userId;
     if (!req.query.sessionId || !req.query.userId) {
-        return res.send("No Autenticat");
+        return res.json({missatge: "No Autenticat"});
     }
     if (!isAuthProfe(sessionId,  userId)) {
-        return res.send("No Autenticat");
+        return res.json({missatge: "No Autenticat"});
     } else {
         const nomClasse = req.query.nomClasse;
         const idClasse = req.query.idClasse;
