@@ -1,21 +1,20 @@
 
 //import { useAuthStore } from "@/stores/userauth";
 
-const URL = import.meta.env.VITE_API_ROUTE;
 const URL_AUTH = import.meta.env.VITE_API_ROUTE_AUTH;
-const URL_CLASS = import.meta.env.VITE_API_ROUTE_CLASS;
-const URL_FORMULARI = import.meta.env.VITE_API_ROUTE_FORMULARI;
+const URL = import.meta.env.VITE_API_ROUTE;
 import { useSessionStore } from '@/stores/sessionStore';
 //const authStore = useAuthStore();
 
 export async function callPostProf(profesor) {
   // const formProfesor = new FormData();
+  console.log(profesor);
 
   // formProfesor.append('nom', profesor.nom);
   // formProfesor.append('cognoms', profesor.cognoms);
   // formProfesor.append('email', profesor.email);
   // formProfesor.append('contrassenya', profesor.contrassenya);
-
+ 
   const response = await fetch(`${URL}/registre`, {
     method: 'POST',
     headers: {
@@ -35,29 +34,6 @@ export async function callPostProf(profesor) {
   return nuevoProfesor;
 };
 
-
-  export async function callGetClasses() {
-    try {
-      const response = await fetch(`${URL}/classes`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-  
-      if (!response.ok) {
-        throw new Error(`Error en la solicitud: ${response.status} ${response.statusText}`);
-      }
-  
-      const data = await response.json();
-      console.log("Clases obtenidas:", data);
-  
-      return data; 
-    } catch (error) {
-      console.error("Error en Communication Manager:", error.message);
-      throw error;
-    }
-  }
   
   /*export async function callGetProf(email,password) {
     try {
@@ -84,7 +60,7 @@ export async function callPostProf(profesor) {
         throw new Error('No hay sessionId o userId almacenado');
     }
 
-    const response = await fetch(`${URL_CLASS}/classes/${course}?sessionId=${sessionId}&userId=${userId}`);
+    const response = await fetch(`${URL}/classes/${course}?sessionId=${sessionId}&userId=${userId}`);
     if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Error al obtener datos de clases: ${errorText}`);
@@ -108,7 +84,7 @@ export async function callPostProf(profesor) {
             throw new Error("No hay sessionId o userId almacenado");
         }
 
-        const response = await fetch(`${URL_CLASS}/classes?sessionId=${sessionId}&userId=${userId}`, {
+        const response = await fetch(`${URL}/classes?sessionId=${sessionId}&userId=${userId}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

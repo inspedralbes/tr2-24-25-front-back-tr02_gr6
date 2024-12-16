@@ -192,6 +192,7 @@ app.post("/registre", async (req, res) => {
         }
         const missatge = await postSQL("registre", { email, nom, cognoms, contrassenya });
         res.send(missatge)
+        console.log(missatge)
     } catch(error){
         console.log("Error /registre: " + error);
         return res.status(500).send("Falten paràmetres");

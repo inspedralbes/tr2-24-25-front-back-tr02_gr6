@@ -1,13 +1,11 @@
 CREATE DATABASE tr6;
 
 USE tr6;
-
 CREATE TABLE cursos (
     id_curs INT NOT NULL,
-    curs_nom VARCHAR(10) NOT NULL,
+    nom_curs VARCHAR(10) NOT NULL,
     PRIMARY KEY (id_curs)
 );
-
 CREATE TABLE Classes (
     id_classe INT NOT NULL AUTO_INCREMENT,
     classe VARCHAR(10) NOT NULL,
@@ -23,13 +21,9 @@ CREATE TABLE Tutors (
     contrassenya VARCHAR(50) NOT NULL,
     nom VARCHAR(50),
     cognoms VARCHAR(50),
-    id_classe INT,
-    PRIMARY KEY (id_profe),
-    FOREIGN KEY (id_classe) REFERENCES Classes (id_classe)
+    PRIMARY KEY (id_profe)
 );
 
-
--- Els camps seran null fins que s'emplenin els qüestionaris
 CREATE TABLE Alumnes (
     id_alumne INT NOT NULL AUTO_INCREMENT,
     email VARCHAR(50) NOT NULL,
@@ -53,11 +47,16 @@ CREATE TABLE Alumnes (
     PRIMARY KEY (id_alumne),
     FOREIGN KEY (id_classe) REFERENCES Classes (id_classe)
 );
+INSERT INTO Cursos VALUES 
+(1, '1ESO'),
+(2, '2ESO'),
+(3, '3ESO'),
+(4, '4ESO');
 
-INSERT INTO Classes (classe, codi_random) VALUES ('1A', 'WeWdewXWnY');
-INSERT INTO Classes (classe, codi_random) VALUES ('1B', 'BZviGgYIyL');
-INSERT INTO Classes (classe, codi_random) VALUES ('2A', 'TeDIEJPszh');
-INSERT INTO Classes (classe, codi_random) VALUES ('2B', 'XfutUvmzKo');
+INSERT INTO Classes (classe, codi_random, id_curs) VALUES ('1A', 'WeWdewXWnY',1);
+INSERT INTO Classes (classe, codi_random, id_curs) VALUES ('1B', 'BZviGgYIyL',1);
+INSERT INTO Classes (classe, codi_random, id_curs) VALUES ('2A', 'TeDIEJPszh',2);
+INSERT INTO Classes (classe, codi_random, id_curs) VALUES ('2B', 'XfutUvmzKo',2);
 
 INSERT INTO Tutors (email, contrassenya, nom, cognoms) VALUES
 ('tutor1A@example.com', 'password123', 'Joan', 'Pérez'),
@@ -81,3 +80,5 @@ INSERT INTO Alumnes (email, contrassenya, nom, cognoms) VALUES
 INSERT INTO Alumnes (email, contrassenya, nom, cognoms) VALUES
 ('alumne2B1@example.com', 'alumne123', 'Eva', 'Pascual'),
 ('alumne2B2@example.com', 'alumne123', 'David', 'González');
+
+

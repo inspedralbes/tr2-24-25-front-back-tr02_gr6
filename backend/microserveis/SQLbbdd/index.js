@@ -511,7 +511,7 @@ function getClasses(connection) {
 }
 
 function getTutors(connection) {
-    connection.query('SELECT id_profe, email, nom, cognoms, id_classe FROM tutors', (err, results) => {
+    connection.query('SELECT id_profe, email, nom, cognoms FROM tutors', (err, results) => {
         if (err) {
             console.error('Error:', err);
         } else {
