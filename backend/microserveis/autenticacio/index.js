@@ -81,10 +81,11 @@ function isAuthProfe(sessionId, tutorId) {
     for (const sessio of sessionsProfeAutenticades) {
         if (sessio.sessionId === sessionId && sessio.tutorId === Number(tutorId)) {
             return true;
+        } else{
+            return false;
+        
         }
     }
-    console.log(`Sessió no vàlida per sessionId: ${sessionId}, tutorId: ${tutorId}`);
-    return false;
 }
 
 
@@ -154,7 +155,6 @@ function isAuthAlumne(sessionId, alumneId) {
             return true;
         }
     }
-    console.log(`Sessió no vàlida per sessionId: ${sessionId}, alumneId: ${alumneId}`);
     return false;
 }
 

@@ -80,6 +80,235 @@ app.get("/alumnes", (req, res) => {
     });
 });
 
+app.get("/alumnesClasseProfe", (req, res) => {
+    const profe_id = req.query.userId;
+
+    if (!profe_id) {
+        return res.status(400).json({ error: "Falta el paràmetre profe_id" });
+    }
+
+    pool.getConnection((err, connection) => {
+        if (err) {
+            console.error("Error obtenint connexió del pool:", err);
+            return res.status(500).send("Error al obtenir connexió");
+        }
+
+        const query = `
+            SELECT a.id_alumne, a.email, a.nom, a.cognoms
+            FROM Alumnes a
+            INNER JOIN Tutors t ON a.id_classe = t.id_classe
+            WHERE t.id_profe = ?
+        `;
+
+        connection.query(query, [profe_id], (err, results) => {
+            connection.release();
+            if (err) {
+                console.error("Error executant la consulta:", err);
+                return res.status(500).json({ error: "Error en retornar els alumnes" });
+            }
+            if (results.length === 0) {
+                return res.status(404).json({ message: "No s'han trobat alumnes per aquest professor" });
+            }
+            res.json(results);
+        });
+    });
+});
+
+app.get("/JSON", (req, res) => {
+    const profe_id = req.query.userId;
+
+    if (!profe_id) {
+        return res.status(400).json({ error: "Falta el paràmetre profe_id" });
+    }
+
+    pool.getConnection((err, connection) => {
+        if (err) {
+            console.error("Error obtenint connexió del pool:", err);
+            return res.status(500).send("Error al obtenir connexió");
+        }
+
+        const query = `
+            SELECT questionari FROM Alumnes WHERE id_alumne = ?
+        `;
+
+        connection.query(query, [profe_id], (err, results) => {
+            connection.release();
+            if (err) {
+                console.error("Error executant la consulta:", err);
+                return res.status(500).json({ error: "Error en retornar els alumnes" });
+            }
+            if (results.length === 0) {
+                return res.status(404).json({ message: "No s'han trobat alumnes per aquest professor" });
+            }
+            res.json(results);
+        });
+    });
+});
+
+app.get("/alumnesClasseAlumne", (req, res) => {
+    const alumne_id = req.query.userId;
+
+    if (!alumne_id) {
+        return res.status(400).json({ error: "Falta el paràmetre alumne_id" });
+    }
+
+    pool.getConnection((err, connection) => {
+        if (err) {
+            console.error("Error obtenint connexió del pool:", err);
+            return res.status(500).send("Error al obtenir connexió");
+        }
+
+        const query = `
+            SELECT a.id_alumne, a.email, a.nom, a.cognoms
+            FROM Alumnes a
+            WHERE a.id_classe = (
+                SELECT id_classe
+                FROM Alumnes
+                WHERE id_alumne = ?
+            )
+        `;
+
+        connection.query(query, [alumne_id], (err, results) => {
+            connection.release();
+            if (err) {
+                console.error("Error executant la consulta:", err);
+                return res.status(500).json({ error: "Error en retornar els alumnes" });
+            }
+
+            if (results.length === 0) {
+                return res.status(404).json({ message: "No s'han trobat alumnes per aquesta classe" });
+            }
+            res.json(results);
+        });
+    });
+});
+
+
+app.put("/afegirClasseProfe", (req, res) => {
+    const profe_id = req.query.userId;
+    const codi_classe = req.query.codi_classe;
+
+    if (!profe_id || !codi_classe) {
+        return res.status(400).json({ error: "Falta el paràmetre profe_id o codi_classe" });
+    }
+
+    pool.getConnection((err, connection) => {
+        if (err) {
+            console.error("Error obtenint connexió del pool:", err);
+            return res.status(500).send("Error al obtenir connexió");
+        }
+
+        const queryGetClasseId = `
+            SELECT id_classe 
+            FROM Classes 
+            WHERE codi_random = ?
+        `;
+
+        connection.query(queryGetClasseId, [codi_classe], (err, results) => {
+            if (err) {
+                connection.release();
+                console.error("Error executant la consulta per obtenir id_classe:", err);
+                return res.status(500).json({ error: "Error en obtenir id_classe" });
+            }
+
+            if (results.length === 0) {
+                connection.release();
+                return res.status(404).json({ error: "No s'ha trobat cap classe amb aquest codi_random" });
+            }
+
+
+            const id_classe = results[0].id_classe;
+
+            const queryUpdateTutor = `
+                UPDATE Tutors 
+                SET id_classe = ? 
+                WHERE id_profe = ?
+            `;
+
+            connection.query(queryUpdateTutor, [id_classe, profe_id], (err, updateResults) => {
+                connection.release();
+                if (err) {
+                    console.error("Error actualitzant el tutor:", err);
+                    return res.status(500).json({ error: "Error en actualitzar el tutor" });
+                }
+
+                if (updateResults.affectedRows === 0) {
+                    return res.status(404).json({ error: "No s'ha trobat cap tutor amb aquest id" });
+                }
+
+
+                res.json({
+                    message: `Profe amb id ${profe_id} ha estat assignat a la classe amb codi ${codi_classe}`,
+                });
+            });
+        });
+    });
+});
+
+app.put("/afegirClasseAlumne", (req, res) => {
+    const alumne_id = req.query.userId;
+    const codi_classe = req.query.codi_classe;
+
+    if (!alumne_id || !codi_classe) {
+        return res.status(400).json({ error: "Falta el paràmetre alumne_id o codi_classe" });
+    }
+
+    pool.getConnection((err, connection) => {
+        if (err) {
+            console.error("Error obtenint connexió del pool:", err);
+            return res.status(500).send("Error al obtenir connexió");
+        }
+
+        const queryGetClasseId = `
+            SELECT id_classe 
+            FROM Classes 
+            WHERE codi_random = ?
+        `;
+
+        connection.query(queryGetClasseId, [codi_classe], (err, results) => {
+            if (err) {
+                connection.release();
+                console.error("Error executant la consulta per obtenir id_classe:", err);
+                return res.status(500).json({ error: "Error en obtenir id_classe" });
+            }
+
+            if (results.length === 0) {
+                connection.release();
+                return res.status(404).json({ error: "No s'ha trobat cap classe amb aquest codi_random" });
+            }
+
+
+            const id_classe = results[0].id_classe;
+
+            const queryUpdateTutor = `
+                UPDATE Alumnes 
+                SET id_classe = ? 
+                WHERE id_alumne = ?
+            `;
+
+            connection.query(queryUpdateTutor, [id_classe, alumne_id], (err, updateResults) => {
+                connection.release();
+                if (err) {
+                    console.error("Error actualitzant el tutor:", err);
+                    return res.status(500).json({ error: "Error en actualitzar el tutor" });
+                }
+
+                if (updateResults.affectedRows === 0) {
+                    return res.status(404).json({ error: "No s'ha trobat cap tutor amb aquest id" });
+                }
+
+
+                res.json({
+                    message: `Alumne amb id ${alumne_id} ha estat assignat a la classe amb codi ${codi_classe}`,
+                });
+
+            });
+        });
+    });
+});
+
+
+
 app.get("/classes/:course_code", (req, res) => {
     const codi_curs = req.params.course_code;
 
@@ -120,7 +349,7 @@ app.post("/classes", (req, res) => {
         if (err) {
             console.error('Error getting connection from pool:', err);
             res.status(500).send("Error al obtenir connexió");
-return;
+            return;
         }
 
         const query = `INSERT INTO Classes (classe, codi_random, id_curs) VALUES (?, ?, ?)`;
@@ -267,6 +496,37 @@ app.put("/classe", (req, res) => {
                 console.log(`Classe: ${classeEditar.nomClasse} editada correctament!`)
             }
             connection.release();
+        });
+    });
+});
+
+app.put("/formulari", (req, res) => {
+    const id_alumne = req.query.userId
+    const formulari = JSON.stringify(req.query.formulari);
+
+    if (!formulari || !id_alumne) {
+        return res.json("Falten paràmetres");
+    }
+
+    pool.getConnection((err, connection) => {
+        if (err) {
+            console.error('Error getting connection from pool:', err);
+            res.status(500).send("Error al obtenir connexió");
+            return;
+        }
+
+        const query = `UPDATE Alumnes SET questionari = ? WHERE id_alumne = ?;`;
+
+        connection.query(query, [formulari, id_alumne], (err, results) => {
+
+            if (err) {
+                console.error('Error:', err);
+                res.status(500).json({ error: "Error en afegir respostes a l'alumne." });
+            }
+
+            res.json({ mensaje: "Respostes afegides" });
+            connection.release();
+
         });
     });
 });

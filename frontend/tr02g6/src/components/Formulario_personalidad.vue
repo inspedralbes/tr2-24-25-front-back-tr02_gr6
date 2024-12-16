@@ -1,11 +1,7 @@
 <!-- eslint-disable no-undef -->
 <script setup>
-import { getAlumnes } from '@/services/communicationManager';
+import { getAlumnes, postResultats } from '@/services/communicationManager';
 import { onMounted, ref, watch } from 'vue'
-const requiredRule = [
-  correo => !!correo || 'Este campo es obligatorio',
-
-];
 const correos = ref([])
 const alumnos = ref([])
 const correo = ref();
@@ -93,7 +89,7 @@ async function fecthGetAlumnos() {
   }
 }
 
-onMounted(()=> {
+onMounted(() => {
   fecthGetAlumnos();
 });
 
@@ -111,21 +107,21 @@ async function fetchPostResultats() {
       alert('Debe aceptar los terminos y condiciones.');
     }
     else {
-      const resultats = await postResultats(
-        correo.value,
-        cae_bien.value,
-        cae_no_bien.value,
-        difunde_rumores.value,
-        ayuda_demás.value,
-        da_empujones.value,
-        no_deja_participar.value,
-        anima_demas.value,
-        insulta.value,
-        victima_empujones.value,
-        victima_insultar.value,
-        victima_no_deja_participar.value,
-        amigos.value,
-      );
+      const formulariEnviar = {
+        cauBe: cae_bien.value,
+        noCauBe: cae_no_bien.value,
+        correRumors: difunde_rumores.value,
+        ajuda: ayuda_demás.value,
+        donaEmpentes: da_empujones.value,
+        noDeixaParticipar: no_deja_participar.value,
+        anima: anima_demas.value,
+        insulta: insulta.value,
+        esEmpentat: victima_empujones.value,
+        esInsultat: victima_insultar.value,
+        esAillat: victima_no_deja_participar.value,
+        esAmic: amigos.value,
+      }
+      const resultats = await postResultats(formulariEnviar);
       console.log("Formulario enviado con éxito:", resultats);
       correo.value = '';
       cae_bien.value = '';
@@ -146,285 +142,94 @@ async function fetchPostResultats() {
   catch (error) {
     console.error('Hubo problemas al enviar los resultados.', error);
   }
-  }
+}
 </script>
 
 <template id="cuerpo">
   <div id="formulario">
     <v-card-title>CESC- Conducta y Experiencias Sociales en Clase (ESO)</v-card-title>
-    <v-select
-      v-model="correo"
-      label="Correo"
-      :rules="requiredRule"
-      :items="correos"
-    />
     <v-card-text>Es obligatorio seleccionar tres opciones en cada pregunta</v-card-text>
     <div id="preguntasTest">
-      <v-select
-        v-model="cae_bien"
-        label="¿Quién me cae bien?"
-        :items="alumnos"
-        :rules="requiredRule"
-        :multiple="true"
-      />
-      <v-text-field
-        disabled
-        :label="cae_bien[0]"
-      />
-      <v-text-field
-        disabled
-        :label="cae_bien[1]"
-      />
-      <v-text-field
-        disabled
-        :label="cae_bien[2]"
-      />
+      <v-select v-model="cae_bien" label="¿Quién me cae bien?" :items="alumnos" :rules="requiredRule"
+        :multiple="true" />
+      <v-text-field disabled :label="cae_bien[0]" />
+      <v-text-field disabled :label="cae_bien[1]" />
+      <v-text-field disabled :label="cae_bien[2]" />
 
-      <v-select
-        v-model="cae_no_bien"
-        :items="alumnos"
-        label="¿Quién NO me cae bien?"
-        :rules="requiredRule"
-        :multiple="true"
-      />
-      <v-text-field
-        disabled
-        :label="cae_no_bien[0]"
-      />
-      <v-text-field
-        disabled
-        :label="cae_no_bien[1]"
-      />
-      <v-text-field
-        disabled
-        :label="cae_no_bien[2]"
-      />
+      <v-select v-model="cae_no_bien" :items="alumnos" label="¿Quién NO me cae bien?" :rules="requiredRule"
+        :multiple="true" />
+      <v-text-field disabled :label="cae_no_bien[0]" />
+      <v-text-field disabled :label="cae_no_bien[1]" />
+      <v-text-field disabled :label="cae_no_bien[2]" />
 
-      <v-select
-        v-model="difunde_rumores"
-        :items="alumnos"
-        label="¿Quién difunde rumores?"
-        :rules="requiredRule"
-        :multiple="true"
-      />
-      <v-text-field
-        disabled
-        :label="difunde_rumores[0]"
-      />
-      <v-text-field
-        disabled
-        :label="difunde_rumores[1]"
-      />
-      <v-text-field
-        disabled
-        :label="difunde_rumores[2]"
-      />
+      <v-select v-model="difunde_rumores" :items="alumnos" label="¿Quién difunde rumores?" :rules="requiredRule"
+        :multiple="true" />
+      <v-text-field disabled :label="difunde_rumores[0]" />
+      <v-text-field disabled :label="difunde_rumores[1]" />
+      <v-text-field disabled :label="difunde_rumores[2]" />
 
-      <v-select
-        v-model="ayuda_demás"
-        :items="alumnos"
-        label="¿Quien ayuda a los demás?"
-        :rules="requiredRule"
-        :multiple="true"
-      />
-      <v-text-field
-        disabled
-        :label="ayuda_demás[0]"
-      />
-      <v-text-field
-        disabled
-        :label="ayuda_demás[1]"
-      />
-      <v-text-field
-        disabled
-        :label="ayuda_demás[2]"
-      />
+      <v-select v-model="ayuda_demás" :items="alumnos" label="¿Quien ayuda a los demás?" :rules="requiredRule"
+        :multiple="true" />
+      <v-text-field disabled :label="ayuda_demás[0]" />
+      <v-text-field disabled :label="ayuda_demás[1]" />
+      <v-text-field disabled :label="ayuda_demás[2]" />
 
-      <v-select
-        v-model="da_empujones"
-        :items="alumnos"
-        label="¿Quien da empujones?"
-        :rules="requiredRule"
-        :multiple="true"
-      />
-      <v-text-field
-        disabled
-        :label="da_empujones[0]"
-      />
-      <v-text-field
-        disabled
-        :label="da_empujones[1]"
-      />
-      <v-text-field
-        disabled
-        :label="da_empujones[2]"
-      />
+      <v-select v-model="da_empujones" :items="alumnos" label="¿Quien da empujones?" :rules="requiredRule"
+        :multiple="true" />
+      <v-text-field disabled :label="da_empujones[0]" />
+      <v-text-field disabled :label="da_empujones[1]" />
+      <v-text-field disabled :label="da_empujones[2]" />
 
-      <v-select
-        v-model="no_deja_participar"
-        :items="alumnos"
-        label="¿Quien no deja participar?"
-        :rules="requiredRule"
-        :multiple="true"
-      />
-      <v-text-field
-        disabled
-        :label="no_deja_participar[0]"
-      />
-      <v-text-field
-        disabled
-        :label="no_deja_participar[1]"
-      />
-      <v-text-field
-        disabled
-        :label="no_deja_participar[2]"
-      />
+      <v-select v-model="no_deja_participar" :items="alumnos" label="¿Quien no deja participar?" :rules="requiredRule"
+        :multiple="true" />
+      <v-text-field disabled :label="no_deja_participar[0]" />
+      <v-text-field disabled :label="no_deja_participar[1]" />
+      <v-text-field disabled :label="no_deja_participar[2]" />
 
-      <v-select
-        v-model="anima_demas"
-        :items="alumnos"
-        label="¿Quien anima a los demás?"
-        :rules="requiredRule"
-        :multiple="true"
-      />
-      <v-text-field
-        disabled
-        :label="anima_demas[0]"
-      />
-      <v-text-field
-        disabled
-        :label="anima_demas[1]"
-      />
-      <v-text-field
-        disabled
-        :label="anima_demas[2]"
-      />
+      <v-select v-model="anima_demas" :items="alumnos" label="¿Quien anima a los demás?" :rules="requiredRule"
+        :multiple="true" />
+      <v-text-field disabled :label="anima_demas[0]" />
+      <v-text-field disabled :label="anima_demas[1]" />
+      <v-text-field disabled :label="anima_demas[2]" />
 
-      <v-select
-        v-model="insulta"
-        :items="alumnos"
-        label="¿Quien insulta?"
-        :rules="requiredRule"
-        :multiple="true"
-      />
-      <v-text-field
-        disabled
-        :label="insulta[0]"
-      />
-      <v-text-field
-        disabled
-        :label="insulta[1]"
-      />
-      <v-text-field
-        disabled
-        :label="insulta[2]"
-      />
+      <v-select v-model="insulta" :items="alumnos" label="¿Quien insulta?" :rules="requiredRule" :multiple="true" />
+      <v-text-field disabled :label="insulta[0]" />
+      <v-text-field disabled :label="insulta[1]" />
+      <v-text-field disabled :label="insulta[2]" />
 
-      <v-select
-        v-model="victima_empujones"
-        :items="alumnos"
-        label="¿A quién dan empujones?"
-        :rules="requiredRule"
-        :multiple="true"
-      />
-      <v-text-field
-        disabled
-        :label="victima_empujones[0]"
-      />
-      <v-text-field
-        disabled
-        :label="victima_empujones[1]"
-      />
-      <v-text-field
-        disabled
-        :label="victima_empujones[2]"
-      />
+      <v-select v-model="victima_empujones" :items="alumnos" label="¿A quién dan empujones?" :rules="requiredRule"
+        :multiple="true" />
+      <v-text-field disabled :label="victima_empujones[0]" />
+      <v-text-field disabled :label="victima_empujones[1]" />
+      <v-text-field disabled :label="victima_empujones[2]" />
 
-      <v-select
-        v-model="victima_insultar"
-        :items="alumnos"
-        label="¿A quién insultan o ridiculizan?"
-        :rules="requiredRule"
-        :multiple="true"
-      />
-      <v-text-field
-        disabled
-        :label="victima_insultar[0]"
-      />
-      <v-text-field
-        disabled
-        :label="victima_insultar[1]"
-      />
-      <v-text-field
-        disabled
-        :label="victima_insultar[2]"
-      />
+      <v-select v-model="victima_insultar" :items="alumnos" label="¿A quién insultan o ridiculizan?"
+        :rules="requiredRule" :multiple="true" />
+      <v-text-field disabled :label="victima_insultar[0]" />
+      <v-text-field disabled :label="victima_insultar[1]" />
+      <v-text-field disabled :label="victima_insultar[2]" />
 
-      <v-select
-        v-model="victima_no_deja_participar"
-        :items="alumnos"
-        label="¿A quién no dejan participar?"
-        :rules="requiredRule"
-        :multiple="true"
-      />
-      <v-text-field
-        disabled
-        :label="victima_no_deja_participar[0]"
-      />
-      <v-text-field
-        disabled
-        :label="victima_no_deja_participar[1]"
-      />
-      <v-text-field
-        disabled
-        :label="victima_no_deja_participar[2]"
-      />
+      <v-select v-model="victima_no_deja_participar" :items="alumnos" label="¿A quién no dejan participar?"
+        :rules="requiredRule" :multiple="true" />
+      <v-text-field disabled :label="victima_no_deja_participar[0]" />
+      <v-text-field disabled :label="victima_no_deja_participar[1]" />
+      <v-text-field disabled :label="victima_no_deja_participar[2]" />
 
-      <v-select
-        v-model="amigos"
-        :items="alumnos"
-        label="¿Quienes son mis amigos/amigas?"
-        :rules="requiredRule"
-        :multiple="true"
-      />
-      <v-text-field
-        disabled
-        :label="amigos[0]"
-      />
-      <v-text-field
-        disabled
-        :label="amigos[1]"
-      />
-      <v-text-field
-        disabled
-        :label="amigos[2]"
-      />
+      <v-select v-model="amigos" :items="alumnos" label="¿Quienes son mis amigos/amigas?" :rules="requiredRule"
+        :multiple="true" />
+      <v-text-field disabled :label="amigos[0]" />
+      <v-text-field disabled :label="amigos[1]" />
+      <v-text-field disabled :label="amigos[2]" />
     </div>
-    <v-checkbox
-      v-model="terminosycondiciones"
-      label="He leído y acepto los términos y condiciones."
-    />
-    <v-btn
-      type="submit"
-      @click="fetchPostResultats"
-    >
+    <v-checkbox v-model="terminosycondiciones" label="He leído y acepto los términos y condiciones." />
+    <v-btn type="submit" @click="fetchPostResultats">
       Enviar
     </v-btn>
-    <v-dialog
-      v-model="dialog"
-      width="auto"
-    >
-      <v-card
-        id="mensajeagradecimiento"
-        max-width="400"
-        text="Los datos introducidos son completamente privados."
-        title="¡Gracias por participar!"
-      >
+    <v-dialog v-model="dialog" width="auto">
+      <v-card id="mensajeagradecimiento" max-width="400" text="Los datos introducidos son completamente privados."
+        title="¡Gracias por participar!">
         <template #actions>
-          <v-btn
-            text="Vale"
-            @click="dialog = false"
-          />
+          <v-btn text="Vale" @click="dialog = false" />
         </template>
       </v-card>
     </v-dialog>

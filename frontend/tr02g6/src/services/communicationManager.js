@@ -104,6 +104,37 @@ export async function callPostProf(profesor) {
         throw error;
     }
   }
+
+  export async function postResultats(formulari) {
+    try {
+        const sessionStore = useSessionStore();
+        const sessionId = sessionStore.sessionId;
+        const userId = sessionStore.userId;
+
+        if (!sessionId || !userId) {
+            throw new Error("No hay sessionId o userId almacenado");
+        }
+
+        const response = await fetch(`${URL}/formulari?sessionId=${sessionId}&userId=${userId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formulari), 
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Error al agregar clase: ${errorText}`);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error en callAddClass:", error);
+        throw error;
+    }
+  }
   
 /*export async function callGetClasses() {
   try {
@@ -146,8 +177,10 @@ export async function callGetProf(email, password) {
 export async function getAlumnes() {
   const sessionStore = useSessionStore();
   const sessionId = sessionStore.sessionId;
-   const userId = sessionStore.userId; 
-  const alumnes = await fetch(`${URL}/alumnes?sessionId=${sessionId}&userId=${userId}`);
+  const userId = sessionStore.userId; 
+  console.log(sessionId);
+  console.log(userId);
+  const alumnes = await fetch(`${URL}/alumnesClasse?sessionId=${sessionId}&userId=${userId}`);
   try {
     const llista_alumnes = await alumnes.json();
     return llista_alumnes
