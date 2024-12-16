@@ -38,11 +38,11 @@
                         <div
                           class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between"
                         >
-                          Contrasenya
+                          Contrassenya
                         </div>
 
                         <v-text-field
-                          v-model="professor.contrasenya"
+                          v-model="professor.contrassenya"
                           :append-inner-icon="
                             visible ? 'mdi-eye-off' : 'mdi-eye'
                           "
@@ -155,7 +155,7 @@
                         />
 
                         <div class="text-subtitle-1 text-medium-emphasis">
-                          Contrasenya
+                          Contrassenya
                         </div>
                         <v-text-field
                           v-model="professor.contrassenya"
@@ -164,7 +164,7 @@
                           "
                           :type="visible ? 'text' : 'password'"
                           density="compact"
-                          :placeholder="'Insereix contrasenya'"
+                          :placeholder="'Insereix contrassenya'"
                           :rules="[(v) => !!v || 'Aquest camp és obligatori']"
                           prepend-inner-icon="mdi-lock-outline"
                           variant="outlined"
@@ -217,11 +217,11 @@ const errorMessage = ref("");
 const router = useRouter();
 
 const identifierPlaceholder = "email@example.com";
-const passwordPlaceholder = "Insereix contrasenya";
+const passwordPlaceholder = "Insereix contrassenya";
 
 async function handleLogin() {
   try {
-    const data = await callGetProf(professor.email, professor.contrasenya);
+    const data = await callGetProf(professor.email, professor.contrassenya);
     if (data && data.sessionId ) {
       const sessionStore = useSessionStore(); 
       sessionStore.setSessionId(data.sessionId);
@@ -231,7 +231,7 @@ async function handleLogin() {
       console.log()
       router.push("/home");
     } else {
-      errorMessage.value = "Email o contrasenya incorrectes.";
+      errorMessage.value = "Email o contrassenya incorrectes.";
     }
   } catch (error) {
     errorMessage.value = "Error al iniciar sessió. Si us plau, torna a intentar-ho.";
