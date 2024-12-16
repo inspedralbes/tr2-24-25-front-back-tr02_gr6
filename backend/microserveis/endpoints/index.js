@@ -71,6 +71,25 @@ app.get("/alumnes", async (req, res) => {
     }
 });
 
+app.get("/alumnesClasse", async (req, res) => {
+    sessionId = req.query.sessionId;
+    userId = req.query.userId;
+    if (!req.query.sessionId || !req.query.userId) {
+        return res.send("No Autenticat");
+    }
+    if (isAuthProfe(sessionId, userId)) {
+        const alumnes = await getSQL("alumnesClasseProfe", { userId });
+        return res.json(alumnes);
+    }
+
+    if (isAuthAlumne(sessionId, userId)){
+        const alumnes = await getSQL("alumnesClasseAlumne", { userId });
+        return res.json(alumnes);
+    }
+
+    res.json({missatge: "No Autenticat"});
+});
+
 app.post("/classes", async (req, res) => {
     sessionId = req.query.sessionId;
     userId = req.query.userId;
@@ -128,6 +147,43 @@ app.put("/classes", async (req, res) => {
     }
 });
 
+app.put("/afegirClasse", async (req, res) => {
+    const { sessionId, userId, codi_classe } = req.query;
+    if (!sessionId || !userId) {
+        return res.send("No Autenticat");
+    }
+    if (isAuthProfe(sessionId, userId)) {
+        const resposta = await putSQL("afegirClasseProfe", { userId, codi_classe });
+        return res.json(resposta);
+    }
+    if (isAuthAlumne(sessionId, userId)) {
+        const resposta = await putSQL("afegirClasseAlumne", { userId, codi_classe });
+        return res.json(resposta);
+    }
+    res.json({missatge: "No Autenticat"});
+});
+
+
+app.post("/formulari", async (req, res) => {
+    sessionId = req.query.sessionId;
+    userId = req.query.userId;
+    if (!req.query.sessionId || !req.query.userId) {
+        return res.send("No Autenticat");
+    }
+
+    if (!isAuthAlumne(sessionId, userId)) {
+        return res.json("No Autenticat");
+    }
+
+    const formulari = req.body;
+
+    if (!formulari) {
+        return res.json("Falten camps");
+    }
+        const resposta = await postSQL("formulari", { userId, formulari });
+        res.json(resposta);
+});
+
 app.post("/registre", async (req, res) => {
     try {
         const { email, contrassenya, nom, cognoms } = req.body;
@@ -142,6 +198,7 @@ app.post("/registre", async (req, res) => {
     }
     
 });
+
 
 async function getSQL(endpoint, params = {}) {
     const queryParams = new URLSearchParams(params).toString();
