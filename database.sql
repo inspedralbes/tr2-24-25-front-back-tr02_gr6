@@ -81,3 +81,10 @@ INSERT INTO Alumnes (email, contrassenya, nom, cognoms) VALUES
 INSERT INTO Alumnes (email, contrassenya, nom, cognoms) VALUES
 ('alumne2B1@example.com', 'alumne123', 'Eva', 'Pascual'),
 ('alumne2B2@example.com', 'alumne123', 'David', 'González');
+
+INSERT INTO Cursos VALUES 
+(1, '1ESO'),
+(2, '2ESO'),
+(3, '3ESO'),
+(4, '4ESO');
+
