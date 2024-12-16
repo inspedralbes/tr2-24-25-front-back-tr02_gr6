@@ -7,7 +7,7 @@
           <v-card-title>{{ classe.classe }}</v-card-title>
           <v-card-subtitle>ID: {{ classe.codi_random }}</v-card-subtitle>
           <v-card-actions>
-            <v-btn @click="details(user)">INFOc:</v-btn>
+            <v-btn @click="codi_random(classe)">CODI CURS</v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
@@ -15,8 +15,22 @@
     <br><br>
     <v-btn color="primary" @click="details">Afegir Classe</v-btn>
     <v-btn @click="navegarapantalla">Formulario</v-btn>
-
   </v-container>
+  
+  <v-dialog v-model="dialog2" max-width="600">
+    <v-card prepend-icon="mdi-account" title="CODI CURS">
+      <v-card-text>
+        <v-row dense>
+          <v-col>
+              <p>{{ selectedClasse.codi_random }}</p>
+            <v-btn text="Tancar" variant="plain" @click="dialog2 = false"></v-btn>
+          </v-col>
+        </v-row>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
+
+  <v-container>
   <v-dialog v-model="dialog" max-width="600">
     <v-card prepend-icon="mdi-account" title="Crear classe">
       <v-card-text>
@@ -31,6 +45,7 @@
       </v-card-text>
     </v-card>
   </v-dialog>
+</v-container>
 
 </template>
 
@@ -41,6 +56,8 @@ import { callFetchClasses, callAddClass } from '@/services/communicationManager'
 import { useSessionStore } from "@/stores/sessionStore";
 
 const dialog = ref(false);
+const dialog2 = ref(false);
+const selectedClasse = ref(null);
 const route = useRoute();
 const router = useRouter();
 const formattedCourse = ref(route.params.course);
@@ -82,6 +99,11 @@ const fetchClasses = async () => {
 const details = async () => {
   dialog.value = true;
 }
+const codi_random = async (classe) => {
+  selectedClasse.value=classe;
+  dialog2.value = true;
+}
+
 
 const hideDetails = async () => {
   if (!nomNouClasse.value.trim()) {
