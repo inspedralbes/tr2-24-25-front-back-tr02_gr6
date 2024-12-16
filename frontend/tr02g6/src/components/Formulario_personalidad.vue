@@ -125,6 +125,7 @@ async function fetchPostResultats() {
         esAillat: victima_no_deja_participar.value,
         esAmic: amigos.value,
       }
+      console.log(resultats);
       const resultats = await postResultats(formulariEnviar);
       console.log("Formulario enviado con éxito:", resultats);
       correo.value = '';
