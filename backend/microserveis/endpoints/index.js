@@ -19,9 +19,7 @@ app.get("/classes", async (req, res) => {
     if (!req.query.sessionId || !req.query.userId) {
         return res.send("Falten Camps");
     }
-    if (!isAuthProfe(sessionId, userId)) {
-        return res.send("No Autenticat");
-    } else {
+    if (isAuthProfe(sessionId, userId)||isAuthAlumne(sessionId, userId)) {
         const classes = await getSQL("classes");
         res.json(classes);
     }
@@ -31,11 +29,9 @@ app.get("/classes/:course_code", async (req, res) => {
     sessionId = req.query.sessionId;
     userId = req.query.userId;
     if (!req.query.sessionId || !req.query.userId) {
-        return res.json({missatge: "Falten camps"});;
+        return res.send("Falten Camps");
     }
-    if (!isAuthProfe(sessionId, userId)) {
-        return res.json({missatge: "No Autenticat"});
-    } else {
+    if (isAuthProfe(sessionId, userId)||isAuthAlumne(sessionId, userId)) {
 
     const courseCode = req.params.course_code;
         const classes = await getSQL("classes/" + courseCode);
