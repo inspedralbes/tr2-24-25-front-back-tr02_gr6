@@ -38,7 +38,7 @@
                         <div
                           class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between"
                         >
-                          Contrassenya
+                          Contrasenya
                         </div>
 
                         <v-text-field
@@ -164,7 +164,7 @@
                           "
                           :type="visible ? 'text' : 'password'"
                           density="compact"
-                          :placeholder="'Insereix contrassenya'"
+                          :placeholder="'Insereix contrasenya'"
                           :rules="[(v) => !!v || 'Aquest camp és obligatori']"
                           prepend-inner-icon="mdi-lock-outline"
                           variant="outlined"
@@ -217,7 +217,7 @@ const errorMessage = ref("");
 const router = useRouter();
 
 const identifierPlaceholder = "email@example.com";
-const passwordPlaceholder = "Insereix contrassenya";
+const passwordPlaceholder = "Insereix contrasenya";
 
 async function handleLogin() {
   try {
@@ -229,7 +229,7 @@ async function handleLogin() {
       const emailStore = useUserStore();
       emailStore.setEmail(professor.email);
       console.log()
-      router.push("/home");
+      router.push("/home");0
     } else {
       errorMessage.value = "Email o contrassenya incorrectes.";
     }
