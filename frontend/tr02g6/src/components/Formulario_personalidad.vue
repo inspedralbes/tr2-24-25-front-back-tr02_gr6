@@ -2,6 +2,9 @@
 <script setup>
 import { getAlumnes, postResultats } from '@/services/communicationManager';
 import { onMounted, ref, watch } from 'vue'
+const requiredRule = [
+  correo => !!correo || 'Este campo es obligatorio',
+];
 const correos = ref([])
 const alumnos = ref([])
 const correo = ref();
@@ -121,6 +124,7 @@ async function fetchPostResultats() {
         esAillat: victima_no_deja_participar.value,
         esAmic: amigos.value,
       }
+      console.log(resultats);
       const resultats = await postResultats(formulariEnviar);
       console.log("Formulario enviado con éxito:", resultats);
       correo.value = '';
@@ -148,6 +152,7 @@ async function fetchPostResultats() {
 <template id="cuerpo">
   <div id="formulario">
     <v-card-title>CESC- Conducta y Experiencias Sociales en Clase (ESO)</v-card-title>
+    <v-select v-model="correo" label="Correo" :rules="requiredRule" :items="correos" />
     <v-card-text>Es obligatorio seleccionar tres opciones en cada pregunta</v-card-text>
     <div id="preguntasTest">
       <v-select v-model="cae_bien" label="¿Quién me cae bien?" :items="alumnos" :rules="requiredRule"
