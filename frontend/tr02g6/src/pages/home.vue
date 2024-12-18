@@ -5,10 +5,10 @@
         <br><br>
         <h3>TUTORIAL:</h3>
       </v-container>
-    </v-main>
+ 
 
 <v-navigation-drawer>
-      <v-avatar ma="5"class="mb-4" color="grey-darken-1" size="64"></v-avatar>
+      <v-avatar ma="5" class="mb-4" color="grey-darken-1" size="64"></v-avatar>
       <v-list-item 
   :title="userStore.email" 
   subtitle="Profesor/a">
@@ -19,7 +19,9 @@
           :prepend-icon="icon"
           :title="text"
           @click="goToCourse(text)"></v-list-item>
+       
 </v-navigation-drawer>
+</v-main>
 
 </template>
 

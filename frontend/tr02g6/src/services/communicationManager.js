@@ -159,6 +159,29 @@ export async function callPostProf(profesor) {
   }
 }*/
 
+export async function postIdClass(id_classe) {
+  try {
+    const response = await fetch(`${URL}/postID?id_classe=${id_classe}`,{
+      method: "PUT",
+      headers: {
+          "Content-Type": "application/json",
+      },
+      body: JSON.stringify(id_classe), 
+  });
+
+  if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Error al entrar a la classe: ${errorText}`);
+  }
+
+  const data = await response.json();
+  return data;
+} catch (error) {
+  console.error("Error en postIdClass:", error);
+  throw error;
+}
+}
+
 export async function callGetProf(email, password) {
   try {
     const response = await fetch(`${URL_AUTH}/auth?email=${email}&contrassenya=${password}`);

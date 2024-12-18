@@ -229,7 +229,7 @@ async function handleLogin() {
       const emailStore = useUserStore();
       emailStore.setEmail(professor.email);
       console.log()
-      router.push("/home");0
+      router.push("/alumnehome");0
     } else {
       errorMessage.value = "Email o contrassenya incorrectes.";
     }
