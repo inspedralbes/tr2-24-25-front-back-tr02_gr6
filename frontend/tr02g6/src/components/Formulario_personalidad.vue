@@ -48,38 +48,6 @@ listaarrays.forEach((array) => {
   });
 });
 
-/*function validarform() {
-  const valido = listaarrays.every(listaarrays => listaarrays.value.length === 3);
-  if (!valido) {
-    alert("Todos los campos deben tener exactamente 3 selecciones.");
-  }
-  else if (correo.value == null) {
-    alert('Debe seleccionar un correo.');
-  }
-  else if (!terminosycondiciones.value) {
-    alert('Debe aceptar los terminos y condiciones.');
-  }
- else{
-  const formData = {
-    correo: correo.value,
-    cae_bien: cae_bien.value,
-    cae_no_bien: cae_no_bien.value,
-    difunde_rumores: difunde_rumores.value,
-    ayuda_demás: ayuda_demás.value,
-    da_empujones: da_empujones.value,
-    no_deja_participar: no_deja_participar.value,
-    anima_demas: anima_demas.value,
-    insulta: insulta.value,
-    victima_empujones: victima_empujones.value,
-    victima_insultar: victima_insultar.value,
-    victima_no_deja_participar: victima_no_deja_participar.value,
-    amigos: amigos.value,
-  };
-  console.log("Formulario enviado con éxito:", formData);
-  dialog.value = true;
-}
-};*/
-
 async function fecthGetAlumnos() {
   try {
     const llista_alumnes = await getAlumnes();
@@ -124,7 +92,7 @@ async function fetchPostResultats() {
         esAillat: victima_no_deja_participar.value,
         esAmic: amigos.value,
       }
-      console.log(resultats);
+      console.log(formulariEnviar);
       const resultats = await postResultats(formulariEnviar);
       console.log("Formulario enviado con éxito:", resultats);
       correo.value = '';
@@ -242,10 +210,6 @@ async function fetchPostResultats() {
 </template>
 
 <style scoped>
-#formulario {
-  background: linear-gradient(rgb(255, 254, 205), rgb(187, 252, 255), rgb(246, 219, 255));
-}
-
 #preguntasTest {
   display: grid;
   grid-template-columns: 1.5fr 1fr 1fr 1fr;
