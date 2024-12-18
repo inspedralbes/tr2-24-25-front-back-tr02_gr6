@@ -175,7 +175,7 @@ app.put("/formulari", async (req, res) => {
     const formulari = JSON.stringify(formulariEstringuejar)
 
     if (!formulari) {
-        returnres.json({missatge: "Falten camps"});
+        return res.json({missatge: "Falten camps"});
     }
         
         const resposta = await putSQL("formulari", { userId, formulari });

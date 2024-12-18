@@ -81,11 +81,8 @@ function isAuthProfe(sessionId, tutorId) {
     for (const sessio of sessionsProfeAutenticades) {
         if (sessio.sessionId === sessionId && sessio.tutorId === Number(tutorId)) {
             return true;
-        } else{
-            return false;
-        
-        }
-    }
+        } 
+    } return false;
 }
 
 
