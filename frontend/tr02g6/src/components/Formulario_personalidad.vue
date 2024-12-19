@@ -2,15 +2,9 @@
 <script setup>
 import { getAlumnes, postResultats } from '@/services/communicationManager';
 import { onMounted, ref, watch } from 'vue'
-const requiredRule = [
-  correo => !!correo || 'Aquest camp és obligatori',
-];
-
-
 const errorMessage = ref("");
 const correos = ref([])
 const alumnos = ref([])
-const correo = ref();
 const cae_bien = ref([]);
 const cae_no_bien = ref([]);
 const difunde_rumores = ref([]);
@@ -59,7 +53,7 @@ async function fecthGetAlumnos() {
     console.log(llista_alumnes);
   }
   catch (error) {
-    console.error('Error al obtener correos', error);
+    console.error('Error en obtenir els correus', error);
   }
 }
 
@@ -73,9 +67,6 @@ async function fetchPostResultats() {
     const valido = listaarrays.every(listaarrays => listaarrays.value.length === 3);
     if (!valido) {
       errorMessage.value = "Tots els camps han de tenir exactament tres seleccions.";
-    }
-    else if (correo.value == null) {
-      errorMessage.value = "Has de seleccionar un correu.";
     }
     else {
       const formulariEnviar = {
@@ -95,7 +86,6 @@ async function fetchPostResultats() {
       console.log(formulariEnviar);
       const resultats = await postResultats(formulariEnviar);
       console.log("Formulario enviado con éxito:", resultats);
-      correo.value = '';
       cae_bien.value = '';
       cae_no_bien.value = '';
       difunde_rumores.value = '';
@@ -112,7 +102,7 @@ async function fetchPostResultats() {
     }
   }
   catch (error) {
-    console.error('Hubo problemas al enviar los resultados.', error);
+    console.error('Hi ha hagut algun problema en enviar el formulari.', error);
   }
 }
 </script>
@@ -120,7 +110,6 @@ async function fetchPostResultats() {
 <template id="cuerpo">
   <div id="formulario">
     <v-card-title>CESC- Conducta i Experiencies Socials en Clase (ESO)</v-card-title>
-    <v-select v-model="correo" label="Correu" :rules="requiredRule" :items="correos" />
     <v-card-text>Es obligatori triar tres opcions en cada pregunta</v-card-text>
     <div id="preguntasTest">
       <v-select v-model="cae_bien" label="Em cau bé" :items="alumnos" :rules="requiredRule"
