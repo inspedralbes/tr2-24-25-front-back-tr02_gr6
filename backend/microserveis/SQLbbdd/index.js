@@ -16,7 +16,7 @@ var alumnesContrassenya = [];
 const dbNom = process.env.DB_NAME;
 const dbHost = process.env.DB_HOST;
 const dbUser = process.env.DB_USER;
-const dbPass = process.env.DB_PASS;
+const dbPass = process.env.DB_PASSWORD;
 
 var pool = mysql.createPool({
     host: dbHost,
@@ -320,8 +320,8 @@ app.get("/classes/:course_code", (req, res) => {
 
         connection.query(
             `SELECT c.id_classe, c.classe, c.codi_random
-             FROM classes c
-             JOIN cursos co ON c.id_curs = co.id_curs
+             FROM Classes c
+             JOIN Cursos co ON c.id_curs = co.id_curs
              WHERE co.nom_curs = ?`,
             [codi_curs],
             (err, results) => {
@@ -532,7 +532,7 @@ app.put("/formulari", (req, res) => {
 });
 
 function getClasses(connection) {
-    connection.query('SELECT * FROM classes', (err, results) => {
+    connection.query('SELECT * FROM Classes', (err, results) => {
         if (err) {
             console.error('Error:', err);
         } else {
@@ -542,7 +542,7 @@ function getClasses(connection) {
 }
 
 function getTutors(connection) {
-    connection.query('SELECT id_profe, email, nom, cognoms FROM tutors', (err, results) => {
+    connection.query('SELECT id_profe, email, nom, cognoms FROM Tutors', (err, results) => {
         if (err) {
             console.error('Error:', err);
         } else {
@@ -552,7 +552,7 @@ function getTutors(connection) {
 }
 
 function getAlumnes(connection) {
-    connection.query('SELECT id_alumne, email, nom, cognoms, id_classe FROM alumnes', (err, results) => {
+    connection.query('SELECT id_alumne, email, nom, cognoms, id_classe FROM Alumnes', (err, results) => {
         if (err) {
             console.error('Error:', err);
         } else {
@@ -562,7 +562,7 @@ function getAlumnes(connection) {
 }
 
 function getTutorsContrassenya(connection) {
-    connection.query('SELECT id_profe, email, contrassenya FROM tutors', (err, results) => {
+    connection.query('SELECT id_profe, email, contrassenya FROM Tutors', (err, results) => {
         if (err) {
             console.error('Error:', err);
         } else {
@@ -572,7 +572,7 @@ function getTutorsContrassenya(connection) {
 }
 
 function getAlumnesContrassenya(connection) {
-    connection.query('SELECT id_alumne, email, contrassenya FROM alumnes', (err, results) => {
+    connection.query('SELECT id_alumne, email, contrassenya FROM Alumnes', (err, results) => {
         if (err) {
             console.error('Error:', err);
         } else {

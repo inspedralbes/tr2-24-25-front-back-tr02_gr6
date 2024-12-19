@@ -5,3 +5,5 @@
 /backend/sessions/alumnes.json
 /backend/sessions/profes.json
 /frontend/tr02g6/dist
+/frontend/tr02g6/.env
+/frontend/tr02g6/.env.production
