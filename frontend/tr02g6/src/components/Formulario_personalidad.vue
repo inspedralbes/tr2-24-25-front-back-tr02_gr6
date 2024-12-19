@@ -191,7 +191,7 @@ async function fetchPostResultats() {
     </v-alert>
     <v-dialog v-model="dialog" width="auto">
       <v-card id="mensajeagradecimiento" max-width="400" text="Les dades introduïdes son completament privades."
-        title="Gràcies per participar!">
+        title="Respostes Enviades.">
         <template #actions>
           <v-btn text="Vale" @click="dialog = false" />
         </template>
@@ -212,9 +212,5 @@ async function fetchPostResultats() {
 
 #formulario>* {
   margin: 5px
-}
-
-#mensajeagradecimiento {
-  background-image: url("https://i.pinimg.com/736x/89/94/46/8994461746191a7480ceea961a045852.jpg");
 }
 </style>
