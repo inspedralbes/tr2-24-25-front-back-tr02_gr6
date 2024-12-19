@@ -4,3 +4,4 @@
 /backend/.env.local
 /backend/sessions/alumnes.json
 /backend/sessions/profes.json
+/frontend/tr02g6/dist
