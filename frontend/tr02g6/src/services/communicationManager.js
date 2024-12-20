@@ -51,7 +51,8 @@ export async function callPostProf(profesor) {
     }
   }*/
 
-  export async function callFetchClasses(course) {
+  
+    export async function callFetchClasses(course) {
     try {
       const sessionStore = useSessionStore();
       const sessionId = sessionStore.sessionId; 
@@ -60,7 +61,7 @@ export async function callPostProf(profesor) {
         throw new Error('No hay sessionId o userId almacenado');
     }
 
-    const response = await fetch(`${URL}/classes/${course}?sessionId=${sessionId}&userId=${userId}`);
+    const response = await fetch(`${URL}/roles/${course}?sessionId=${sessionId}&userId=${userId}`);
     if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Error al obtener datos de clases: ${errorText}`);
@@ -74,6 +75,8 @@ export async function callPostProf(profesor) {
       throw error;
     }
   }
+
+
   export async function callAddClass(classeData) {
     try {
         const sessionStore = useSessionStore();

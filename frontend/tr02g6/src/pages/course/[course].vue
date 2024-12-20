@@ -1,5 +1,6 @@
 <template>
-  <v-container>
+  <v-main>
+    <v-container>
     <h1>Gestió de {{ formattedCourse }}</h1>
     <v-row>
       <v-col cols="12" md="6" v-for="classe in classes" :key="classe.id_classe">
@@ -17,7 +18,7 @@
     <v-btn @click="navegarapantalla">Formulario</v-btn>
 
   </v-container>
-  <v-dialog v-model="dialog" max-width="600">
+  <v-dialog v-model="dialog" max-width="600" >
     <v-card prepend-icon="mdi-account" title="Crear classe">
       <v-card-text>
         <v-row dense>
@@ -31,7 +32,7 @@
       </v-card-text>
     </v-card>
   </v-dialog>
-
+</v-main>
 </template>
 
 <script setup>
@@ -94,8 +95,7 @@ const hideDetails = async () => {
       id_curs: reformattedCourse,
     };
     console.log("Enviando datos al backend:", classeData);
-
-
+    
     try {
       await callAddClass(classeData);
          nomNouClasse.value = ''; 

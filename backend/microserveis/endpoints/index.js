@@ -52,6 +52,19 @@ app.get("/tutors", async (req, res) => {
         res.json(tutors);
     }
 });
+app.get("/roles", async (req, res) => {
+    sessionId = req.query.sessionId;
+    userId = req.query.userId;
+    if (!req.query.sessionId || !req.query.userId) {
+        return res.json({missatge: "No Autenticat"});
+    }
+    if (!isAuthProfe(sessionId, userId)) {
+        return res.json({missatge: "No Autenticat"});
+    } else {
+        const alumnes = await getSQL("roles");
+        res.json(alumnes);
+    }
+});
 
 app.get("/alumnes", async (req, res) => {
     sessionId = req.query.sessionId;

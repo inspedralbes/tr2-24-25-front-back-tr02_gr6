@@ -145,6 +145,36 @@ app.get("/JSON", (req, res) => {
     });
 });
 
+
+app.get("/roles", (req,res) => {
+
+    pool.getConnection((err, connection) => {
+        if (err) {
+            console.error('Error getting connection from pool:', err);
+            res.status(500).send("Error al obtenir connexió");
+        }
+
+        connection.query(
+            `SELECT e.emaul, c.classe, c.codi_random
+             FROM classes c
+             JOIN cursos co ON c.id_curs = co.id_curs
+             WHERE co.nom_curs = ?`,
+            [codi_curs],
+            (err, results) => {
+                connection.release();
+
+                if (err) {
+                    console.error("Error en la consulta:", err);
+                    return res.status(500).send({ error: "Error al obtenir dades" });
+                }
+
+                res.json(results);
+            }
+        );
+    });
+});
+
+
 app.get("/alumnesClasseAlumne", (req, res) => {
     const alumne_id = req.query.userId;
 
@@ -581,15 +611,15 @@ function getAlumnesContrassenya(connection) {
     });
 }
 
-function generarCodiAleatori() {
-    const lletres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-    let codi = '';
-    for (let i = 0; i < 10; i++) {
-        const indexAleatori = Math.floor(Math.random() * lletres.length);
-        codi += lletres[indexAleatori];
-    }
-    return codi;
-}
+// function generarCodiAleatori() {
+//     const lletres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+//     let codi = '';
+//     for (let i = 0; i < 10; i++) {
+//         const indexAleatori = Math.floor(Math.random() * lletres.length);
+//         codi += lletres[indexAleatori];
+//     }
+//     return codi;
+// }
 
 function esProfe(email) {
     const teNumeros = /\d/;
@@ -609,6 +639,7 @@ function jaExisteix(nouUser) {
     };
     return false;
 }
+
 
 
 process.on('message', (message) => {

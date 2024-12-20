@@ -28,7 +28,7 @@ CREATE TABLE Tutors (
     FOREIGN KEY (id_classe) REFERENCES Classes (id_classe)
 );
 
--- Els camps seran null fins que s'emplenin els qüestionaris
+
 CREATE TABLE Alumnes (
     id_alumne INT NOT NULL AUTO_INCREMENT,
     email VARCHAR(50) NOT NULL,
@@ -65,10 +65,10 @@ INSERT INTO Classes (classe, codi_random, id_curs) VALUES ('2A', 'TeDIEJPszh', 2
 INSERT INTO Classes (classe, codi_random, id_curs) VALUES ('2B', 'XfutUvmzKo', 2);
 
 INSERT INTO Tutors (email, contrassenya, nom, cognoms, id_classe) VALUES
-('tutor1A@example.com', 'password123', 'Joan', 'Pérez', 1),
-('tutor1B@example.com', 'password123', 'Anna', 'García', 2),
-('tutor2A@example.com', 'password123', 'Carla', 'López', 3),
-('tutor2B@example.com', 'password123', 'Marc', 'Sánchez', 4);
+('tutorA@example.com', 'password123', 'Joan', 'Pérez', 1),
+('tutorB@example.com', 'password123', 'Anna', 'García', 2),
+('tutorA@example.com', 'password123', 'Carla', 'López', 3),
+('tutorB@example.com', 'password123', 'Marc', 'Sánchez', 4);
 
 
 INSERT INTO Alumnes (email, contrassenya, nom, cognoms, id_classe) VALUES
