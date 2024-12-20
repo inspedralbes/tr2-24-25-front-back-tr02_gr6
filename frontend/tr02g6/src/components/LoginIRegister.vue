@@ -13,7 +13,7 @@
                       <v-img
                         class="mx-auto"
                         max-width="228"
-                        src="https://icones.pro/wp-content/uploads/2021/02/icone-utilisateur-bleu.png"
+                        src="/login.png"
                       ></v-img>
                     </slot>
                     <v-form @submit.prevent="handleLogin" ref="form">
