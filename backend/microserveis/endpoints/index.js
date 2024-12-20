@@ -21,7 +21,7 @@ app.get("/classes", async (req, res) => {
     }
     if (isAuthProfe(sessionId, userId)||isAuthAlumne(sessionId, userId)) {
         const classes = await getSQL("classes");
-        res.json(classes);
+        return res.json(classes);
     }
 });
 
@@ -35,7 +35,7 @@ app.get("/classes/:course_code", async (req, res) => {
 
     const courseCode = req.params.course_code;
         const classes = await getSQL("classes/" + courseCode);
-        res.json(classes);
+        return res.json(classes);
 }
 });
 
@@ -94,16 +94,16 @@ app.post("/classes", async (req, res) => {
     }
 
     if (!isAuthProfe(sessionId, userId)) {
-        res.json({missatge: "No Autenticat"});
+        return res.json({missatge: "No Autenticat"});
     }
 
     const { classe, codi_random, id_curs } = req.body;
 
     if (!classe || !codi_random || !id_curs) {
-        res.json({missatge: "Falten camps"});
+        return res.json({missatge: "Falten camps"});
     }
         const classes = await postSQL("classes", { classe, codi_random, id_curs });
-        res.json(classes);
+        return res.json(classes);
 });
 
 app.delete("/classes", async (req, res) => {
