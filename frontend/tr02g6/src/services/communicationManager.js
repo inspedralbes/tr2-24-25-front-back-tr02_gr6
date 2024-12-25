@@ -61,6 +61,7 @@ export async function callPostProf(profesor) {
     }
 
     const response = await fetch(`${URL}/classes/${course}?sessionId=${sessionId}&userId=${userId}`);
+    console.log(response)
     if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Error al obtener datos de clases: ${errorText}`);

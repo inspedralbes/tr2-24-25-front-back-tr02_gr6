@@ -93,17 +93,14 @@ app.post("/classes", async (req, res) => {
         return res.send("No Autenticat");
     }
 
-    if (!isAuthProfe(sessionId, userId)) {
-        return res.json({missatge: "No Autenticat"});
-    }
 
     const { classe, codi_random, id_curs } = req.body;
 
     if (!classe || !codi_random || !id_curs) {
-        return res.json({missatge: "Falten camps"});
+         res.json({missatge: "Falten camps"});
     }
         const classes = await postSQL("classes", { classe, codi_random, id_curs });
-        return res.json(classes);
+         res.json(classes);
 });
 
 app.delete("/classes", async (req, res) => {
