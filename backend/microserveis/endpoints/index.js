@@ -93,9 +93,6 @@ app.post("/classes", async (req, res) => {
         return res.send("No Autenticat");
     }
 
-    if (!isAuthProfe(sessionId, userId)) {
-        res.json({missatge: "No Autenticat"});
-    }
 
     const { classe, codi_random, id_curs } = req.body;
 
