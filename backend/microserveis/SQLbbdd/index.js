@@ -56,29 +56,29 @@ app.get("/classes", (req, res) => {
     });
 });
 
-app.get("/tutors", (req, res) => {
+app.get("/classeForma", (req, res) => {
+    const email = req.query.email;
+    console.log("EMAIL DE SQL",email)
     pool.getConnection((err, connection) => {
         if (err) {
             console.error('Error getting connection from pool:', err);
             res.status(500).send("Error al obtenir connexió");
             return;
         }
-        getTutors(connection);
-        res.json(tutors);
+        const query =`SELECT id_classe FROM Alumnes WHERE email=?`;
+        connection.query(query,[email], (err, results) => {
+            if (err) {
+                console.error('Error:', err);
+            } else {
+                classes = results;
+                console.log("RESULTADO DE SQL",classes)
+            }
+        
+        res.json(classes);
     });
+});
 });
 
-app.get("/alumnes", (req, res) => {
-    pool.getConnection((err, connection) => {
-        if (err) {
-            console.error('Error getting connection from pool:', err);
-            res.status(500).send("Error al obtenir connexió");
-            return;
-        }
-        getAlumnes(connection);
-        res.json(alumnes);
-    });
-});
 
 app.get("/alumnesClasseProfe", (req, res) => {
     const profe_id = req.query.userId;
@@ -111,6 +111,30 @@ app.get("/alumnesClasseProfe", (req, res) => {
             }
             res.json(results);
         });
+    });
+});
+
+app.get("/tutors", (req, res) => {
+    pool.getConnection((err, connection) => {
+        if (err) {
+            console.error('Error getting connection from pool:', err);
+            res.status(500).send("Error al obtenir connexió");
+            return;
+        }
+        getTutors(connection);
+        res.json(tutors);
+    });
+});
+
+app.get("/alumnes", (req, res) => {
+    pool.getConnection((err, connection) => {
+        if (err) {
+            console.error('Error getting connection from pool:', err);
+            res.status(500).send("Error al obtenir connexió");
+            return;
+        }
+        getAlumnes(connection);
+        res.json(alumnes);
     });
 });
 
@@ -530,6 +554,7 @@ app.put("/formulari", (req, res) => {
         });
     });
 });
+
 
 function getClasses(connection) {
     connection.query('SELECT * FROM Classes', (err, results) => {

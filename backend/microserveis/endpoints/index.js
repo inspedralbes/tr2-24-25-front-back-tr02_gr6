@@ -86,6 +86,29 @@ app.get("/alumnesClasse", async (req, res) => {
     res.json({missatge: "No Autenticat"});
 });
 
+app.get("/classeForma", async (req, res) => {
+    email= req.query.email;
+    sessionId = req.query.sessionId;
+    userId = req.query.userId;
+    console.log("email que llega a endpoints",email)
+    if (!req.query.sessionId || !req.query.userId) {
+        console.log("hola1")
+        return res.json({missatge: "No Autenticat"});
+    }
+    if (isAuthProfe(sessionId, userId)) {
+        const alumnes = await getSQL("classeForma", { email,sessionId, userId });
+        console.log("hola2")
+        return res.json(alumnes);
+    }
+
+    if (isAuthAlumne(sessionId, userId)){
+        const alumnes = await getSQL("classeForma", { email,sessionId, userId });
+        console.log(alumnes)
+        return res.json(alumnes);
+    }
+
+});
+
 app.post("/classes", async (req, res) => {
     sessionId = req.query.sessionId;
     userId = req.query.userId;

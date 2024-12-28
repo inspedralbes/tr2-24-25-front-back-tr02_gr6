@@ -27,7 +27,7 @@
                           Email
                         </div>
                         <v-text-field
-                          v-model="professor.email"
+                          v-model="user.email"
                           density="compact"
                           :placeholder="identifierPlaceholder"
                           :rules="[(v) => !!v || 'Aquest camp és obligatori']"
@@ -42,7 +42,7 @@
                         </div>
 
                         <v-text-field
-                          v-model="professor.contrassenya"
+                          v-model="user.contrassenya"
                           :append-inner-icon="
                             visible ? 'mdi-eye-off' : 'mdi-eye'
                           "
@@ -112,7 +112,7 @@
                               Nom
                             </div>
                             <v-text-field
-                              v-model="professor.nom"
+                              v-model="user.nom"
                               density="compact"
                               :placeholder="'Nom'"
                               :rules="[
@@ -128,7 +128,7 @@
                               Cognoms
                             </div>
                             <v-text-field
-                              v-model="professor.cognoms"
+                              v-model="user.cognoms"
                               density="compact"
                               :placeholder="'Cognoms'"
                               :rules="[
@@ -145,7 +145,7 @@
                           Email
                         </div>
                         <v-text-field
-                          v-model="professor.email"
+                          v-model="user.email"
                           density="compact"
                           :placeholder="'email@example.com'"
                           :rules="[(v) => !!v || 'Aquest camp és obligatori']"
@@ -158,7 +158,7 @@
                           Contrassenya
                         </div>
                         <v-text-field
-                          v-model="professor.contrassenya"
+                          v-model="user.contrassenya"
                           :append-inner-icon="
                             visible ? 'mdi-eye-off' : 'mdi-eye'
                           "
@@ -197,7 +197,7 @@
 
 <script setup>
 import { ref, reactive } from "vue";
-import { callPostProf, callGetProf } from "@/services/communicationManager";
+import { callPostProf, callGetProf,callGetClasseFormaPart } from "@/services/communicationManager";
 import { useRouter } from "vue-router";
 
 import { useSessionStore } from "@/stores/sessionStore"; 
@@ -205,7 +205,7 @@ import {useUserStore} from "@/stores/userStore"; import { useAuthStore } from "@
 const authStore = useAuthStore()
 const step = ref(1);
 
-const professor = reactive({
+const user = reactive({
   nom: "",
   cognoms: "",
   email: "",
@@ -219,17 +219,58 @@ const router = useRouter();
 const identifierPlaceholder = "email@example.com";
 const passwordPlaceholder = "Insereix contrasenya";
 
+async function verificarUsuari(email) {
+function conteNumeros(email) {
+    const teNumeros = /\d/;
+     return !teNumeros.test(email);
+}
+
+async function classeConteNumeros(email) {
+  try{
+    const data = await callGetClasseFormaPart(email);
+    console.log(data)
+    return /\d/.test(data); 
+  }catch (error) {
+    return false;
+  }
+}
+
+const esProfe = conteNumeros(email);
+const formaPartClasse=classeConteNumeros(email);
+
+if (esProfe && formaPartClasse) {
+    console.log("El usuario es profesor y forma parte de una clase.");
+    return { esProfe: true, formaPartClasse: true };
+  } else if (esProfe) {
+    console.log("El usuario es profesor pero no forma parte de una clase.");
+    return { esProfe: true, formaPartClasse: false };
+  } else if (formaPartClasse) {
+    console.log("El usuario es alumno y forma parte de una clase.");
+    return { esProfe: false, formaPartClasse: true };
+  } else {
+    console.log("El usuario es alumno y no forma parte de una clase.");
+    return { esProfe: false, formaPartClasse: false };
+  }
+}
+
 async function handleLogin() {
   try {
-    const data = await callGetProf(professor.email, professor.contrassenya);
+    const data = await callGetProf(user.email, user.contrassenya);
     if (data && data.sessionId ) {
       const sessionStore = useSessionStore(); 
       sessionStore.setSessionId(data.sessionId);
       sessionStore.setUserId(data.tutorId || data.alumneId); 
-      const emailStore = useUserStore();
-      emailStore.setEmail(professor.email);
-      console.log()
-      router.push("/home");0
+
+      const resultat = await verificarUsuari(user.email);
+      if (resultat.esProfe && resultat.formaPartClasse) {
+        router.push("/home");
+      } else if (resultat.esProfe) {
+        alert("Ets professor, però no formes part de cap classe.");
+      } else if (resultat.formaPartClasse) {
+        router.push("/home");
+      } else {
+        alert("No formes part de cap classe.");
+      }
     } else {
       errorMessage.value = "Email o contrassenya incorrectes.";
     }
@@ -241,17 +282,17 @@ async function handleLogin() {
 
 async function handleRegister() {
   if (
-    !professor.nom ||
-    !professor.cognoms ||
-    !professor.email ||
-    !professor.contrassenya
+    !user.nom ||
+    !user.cognoms ||
+    !user.email ||
+    !user.contrassenya
   ) {
     alert("Si us plau, omple tos els camps.");
     return;
   }
 
   try {
-    const response = await callPostProf(professor);
+    const response = await callPostProf(user);
     if (response.error == "Usat."){
       alert("Correu en ús.");
     } else {

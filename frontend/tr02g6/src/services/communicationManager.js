@@ -175,6 +175,28 @@ export async function callGetProf(email, password) {
     throw error;
   }
 }
+export async function callGetClasseFormaPart(email) {
+  const sessionStore = useSessionStore();
+  const sessionId = sessionStore.sessionId;
+  const userId = sessionStore.userId;
+console.log(email)
+  try {
+    const response = await fetch(`${URL}/classeForma?email=${email}&sessionId=${sessionId}&userId=${userId}`);
+    console.log(response)
+    if (!response.ok) {
+      throw new Error(`Error en la solicitud: ${response.status}`);
+    }
+    const data = await response.json();
+
+    console.log("la data que tanto ansias",data)
+
+    return data;
+  } catch (error) {
+    console.error("Error en Communication Manager:", error);
+    throw error;
+  }
+}
+
 export async function getAlumnes() {
   const sessionStore = useSessionStore();
   const sessionId = sessionStore.sessionId;
