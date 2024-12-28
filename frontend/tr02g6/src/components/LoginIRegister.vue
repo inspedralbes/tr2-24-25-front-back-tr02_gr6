@@ -219,65 +219,63 @@ const router = useRouter();
 const identifierPlaceholder = "email@example.com";
 const passwordPlaceholder = "Insereix contrasenya";
 
-async function verificarUsuari(email) {
-function conteNumeros(email) {
+function esProfe(email) {
     const teNumeros = /\d/;
-     return !teNumeros.test(email);
+    return !teNumeros.test(email);
 }
 
-async function classeConteNumeros(email) {
-  try{
-    const data = await callGetClasseFormaPart(email);
-    console.log(data)
-    return /\d/.test(data); 
-  }catch (error) {
-    return false;
-  }
-}
+async function teClasse(email) {
+    try {
+        const obj = await callGetClasseFormaPart(email);
+        const data = JSON.stringify(obj);
 
-const esProfe = conteNumeros(email);
-const formaPartClasse=classeConteNumeros(email);
+        console.log("Data received in teClasse:", data);
 
-if (esProfe && formaPartClasse) {
-    console.log("El usuario es profesor y forma parte de una clase.");
-    return { esProfe: true, formaPartClasse: true };
-  } else if (esProfe) {
-    console.log("El usuario es profesor pero no forma parte de una clase.");
-    return { esProfe: true, formaPartClasse: false };
-  } else if (formaPartClasse) {
-    console.log("El usuario es alumno y forma parte de una clase.");
-    return { esProfe: false, formaPartClasse: true };
-  } else {
-    console.log("El usuario es alumno y no forma parte de una clase.");
-    return { esProfe: false, formaPartClasse: false };
-  }
+        if (data.includes("null")) {
+            console.log(" data is null");
+            return false;
+        }
+                console.log("data not null")
+        return true;
+    } catch (error) {
+        console.error("Error in teClasse:", error);
+        return false;
+    }
 }
 
 async function handleLogin() {
-  try {
-    const data = await callGetProf(user.email, user.contrassenya);
-    if (data && data.sessionId ) {
-      const sessionStore = useSessionStore(); 
-      sessionStore.setSessionId(data.sessionId);
-      sessionStore.setUserId(data.tutorId || data.alumneId); 
+    try {
+        const data = await callGetProf(user.email, user.contrassenya);
 
-      const resultat = await verificarUsuari(user.email);
-      if (resultat.esProfe && resultat.formaPartClasse) {
-        router.push("/home");
-      } else if (resultat.esProfe) {
-        alert("Ets professor, però no formes part de cap classe.");
-      } else if (resultat.formaPartClasse) {
-        router.push("/home");
-      } else {
-        alert("No formes part de cap classe.");
-      }
-    } else {
-      errorMessage.value = "Email o contrassenya incorrectes.";
+        if (data && data.sessionId) {
+            const sessionStore = useSessionStore();
+            sessionStore.setSessionId(data.sessionId);
+            sessionStore.setUserId(data.tutorId || data.alumneId);
+
+            const email = user.email;
+            const esProfeCheck = esProfe(email);
+            const teClasseCheck = await teClasse(email); 
+
+            if (esProfeCheck && teClasseCheck) {
+                console.log("PROFE Y CON CLASE");
+                router.push("/home");
+            } else if (esProfeCheck && !teClasseCheck) {
+                console.log("Ets professor, però no formes part de cap classe.");
+                router.push("/home");
+            } else if (!esProfeCheck && !teClasseCheck) {
+                console.log("ALUMNO Y SIN CLASE");
+                router.push("/home");
+            } else {
+                console.log("ALUMNO Y CON CLASE");
+                router.push("/home");
+            }
+        } else {
+            errorMessage.value = "Email o contrassenya incorrectes.";
+        }
+    } catch (error) {
+        errorMessage.value = "Error al iniciar sessió. Si us plau, torna a intentar-ho.";
+        console.error("Error al iniciar sessió:", error);
     }
-  } catch (error) {
-    errorMessage.value = "Error al iniciar sessió. Si us plau, torna a intentar-ho.";
-    console.error("Error al iniciar sessió:", error);
-  }
 }
 
 async function handleRegister() {
