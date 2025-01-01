@@ -14,7 +14,7 @@ export async function callPostProf(profesor) {
   // formProfesor.append('cognoms', profesor.cognoms);
   // formProfesor.append('email', profesor.email);
   // formProfesor.append('contrassenya', profesor.contrassenya);
- 
+
   const response = await fetch(`${URL}/registre`, {
     method: 'POST',
     headers: {
@@ -34,109 +34,109 @@ export async function callPostProf(profesor) {
   return nuevoProfesor;
 };
 
-  
-  /*export async function callGetProf(email,password) {
-    try {
-      const response = await fetch(`${URL_AUTH}/auth?email=${email}&contrassenya=${password}`);
-      if (!response.ok) {
-        throw new Error(`Error en la solicitud: ${response.status}`);
-      }
-      const data = await response.json();
-    
-  
-      return data;
-    } catch (error) {
-      console.error("Error en Communication Manager:", error);
-      throw error;
-    }
-  }*/
 
-  export async function callFetchClasses(course) {
-    try {
-      const sessionStore = useSessionStore();
-      const sessionId = sessionStore.sessionId; 
-      const userId = sessionStore.userId
-      if (!sessionId || !userId) {
-        throw new Error('No hay sessionId o userId almacenado');
+/*export async function callGetProf(email,password) {
+  try {
+    const response = await fetch(`${URL_AUTH}/auth?email=${email}&contrassenya=${password}`);
+    if (!response.ok) {
+      throw new Error(`Error en la solicitud: ${response.status}`);
+    }
+    const data = await response.json();
+  
+ 
+    return data;
+  } catch (error) {
+    console.error("Error en Communication Manager:", error);
+    throw error;
+  }
+}*/
+
+export async function callFetchClasses(course) {
+  try {
+    const sessionStore = useSessionStore();
+    const sessionId = sessionStore.sessionId;
+    const userId = sessionStore.userId
+    if (!sessionId || !userId) {
+      throw new Error('No hay sessionId o userId almacenado');
     }
 
     const response = await fetch(`${URL}/classes/${course}?sessionId=${sessionId}&userId=${userId}`);
     console.log(response)
     if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Error al obtener datos de clases: ${errorText}`);
-      }
-  
-      const data = await response.json();
-      console.log(data);
-      return data;
-    } catch (error) {
-      console.error("Error en Communication Manager:", error);
-      throw error;
+      const errorText = await response.text();
+      throw new Error(`Error al obtener datos de clases: ${errorText}`);
     }
+
+    const data = await response.json();
+    console.log(data);
+    return data;
+  } catch (error) {
+    console.error("Error en Communication Manager:", error);
+    throw error;
   }
-  export async function callAddClass(classeData) {
-    try {
-        const sessionStore = useSessionStore();
-        const sessionId = sessionStore.sessionId;
-        const userId = sessionStore.userId;
+}
+export async function callAddClass(classeData) {
+  try {
+    const sessionStore = useSessionStore();
+    const sessionId = sessionStore.sessionId;
+    const userId = sessionStore.userId;
 
-        if (!sessionId || !userId) {
-            throw new Error("No hay sessionId o userId almacenado");
-        }
-
-        const response = await fetch(`${URL}/classes?sessionId=${sessionId}&userId=${userId}`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(classeData), 
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Error al agregar clase: ${errorText}`);
-        }
-
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error("Error en callAddClass:", error);
-        throw error;
+    if (!sessionId || !userId) {
+      throw new Error("No hay sessionId o userId almacenado");
     }
-  }
 
-  export async function postResultats(formulari) {
-    try {
-        const sessionStore = useSessionStore();
-        const sessionId = sessionStore.sessionId;
-        const userId = sessionStore.userId;
+    const response = await fetch(`${URL}/classes?sessionId=${sessionId}&userId=${userId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(classeData),
+    });
 
-        if (!sessionId || !userId) {
-            throw new Error("No hay sessionId o userId almacenado");
-        }
-
-        const response = await fetch(`${URL}/formulari?sessionId=${sessionId}&userId=${userId}`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(formulari), 
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Error al agregar clase: ${errorText}`);
-        }
-
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error("Error en callAddClass:", error);
-        throw error;
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Error al agregar clase: ${errorText}`);
     }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error en callAddClass:", error);
+    throw error;
   }
-  
+}
+
+export async function postResultats(formulari) {
+  try {
+    const sessionStore = useSessionStore();
+    const sessionId = sessionStore.sessionId;
+    const userId = sessionStore.userId;
+
+    if (!sessionId || !userId) {
+      throw new Error("No hay sessionId o userId almacenado");
+    }
+
+    const response = await fetch(`${URL}/formulari?sessionId=${sessionId}&userId=${userId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formulari),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Error al agregar clase: ${errorText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error en callAddClass:", error);
+    throw error;
+  }
+}
+
 /*export async function callGetClasses() {
   try {
     const response = await fetch(`${URL}/classes`, {
@@ -180,7 +180,7 @@ export async function callGetClasseFormaPart(email) {
   const sessionStore = useSessionStore();
   const sessionId = sessionStore.sessionId;
   const userId = sessionStore.userId;
-console.log(email)
+  console.log(email)
   try {
     const response = await fetch(`${URL}/classeForma?email=${email}&sessionId=${sessionId}&userId=${userId}`);
     console.log(response)
@@ -188,9 +188,23 @@ console.log(email)
       throw new Error(`Error en la solicitud: ${response.status}`);
     }
     const data = await response.json();
-
-    console.log("la data que tanto ansias",data)
-
+    return data;
+  } catch (error) {
+    console.error("Error en Communication Manager:", error);
+    throw error;
+  }
+}
+export async function callGetAlumnesClasse(email) {
+  const sessionStore = useSessionStore();
+  const sessionId = sessionStore.sessionId;
+  const userId = sessionStore.userId;
+  try {
+    const response = await fetch(`${URL}/alumnesClasse?email=${email}&sessionId=${sessionId}&userId=${userId}`);
+    console.log(response)
+    if (!response.ok) {
+      throw new Error(`Error en la solicitud: ${response.status}`);
+    }
+    const data = await response.json();
     return data;
   } catch (error) {
     console.error("Error en Communication Manager:", error);
@@ -198,20 +212,20 @@ console.log(email)
   }
 }
 
-export async function callPutClass(email,codi_classe) {
+export async function callPutClass(email, codi_classe) {
   const sessionStore = useSessionStore();
   const sessionId = sessionStore.sessionId;
   const userId = sessionStore.userId;
   console.log(codi_classe)
-console.log(email)
+  console.log(email)
   try {
     const response = await fetch(`${URL}/afegirClasse?codi_classe=${codi_classe}&email=${email}&sessionId=${sessionId}&userId=${userId}`, {
       method: "PUT",
       headers: {
-          "Content-Type": "application/json",
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({email,codi_classe}), 
-  });
+      body: JSON.stringify({ email, codi_classe }),
+    });
 
     console.log(response)
     if (!response.ok) {
@@ -229,7 +243,7 @@ console.log(email)
 export async function getAlumnes() {
   const sessionStore = useSessionStore();
   const sessionId = sessionStore.sessionId;
-  const userId = sessionStore.userId; 
+  const userId = sessionStore.userId;
   console.log(sessionId);
   console.log(userId);
   const alumnes = await fetch(`${URL}/alumnesClasse?sessionId=${sessionId}&userId=${userId}`);

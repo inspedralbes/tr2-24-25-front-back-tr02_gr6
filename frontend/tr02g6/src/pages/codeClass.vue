@@ -46,7 +46,7 @@ async function putClass() {
             alert("El codi no existeix")
         } else if (obj.message) {
             console.log("Acción exitosa:", obj.message);
-            router.push("/class")
+            router.push("/classAlum")
         }
     } catch (error) {
         console.error("Error al meterse en la clase", error);

@@ -70,16 +70,17 @@ app.get("/alumnes", async (req, res) => {
 app.get("/alumnesClasse", async (req, res) => {
     sessionId = req.query.sessionId;
     userId = req.query.userId;
+    email= req.query.email;
     if (!req.query.sessionId || !req.query.userId) {
         return res.json({missatge: "No Autenticat"});
     }
     if (isAuthProfe(sessionId, userId)) {
-        const alumnes = await getSQL("alumnesClasseProfe", { userId });
+        const alumnes = await getSQL("alumnesClasseProfe", { email,sessionId, userId });
         return res.json(alumnes);
     }
 
     if (isAuthAlumne(sessionId, userId)){
-        const alumnes = await getSQL("alumnesClasseAlumne", { userId });
+        const alumnes = await getSQL("alumnesClasseAlumne", { email,sessionId, userId });
         return res.json(alumnes);
     }
 
@@ -90,14 +91,11 @@ app.get("/classeForma", async (req, res) => {
     email= req.query.email;
     sessionId = req.query.sessionId;
     userId = req.query.userId;
-    console.log("email que llega a endpoints",email)
     if (!req.query.sessionId || !req.query.userId) {
-        console.log("hola1")
         return res.json({missatge: "No Autenticat"});
     }
     if (isAuthProfe(sessionId, userId)) {
         const alumnes = await getSQL("classeFormaProfe", { email,sessionId, userId });
-        console.log("hola2")
         return res.json(alumnes);
     }
 
@@ -115,7 +113,6 @@ app.post("/classes", async (req, res) => {
     if (!req.query.sessionId || !req.query.userId) {
         return res.send("No Autenticat");
     }
-
 
     const { classe, codi_random, id_curs } = req.body;
 

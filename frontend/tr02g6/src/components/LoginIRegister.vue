@@ -258,8 +258,8 @@ async function handleLogin() {
 
             if (esProfeCheck && teClasseCheck) {
                 console.log("PROFE Y CON CLASE");
-                router.push("/home");
-            } else if (esProfeCheck && !teClasseCheck) {
+                router.push("/classProf")
+              } else if (esProfeCheck && !teClasseCheck) {
                 console.log("Ets professor, però no formes part de cap classe.");
                 router.push("/home");
             } else if (!esProfeCheck && !teClasseCheck) {
@@ -267,8 +267,8 @@ async function handleLogin() {
                 router.push("/codeClass");
             } else {
                 console.log("ALUMNO Y CON CLASE");
-                router.push("/class");
-            }
+                router.push("/classAlum")
+              }
         } else {
             errorMessage.value = "Email o contrassenya incorrectes.";
         }

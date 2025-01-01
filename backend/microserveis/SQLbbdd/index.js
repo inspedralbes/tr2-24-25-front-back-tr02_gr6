@@ -192,11 +192,7 @@ app.get("/JSON", (req, res) => {
 });
 
 app.get("/alumnesClasseAlumne", (req, res) => {
-    const alumne_id = req.query.userId;
-
-    if (!alumne_id) {
-        return res.status(400).json({ error: "Falta el paràmetre alumne_id" });
-    }
+    const email = req.query.email;
 
     pool.getConnection((err, connection) => {
         if (err) {
@@ -205,16 +201,15 @@ app.get("/alumnesClasseAlumne", (req, res) => {
         }
 
         const query = `
-            SELECT a.id_alumne, a.email, a.nom, a.cognoms
-            FROM Alumnes a
+            SELECT a.id_alumne, a.email, a.nom, a.cognoms, c.classe
+            FROM Alumnes a JOIN Classes c ON  a.id_classe = c.id_classe
             WHERE a.id_classe = (
                 SELECT id_classe
                 FROM Alumnes
-                WHERE id_alumne = ?
+                WHERE email = ?
             )
-        `;
-
-        connection.query(query, [alumne_id], (err, results) => {
+        `;    
+        connection.query(query, [email], (err, results) => {
             connection.release();
             if (err) {
                 console.error("Error executant la consulta:", err);
