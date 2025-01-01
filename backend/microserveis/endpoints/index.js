@@ -96,13 +96,13 @@ app.get("/classeForma", async (req, res) => {
         return res.json({missatge: "No Autenticat"});
     }
     if (isAuthProfe(sessionId, userId)) {
-        const alumnes = await getSQL("classeForma", { email,sessionId, userId });
+        const alumnes = await getSQL("classeFormaProfe", { email,sessionId, userId });
         console.log("hola2")
         return res.json(alumnes);
     }
 
     if (isAuthAlumne(sessionId, userId)){
-        const alumnes = await getSQL("classeForma", { email,sessionId, userId });
+        const alumnes = await getSQL("classeFormaAlumne", { email,sessionId, userId });
         console.log(alumnes)
         return res.json(alumnes);
     }
@@ -164,16 +164,19 @@ app.put("/classes", async (req, res) => {
 });
 
 app.put("/afegirClasse", async (req, res) => {
-    const { sessionId, userId, codi_classe } = req.query;
-    if (!sessionId || !userId) {
+    codi_classe= req.query.codi_classe;
+    email= req.query.email;
+    sessionId = req.query.sessionId;
+    userId = req.query.userId;
+    if (!req.query.sessionId || !req.query.userId) {
         return res.send("No Autenticat");
     }
     if (isAuthProfe(sessionId, userId)) {
-        const resposta = await putSQL("afegirClasseProfe", { userId, codi_classe });
+        const resposta = await putSQL("afegirClasseProfe", { codi_classe, email,sessionId, userId });
         return res.json(resposta);
     }
     if (isAuthAlumne(sessionId, userId)) {
-        const resposta = await putSQL("afegirClasseAlumne", { userId, codi_classe });
+        const resposta = await putSQL("afegirClasseAlumne", { codi_classe, email,sessionId, userId });
         return res.json(resposta);
     }
     res.json({missatge: "No Autenticat"});

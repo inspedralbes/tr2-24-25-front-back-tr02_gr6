@@ -175,6 +175,7 @@ export async function callGetProf(email, password) {
     throw error;
   }
 }
+
 export async function callGetClasseFormaPart(email) {
   const sessionStore = useSessionStore();
   const sessionId = sessionStore.sessionId;
@@ -196,6 +197,34 @@ console.log(email)
     throw error;
   }
 }
+
+export async function callPutClass(email,codi_classe) {
+  const sessionStore = useSessionStore();
+  const sessionId = sessionStore.sessionId;
+  const userId = sessionStore.userId;
+  console.log(codi_classe)
+console.log(email)
+  try {
+    const response = await fetch(`${URL}/afegirClasse?codi_classe=${codi_classe}&email=${email}&sessionId=${sessionId}&userId=${userId}`, {
+      method: "PUT",
+      headers: {
+          "Content-Type": "application/json",
+      },
+      body: JSON.stringify({email,codi_classe}), 
+  });
+
+    console.log(response)
+    if (!response.ok) {
+      throw new Error(`Error en la solicitud: ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error en Communication Manager:", error);
+    throw error;
+  }
+}
+
 
 export async function getAlumnes() {
   const sessionStore = useSessionStore();

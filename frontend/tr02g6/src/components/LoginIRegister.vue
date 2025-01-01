@@ -199,10 +199,9 @@
 import { ref, reactive } from "vue";
 import { callPostProf, callGetProf,callGetClasseFormaPart } from "@/services/communicationManager";
 import { useRouter } from "vue-router";
-
 import { useSessionStore } from "@/stores/sessionStore"; 
-import {useUserStore} from "@/stores/userStore"; import { useAuthStore } from "@/stores/userauth"
-const authStore = useAuthStore()
+import { useUserStore } from "@/stores/userStore"; 
+
 const step = ref(1);
 
 const user = reactive({
@@ -215,7 +214,8 @@ const user = reactive({
 const visible = ref(false);
 const errorMessage = ref("");
 const router = useRouter();
-
+const sessionStore = useSessionStore();
+const emailStore = useUserStore();
 const identifierPlaceholder = "email@example.com";
 const passwordPlaceholder = "Insereix contrasenya";
 
@@ -248,10 +248,10 @@ async function handleLogin() {
         const data = await callGetProf(user.email, user.contrassenya);
 
         if (data && data.sessionId) {
-            const sessionStore = useSessionStore();
             sessionStore.setSessionId(data.sessionId);
             sessionStore.setUserId(data.tutorId || data.alumneId);
-
+            emailStore.setEmail(user.email);
+            emailStore.setName(user.nom);
             const email = user.email;
             const esProfeCheck = esProfe(email);
             const teClasseCheck = await teClasse(email); 
@@ -264,10 +264,10 @@ async function handleLogin() {
                 router.push("/home");
             } else if (!esProfeCheck && !teClasseCheck) {
                 console.log("ALUMNO Y SIN CLASE");
-                router.push("/home");
+                router.push("/codeClass");
             } else {
                 console.log("ALUMNO Y CON CLASE");
-                router.push("/home");
+                router.push("/class");
             }
         } else {
             errorMessage.value = "Email o contrassenya incorrectes.";

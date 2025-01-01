@@ -56,7 +56,29 @@ app.get("/classes", (req, res) => {
     });
 });
 
-app.get("/classeForma", (req, res) => {
+app.get("/classeFormaProfe", (req, res) => {
+    const email = req.query.email;
+    console.log("EMAIL DE SQL",email)
+    pool.getConnection((err, connection) => {
+        if (err) {
+            console.error('Error getting connection from pool:', err);
+            res.status(500).send("Error al obtenir connexió");
+            return;
+        }
+        const query =`SELECT id_classe FROM Tutors WHERE email=?`;
+        connection.query(query,[email], (err, results) => {
+            if (err) {
+                console.error('Error:', err);
+            } else {
+                classes = results;
+                console.log("RESULTADO DE SQL",classes)
+            }
+        
+        res.json(classes);
+    });
+});
+});
+app.get("/classeFormaAlumne", (req, res) => {
     const email = req.query.email;
     console.log("EMAIL DE SQL",email)
     pool.getConnection((err, connection) => {
@@ -270,11 +292,11 @@ app.put("/afegirClasseProfe", (req, res) => {
 });
 
 app.put("/afegirClasseAlumne", (req, res) => {
-    const alumne_id = req.query.userId;
+    const alumne_email = req.query.email;
     const codi_classe = req.query.codi_classe;
 
-    if (!alumne_id || !codi_classe) {
-        return res.status(400).json({ error: "Falta el paràmetre alumne_id o codi_classe" });
+    if (!alumne_email || !codi_classe) {
+        return res.status(400).json({ error: "Falta el paràmetre alumne_email o codi_classe" });
     }
 
     pool.getConnection((err, connection) => {
@@ -307,10 +329,10 @@ app.put("/afegirClasseAlumne", (req, res) => {
             const queryUpdateTutor = `
                 UPDATE Alumnes 
                 SET id_classe = ? 
-                WHERE id_alumne = ?
+                WHERE email = ?
             `;
 
-            connection.query(queryUpdateTutor, [id_classe, alumne_id], (err, updateResults) => {
+            connection.query(queryUpdateTutor, [id_classe, alumne_email], (err, updateResults) => {
                 connection.release();
                 if (err) {
                     console.error("Error actualitzant el tutor:", err);
@@ -323,7 +345,7 @@ app.put("/afegirClasseAlumne", (req, res) => {
 
 
                 res.json({
-                    message: `Alumne amb id ${alumne_id} ha estat assignat a la classe amb codi ${codi_classe}`,
+                    message: `Alumne amb correu ${alumne_email} ha estat assignat a la classe amb codi ${codi_classe}`,
                 });
 
             });
