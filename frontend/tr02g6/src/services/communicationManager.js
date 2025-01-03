@@ -4,7 +4,10 @@
 const URL_AUTH = import.meta.env.VITE_API_ROUTE_AUTH;
 const URL = import.meta.env.VITE_API_ROUTE;
 import { useSessionStore } from '@/stores/sessionStore';
-//const authStore = useAuthStore();
+const sessionStore = useSessionStore();
+const sessionId = sessionStore.sessionId;
+const userId = sessionStore.userId;
+
 
 export async function callPostProf(profesor) {
   // const formProfesor = new FormData();
@@ -53,9 +56,6 @@ export async function callPostProf(profesor) {
 
 export async function callFetchClasses(course) {
   try {
-    const sessionStore = useSessionStore();
-    const sessionId = sessionStore.sessionId;
-    const userId = sessionStore.userId
     if (!sessionId || !userId) {
       throw new Error('No hay sessionId o userId almacenado');
     }
@@ -177,9 +177,6 @@ export async function callGetProf(email, password) {
 }
 
 export async function callGetClasseFormaPart(email) {
-  const sessionStore = useSessionStore();
-  const sessionId = sessionStore.sessionId;
-  const userId = sessionStore.userId;
   console.log(email)
   try {
     const response = await fetch(`${URL}/classeForma?email=${email}&sessionId=${sessionId}&userId=${userId}`);
@@ -194,12 +191,10 @@ export async function callGetClasseFormaPart(email) {
     throw error;
   }
 }
-export async function callGetAlumnesClasse(email) {
-  const sessionStore = useSessionStore();
-  const sessionId = sessionStore.sessionId;
-  const userId = sessionStore.userId;
+
+export async function getClasse(email) {
   try {
-    const response = await fetch(`${URL}/alumnesClasse?email=${email}&sessionId=${sessionId}&userId=${userId}`);
+    const response = await fetch(`${URL}/classe?email=${email}&sessionId=${sessionId}&userId=${userId}`);
     console.log(response)
     if (!response.ok) {
       throw new Error(`Error en la solicitud: ${response.status}`);
@@ -212,10 +207,8 @@ export async function callGetAlumnesClasse(email) {
   }
 }
 
+
 export async function callPutClass(email, codi_classe) {
-  const sessionStore = useSessionStore();
-  const sessionId = sessionStore.sessionId;
-  const userId = sessionStore.userId;
   console.log(codi_classe)
   console.log(email)
   try {
@@ -241,9 +234,6 @@ export async function callPutClass(email, codi_classe) {
 
 
 export async function getAlumnes() {
-  const sessionStore = useSessionStore();
-  const sessionId = sessionStore.sessionId;
-  const userId = sessionStore.userId;
   console.log(sessionId);
   console.log(userId);
   const alumnes = await fetch(`${URL}/alumnesClasse?sessionId=${sessionId}&userId=${userId}`);

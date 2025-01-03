@@ -101,7 +101,40 @@ app.get("/classeFormaAlumne", (req, res) => {
 });
 });
 
+app.get("/classe", (req, res) => {
+    const email = req.query.email;
+    console.log("EMAIL DE SQL",email)
+    pool.getConnection((err, connection) => {
+        if (err) {
+            console.error('Error getting connection from pool:', err);
+            res.status(500).send("Error al obtenir connexió");
+            return;
+        }
+        const query =`SELECT c.classe FROM Classes c JOIN Alumnes a ON c.id_classe = a.id_classe WHERE a.id_classe = (
+    SELECT id_classe
+    FROM Alumnes
+    WHERE email = ?
+)`;
+        connection.query(query,[email], (err, results) => {
+            if (err) {
+                console.error('Error:', err);
+            } else {
+                classes = results;
+            }
+        
+        res.json(classes);
+    });
+});
+});
 
+
+// SELECT a.id_alumne, a.email, a.nom, a.cognoms, c.classe
+// FROM Alumnes a JOIN Classes c ON  a.id_classe = c.id_classe
+// WHERE a.id_classe = (
+//     SELECT id_classe
+//     FROM Alumnes
+//     WHERE email = ?
+// )
 app.get("/alumnesClasseProfe", (req, res) => {
     const profe_id = req.query.userId;
 
@@ -192,7 +225,11 @@ app.get("/JSON", (req, res) => {
 });
 
 app.get("/alumnesClasseAlumne", (req, res) => {
-    const email = req.query.email;
+    const alumne_id = req.query.userId;
+
+    if (!alumne_id) {
+        return res.status(400).json({ error: "Falta el paràmetre alumne_id" });
+    }
 
     pool.getConnection((err, connection) => {
         if (err) {
@@ -201,15 +238,16 @@ app.get("/alumnesClasseAlumne", (req, res) => {
         }
 
         const query = `
-            SELECT a.id_alumne, a.email, a.nom, a.cognoms, c.classe
-            FROM Alumnes a JOIN Classes c ON  a.id_classe = c.id_classe
+            SELECT a.id_alumne, a.email, a.nom, a.cognoms
+            FROM Alumnes a
             WHERE a.id_classe = (
                 SELECT id_classe
                 FROM Alumnes
-                WHERE email = ?
+                WHERE id_alumne = ?
             )
-        `;    
-        connection.query(query, [email], (err, results) => {
+        `;
+
+        connection.query(query, [alumne_id], (err, results) => {
             connection.release();
             if (err) {
                 console.error("Error executant la consulta:", err);
@@ -223,7 +261,6 @@ app.get("/alumnesClasseAlumne", (req, res) => {
         });
     });
 });
-
 
 app.put("/afegirClasseProfe", (req, res) => {
     const profe_id = req.query.userId;

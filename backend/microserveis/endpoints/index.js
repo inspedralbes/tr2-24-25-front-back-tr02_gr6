@@ -87,6 +87,18 @@ app.get("/alumnesClasse", async (req, res) => {
     res.json({missatge: "No Autenticat"});
 });
 
+app.get("/classe", async (req, res) => {
+    sessionId = req.query.sessionId;
+    userId = req.query.userId;
+    email= req.query.email;
+    if (!req.query.sessionId || !req.query.userId) {
+        return res.json({missatge: "No Autenticat"});
+    }
+        const alumnes = await getSQL("classe", { email,sessionId, userId });
+    return res.json(alumnes);
+    
+});
+
 app.get("/classeForma", async (req, res) => {
     email= req.query.email;
     sessionId = req.query.sessionId;
