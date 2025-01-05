@@ -65,7 +65,11 @@ io.on('connection', (socket) => {
             if (processos[nomServei] && processos[nomServei].actiu) {
                 processos[nomServei].actiu = false;
                 processos[nomServei].referencia.send({ action: 'stop' });
-                processos["mongoDB"].referencia.send({ action: 'apagarLog', servei: nomServei });
+                if (processos["mongoDB"] && processos["mongoDB"].actiu) {
+                    processos["mongoDB"].referencia.send({ action: 'apagarLog', servei: nomServei });
+                } else {
+                    socket.emit("resposta", `El servei de mongoDB no està actiu o ha fallat!`);
+                }
                 socket.emit("resposta", `${nomServei} aturat`);
             } else if (processos[nomServei]) {
                 socket.emit("resposta", `${nomServei} ja està aturat`);
@@ -84,7 +88,11 @@ io.on('connection', (socket) => {
                 if (!processos[nomServei].referencia) crearServei(nomServei);
                 processos[nomServei].actiu = true;
                 processos[nomServei].referencia.send({ action: 'start' });
-                processos["mongoDB"].referencia.send({ action: 'encendreLog', servei: nomServei });
+                if (processos["mongoDB"] && processos["mongoDB"].actiu) {
+                    processos["mongoDB"].referencia.send({ action: 'encendreLog', servei: nomServei });
+                } else {
+                    socket.emit("resposta", `El servei de mongoDB no està actiu o ha fallat!`);
+                }
                 socket.emit("resposta", `${nomServei} actiu`);
             } else if (processos[nomServei]) {
                 socket.emit("resposta", `${nomServei} ja està actiu`);
@@ -128,7 +136,6 @@ io.on('connection', (socket) => {
 app.get("/processos", (req, res) => {
     const contrassenyaUser = req.query.contrassenya;
     if (contrassenyaUser === contrassenya) {
-        console.log("Processos enviats.");
         const processosArray = Object.keys(processos).map(nom => {
             return { nom: nom, actiu: processos[nom].actiu };
         });

@@ -42,10 +42,10 @@ async function getLogs(microservei) {
 process.on('message', async (message) => { // Assegura't que és async
     if (message.action === 'start') {
         app.listen(port, () => {
-            console.log(`Servei de MongoDB corrent al port ${port}`);
+            console.log(`Servei d'Autenticació corrent a ${port}`);
         }).on('error', (err) => {
             if (err.code === 'EADDRINUSE') {
-                console.error(`El port ${port} ja està en ús.`);
+                console.log(`El port ${port} ja està en ús, però el servidor està funcionant.`);
             } else {
                 console.error(err);
             }
@@ -59,7 +59,11 @@ process.on('message', async (message) => { // Assegura't que és async
     }
     if (message.action === 'getLog') {
         const logs = await getLogs(message.servei);
-        process.send({logs});
+        const simplifiedLogs = logs.map(log => ({
+            message: log.message,
+            timestamp: log.timestamp
+        }));
+        process.send({ logs: simplifiedLogs });
     }
     if (message.action === 'encendreLog') {
         await logMessage(message.servei, `Microservei de ${message.servei} encés.`);

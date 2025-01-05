@@ -614,10 +614,10 @@ function jaExisteix(nouUser) {
 process.on('message', (message) => {
     if (message.action === 'start') {
         app.listen(port, () => {
-            console.log(`Servei de Bases de Dades corrent al port ${port}`);
+            console.log(`Servei d'Autenticació corrent a ${port}`);
         }).on('error', (err) => {
             if (err.code === 'EADDRINUSE') {
-                console.error(`El port ${port} ja està en ús.`);
+                console.log(`El port ${port} ja està en ús, però el servidor està funcionant.`);
             } else {
                 console.error(err);
             }

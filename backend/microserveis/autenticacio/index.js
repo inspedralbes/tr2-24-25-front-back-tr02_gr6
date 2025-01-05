@@ -217,10 +217,10 @@ process.on('message', (message) => {
         getSessionsProfe();
         getSessionsAlumne();
         app.listen(port, () => {
-            console.log(`Servei d'Autenticacio corrents a ${port}`);
+            console.log(`Servei d'Autenticació corrent a ${port}`);
         }).on('error', (err) => {
             if (err.code === 'EADDRINUSE') {
-                console.error(`El port ${port} ja està en ús.`);
+                console.log(`El port ${port} ja està en ús, però el servidor està funcionant.`);
             } else {
                 console.error(err);
             }
