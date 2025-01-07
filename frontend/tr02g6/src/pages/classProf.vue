@@ -10,7 +10,6 @@
                     <v-icon>mdi-home</v-icon>
                 </v-btn>
                 <h1>BENVINGUT/DA {{ userStore.email }} a {{ classe }}!</h1>
-                <h1></h1>
             </v-col>
         </v-row>
         <v-row>
@@ -29,15 +28,25 @@
                         {{ alumne.nom }}
                     </v-card-title>
                     <v-card-subtitle>
-                         {{ alumne.email }}
+                        {{ alumne.email }}
                     </v-card-subtitle>
                 </v-card>
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col cols="12" class="d-flex align-center">
+                <v-switch 
+                class="fixed-button mb-12 mr-10"
+                    v-model="habilitarForm"
+                    label="📝"
+                ></v-switch>
             </v-col>
         </v-row>
         <v-btn 
             large
             class="form-button fixed-button"
-           @click="navegarapantalla"
+            :disabled="!habilitarForm"
+            @click="navegarapantalla"
         >
             FORMULARI
         </v-btn>
@@ -48,13 +57,17 @@
 import { ref, onMounted } from 'vue';
 import { useUserStore } from '@/stores/userStore';
 import { getAlumnes, getClasse } from '@/services/communicationManager';
-import {useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
+
 const router = useRouter();
 
 const userStore = useUserStore();
 const alumnes = ref([]);
 const email = userStore.email;
-const classe= ref("") 
+const classe = ref("");
+
+const habilitarForm = ref(false); 
+
 async function fetchAlumnes(email) {
     try {
         const data = await getAlumnes(email);
@@ -63,9 +76,9 @@ async function fetchAlumnes(email) {
     } catch (error) {
         console.error("Error al realitzar la solicitud:", error.message);
     }
-};
+}
 
-async function  fetchClasse(email) {
+async function fetchClasse(email) {
     try {
         const data = await getClasse(email);
         classe.value = data[0].classe;
@@ -73,21 +86,20 @@ async function  fetchClasse(email) {
     } catch (error) {
         console.error("Error al realitzar la solicitud:", error.message);
     }
-};
-
-const navegarapantalla = () =>{
-  router.push('/formPage')
-}
-const inici = () =>{
-  router.push('/home')
 }
 
+const navegarapantalla = () => {
+    router.push('/formPage');
+}
 
-onMounted(
-    fetchAlumnes(email),
-    fetchClasse(email)
-);
+const inici = () => {
+    router.push('/home');
+}
 
+onMounted(() => {
+    fetchAlumnes(email);
+    fetchClasse(email);
+});
 </script>
 
 <style>
