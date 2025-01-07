@@ -258,10 +258,10 @@ async function handleLogin() {
 
             if (esProfeCheck && teClasseCheck) {
                 console.log("PROFE Y CON CLASE");
-                router.push("/classProf")
+                router.push("/classProf");
               } else if (esProfeCheck && !teClasseCheck) {
                 console.log("Ets professor, però no formes part de cap classe.");
-                router.push("/home");
+                router.push("/formProfe");
             } else if (!esProfeCheck && !teClasseCheck) {
                 console.log("ALUMNO Y SIN CLASE");
                 router.push("/codeClass");

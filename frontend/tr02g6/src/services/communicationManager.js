@@ -75,17 +75,17 @@ export async function callFetchClasses(course) {
     throw error;
   }
 }
-export async function callAddClass(classeData) {
+export async function callAddClass(email,classeData) {
   try {
     const sessionStore = useSessionStore();
     const sessionId = sessionStore.sessionId;
     const userId = sessionStore.userId;
-
+console.log(email)
     if (!sessionId || !userId) {
       throw new Error("No hay sessionId o userId almacenado");
     }
 
-    const response = await fetch(`${URL}/classes?sessionId=${sessionId}&userId=${userId}`, {
+    const response = await fetch(`${URL}/classes?email=${email}&sessionId=${sessionId}&userId=${userId}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -233,10 +233,10 @@ export async function callPutClass(email, codi_classe) {
 }
 
 
-export async function getAlumnes() {
+export async function getAlumnes(email) {
   console.log(sessionId);
   console.log(userId);
-  const alumnes = await fetch(`${URL}/alumnesClasse?sessionId=${sessionId}&userId=${userId}`);
+  const alumnes = await fetch(`${URL}/alumnesClasse?email=${email}&sessionId=${sessionId}&userId=${userId}`);
   try {
     const llista_alumnes = await alumnes.json();
     return llista_alumnes

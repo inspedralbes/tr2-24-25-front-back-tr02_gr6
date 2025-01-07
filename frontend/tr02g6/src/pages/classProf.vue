@@ -1,8 +1,15 @@
 <template>
     <v-container>
         <v-row>
-            <v-col>
-                <h1>BENVINGUT/DA {{ userStore.email }}  a {{ classe }}!</h1>
+            <v-col cols="12" class="d-flex align-center">
+                <v-btn 
+                    icon 
+                    class="home-button"
+                    @click="inici"
+                >
+                    <v-icon>mdi-home</v-icon>
+                </v-btn>
+                <h1>BENVINGUT/DA {{ userStore.email }} a {{ classe }}!</h1>
                 <h1></h1>
             </v-col>
         </v-row>
@@ -40,7 +47,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useUserStore } from '@/stores/userStore';
-import { callGetAlumnesClasse } from '@/services/communicationManager';
+import { getAlumnes, getClasse } from '@/services/communicationManager';
 import {useRouter } from 'vue-router';
 const router = useRouter();
 
@@ -48,11 +55,20 @@ const userStore = useUserStore();
 const alumnes = ref([]);
 const email = userStore.email;
 const classe= ref("") 
-const fetchAlumnes = async () => {
+async function fetchAlumnes(email) {
     try {
-        const data = await callGetAlumnesClasse(email);
+        const data = await getAlumnes(email);
         alumnes.value = data;
-        classe.value = data[0].classe
+        console.log(data);
+    } catch (error) {
+        console.error("Error al realitzar la solicitud:", error.message);
+    }
+};
+
+async function  fetchClasse(email) {
+    try {
+        const data = await getClasse(email);
+        classe.value = data[0].classe;
         console.log(data);
     } catch (error) {
         console.error("Error al realitzar la solicitud:", error.message);
@@ -62,8 +78,16 @@ const fetchAlumnes = async () => {
 const navegarapantalla = () =>{
   router.push('/formPage')
 }
+const inici = () =>{
+  router.push('/home')
+}
 
-onMounted(fetchAlumnes);
+
+onMounted(
+    fetchAlumnes(email),
+    fetchClasse(email)
+);
+
 </script>
 
 <style>
@@ -72,7 +96,7 @@ onMounted(fetchAlumnes);
     color: white;
     font-size: 1.2em;
     font-weight: bold;
-    width: 250px; /* Ajusta el ancho del botón */
+    width: 250px;
     height: 60px !important;
 }
 
