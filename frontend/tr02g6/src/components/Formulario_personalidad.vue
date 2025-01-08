@@ -2,6 +2,7 @@
 <script setup>
 import { getAlumnes, postResultats } from '@/services/communicationManager';
 import { onMounted, ref, watch } from 'vue'
+import { useUserStore } from '../stores/userStore';
 const errorMessage = ref("");
 const correos = ref([])
 const alumnos = ref([])
@@ -24,7 +25,8 @@ const limitSelections = (selectedItems) => {
     selectedItems.shift();
   }
 };
-
+  const sessionStore = useUserStore();
+  const email = sessionStore.email
 const listaarrays = [
   cae_bien,
   cae_no_bien,

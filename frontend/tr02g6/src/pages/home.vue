@@ -24,11 +24,9 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore';
 const userStore = useUserStore();
-
 const links = [
   ['mdi-inbox-arrow-down', '1 ESO'],
   ['mdi-inbox-arrow-down', '2 ESO'],
