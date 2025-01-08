@@ -168,8 +168,9 @@ app.put("/formulari", async (req, res) => {
         return res.json({missatge: "No Autenticat"});
     }
 
+
     const formulariEstringuejar = req.body;
-    const formulari = JSON.stringify(formulariEstringuejar)
+    const formulari = JSON.stringify(formulariEstringuejar);
 
     if (!formulari) {
         return res.json({missatge: "Falten camps"});
