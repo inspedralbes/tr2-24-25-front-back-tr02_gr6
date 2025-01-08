@@ -50,7 +50,7 @@ process.on('message', async (message) => { // Assegura't que és async
                 console.error(err);
             }
         });
-        mongoose.connect(`mongodb+srv://${user}:${passsowrd}@${cluster}.hrrx5.mongodb.net/?retryWrites=true&w=majority&appName=TR2G6`)
+        mongoose.connect(`mongodb+srv://${user}:${passsowrd}@${cluster}.hrrx5.mongodb.net/?retryWrites=true&w=majority&appName=TR2G6`).then(() => console.log("Connectat a MongoDB"))
             .catch(err => console.error('Error en connectar a MongoDB Atlas:', err));
     }
     if (message.action === 'stop') {
