@@ -206,6 +206,20 @@ export async function getClasse(email) {
     throw error;
   }
 }
+export async function getTutor(email) {
+  try {
+    const response = await fetch(`${URL}/classe?email=${email}&sessionId=${sessionId}&userId=${userId}`);
+    console.log(response)
+    if (!response.ok) {
+      throw new Error(`Error en la solicitud: ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error en Communication Manager:", error);
+    throw error;
+  }
+}
 
 
 export async function callPutClass(email, codi_classe) {

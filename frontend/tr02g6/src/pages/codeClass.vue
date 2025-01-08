@@ -56,7 +56,7 @@ async function putClass() {
 
 <style>
 .kahoot-background {
-    background: linear-gradient(135deg, #6a1b9a, #8e24aa);
+    background: linear-gradient(135deg, #6a1b9a, #cb43f1);
     color: white;
     margin: 0;
     padding: 0;

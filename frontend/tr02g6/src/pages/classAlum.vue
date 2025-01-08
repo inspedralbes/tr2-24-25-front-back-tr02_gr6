@@ -55,6 +55,7 @@ const userStore = useUserStore();
 const alumnes = ref([]);
 const email = userStore.email;
 const classe= ref("") 
+const id_classe= ref("")
 async function fetchAlumnes(email) {
     try {
         const data = await getAlumnes(email);
@@ -69,6 +70,7 @@ async function  fetchClasse(email) {
     try {
         const data = await getClasse(email);
         classe.value = data[0].classe;
+        id_classe.value = data[0].id_classe;
         console.log(data);
     } catch (error) {
         console.error("Error al realitzar la solicitud:", error.message);

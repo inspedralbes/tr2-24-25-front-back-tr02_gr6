@@ -58,6 +58,7 @@ import { ref, onMounted } from 'vue';
 import { useUserStore } from '@/stores/userStore';
 import { getAlumnes, getClasse } from '@/services/communicationManager';
 import { useRouter } from 'vue-router';
+import { ro } from 'vuetify/locale';
 
 const router = useRouter();
 
@@ -74,7 +75,9 @@ async function fetchAlumnes(email) {
         alumnes.value = data;
         console.log(data);
     } catch (error) {
+        
         console.error("Error al realitzar la solicitud:", error.message);
+        router.push('/');
     }
 }
 

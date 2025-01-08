@@ -199,6 +199,7 @@
 import { ref, reactive } from "vue";
 import { callPostProf, callGetProf,callGetClasseFormaPart } from "@/services/communicationManager";
 import { useRouter } from "vue-router";
+const router = useRouter();
 import { useSessionStore } from "@/stores/sessionStore"; 
 import { useUserStore } from "@/stores/userStore"; 
 
@@ -213,7 +214,6 @@ const user = reactive({
 
 const visible = ref(false);
 const errorMessage = ref("");
-const router = useRouter();
 const sessionStore = useSessionStore();
 const emailStore = useUserStore();
 const identifierPlaceholder = "email@example.com";

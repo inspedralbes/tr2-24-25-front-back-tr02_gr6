@@ -101,6 +101,29 @@ app.get("/classeFormaAlumne", (req, res) => {
 });
 });
 
+app.get("/tutor", (req, res) => {
+    const email = req.query.email;
+
+    pool.getConnection((err, connection) => {
+        if (err) {
+            console.error('Error getting connection from pool:', err);
+            res.status(500).send("Error al obtenir connexió");
+            return;
+        }
+        const query =`SELECT email FROM Tutors WHERE email=?`;
+        connection.query(query,[email], (err, results) => {
+            if (err) {
+                console.error('Error:', err);
+            } else {
+                classes = results;
+                console.log("RESULTADO DE SQL",classes)
+            }
+        
+        res.json(classes);
+    });
+});
+});
+
 app.get("/classeAlum", (req, res) => {
     const email = req.query.email;
     console.log("EMAIL DE SQL",email)
@@ -135,7 +158,7 @@ app.get("/classeProf", (req, res) => {
             res.status(500).send("Error al obtenir connexió");
             return;
         }
-        const query =`SELECT c.classe FROM Classes c JOIN Tutors a ON c.id_classe = a.id_classe WHERE a.id_classe = (
+        const query =`SELECT c.classe,c.id_classe FROM Classes c JOIN Tutors a ON c.id_classe = a.id_classe WHERE a.id_classe = (
     SELECT id_classe
     FROM Tutors
     WHERE email = ?

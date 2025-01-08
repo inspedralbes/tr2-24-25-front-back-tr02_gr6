@@ -5,10 +5,9 @@
         <br><br>
         <h3>TUTORIAL:</h3>
       </v-container>
-    </v-main>
 
 <v-navigation-drawer>
-      <v-avatar ma="5"class="mb-4" color="grey-darken-1" size="64"></v-avatar>
+      <v-avatar ma="5" class="mb-4" color="grey-darken-1" size="64"></v-avatar>
       <v-list-item 
   :title="userStore.email" 
   subtitle="Profesor/a">
@@ -20,12 +19,14 @@
           :title="text"
           @click="goToCourse(text)"></v-list-item>
 </v-navigation-drawer>
+</v-main>
 
 </template>
 
 <script setup>
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore';
+
 const userStore = useUserStore();
 const links = [
   ['mdi-inbox-arrow-down', '1 ESO'],
