@@ -17,43 +17,32 @@
                       ></v-img>
                     </slot>
                     <v-form @submit.prevent="handleLogin" ref="form">
-                      <v-card
-                        class="mx-auto pa-12 pb-8"
-                        elevation="8"
-                        max-width="448"
-                        rounded="lg"
-                      >
-                        <div class="text-subtitle-1 text-medium-emphasis">
-                          Email
-                        </div>
-                        <v-text-field
-                          v-model="user.email"
-                          density="compact"
-                          :placeholder="identifierPlaceholder"
-                          :rules="[(v) => !!v || 'Aquest camp és obligatori']"
-                          prepend-inner-icon="mdi-email-outline"
-                          variant="outlined"
-                        ></v-text-field>
+                      <div class="text-subtitle-1 text-medium-emphasis mb-2">
+                        Email
+                      </div>
+                      <v-text-field
+                        v-model="user.email"
+                        density="compact"
+                        placeholder="Introduce tu email"
+                        :rules="[(v) => !!v || 'Aquest camp és obligatori']"
+                        prepend-inner-icon="mdi-email-outline"
+                        variant="outlined"
+                      ></v-text-field>
 
-                        <div
-                          class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between"
-                        >
-                          Contrasenya
-                        </div>
-
-                        <v-text-field
-                          v-model="user.contrassenya"
-                          :append-inner-icon="
-                            visible ? 'mdi-eye-off' : 'mdi-eye'
-                          "
-                          :type="visible ? 'text' : 'password'"
-                          density="compact"
-                          :placeholder="passwordPlaceholder"
-                          :rules="[(v) => !!v || 'Aquest camp és obligatori']"
-                          prepend-inner-icon="mdi-lock-outline"
-                          variant="outlined"
-                          @click:append-inner="visible = !visible"
-                        ></v-text-field>
+                      <div class="text-subtitle-1 text-medium-emphasis mt-4 mb-2">
+                        Contrasenya
+                      </div>
+                      <v-text-field
+                        v-model="user.contrassenya"
+                        :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
+                        :type="visible ? 'text' : 'password'"
+                        density="compact"
+                        placeholder="Introduce tu contraseña"
+                        :rules="[(v) => !!v || 'Aquest camp és obligatori']"
+                        prepend-inner-icon="mdi-lock-outline"
+                        variant="outlined"
+                        @click:append-inner="visible = !visible"
+                      ></v-text-field>
 
                       <v-row justify="center" class="mt-4">
                         <v-btn
@@ -102,7 +91,7 @@
                           Nom
                         </div>
                         <v-text-field
-                          v-model="professor.nom"
+                          v-model="user.nom"
                           density="compact"
                           placeholder="Nom"
                           :rules="[(v) => !!v || 'Aquest camp és obligatori']"
@@ -115,7 +104,7 @@
                           Cognoms
                         </div>
                         <v-text-field
-                          v-model="professor.cognoms"
+                          v-model="user.cognoms"
                           density="compact"
                           placeholder="Cognoms"
                           :rules="[(v) => !!v || 'Aquest camp és obligatori']"
@@ -129,7 +118,7 @@
                       Email
                     </div>
                     <v-text-field
-                      v-model="professor.email"
+                      v-model="user.email"
                       density="compact"
                       placeholder="email@example.com"
                       :rules="[(v) => !!v || 'Aquest camp és obligatori']"
@@ -141,7 +130,7 @@
                       Contrasenya
                     </div>
                     <v-text-field
-                      v-model="professor.contrassenya"
+                      v-model="user.contrassenya"
                       :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
                       :type="visible ? 'text' : 'password'"
                       density="compact"
@@ -239,7 +228,7 @@ async function handleLogin() {
                 console.log("PROFE Y CON CLASE");
                 router.push("/classProf");
               } else if (esProfeCheck && !teClasseCheck) {
-                console.log("Ets professor, però no formes part de cap classe.");
+                console.log("Ets user, però no formes part de cap classe.");
                 router.push("/formProfe");
             } else if (!esProfeCheck && !teClasseCheck) {
                 console.log("ALUMNO Y SIN CLASE");
