@@ -39,7 +39,7 @@ CREATE TABLE Alumnes (
     FOREIGN KEY (id_classe) REFERENCES Classes (id_classe)
 );
 
-CREATE TABLE `respostes` (
+CREATE TABLE `Respostes` (
   `id_alumne` int(11) NOT NULL,
   `soc_POS_1` int(11) DEFAULT NULL,
   `soc_POS_2` int(11) DEFAULT NULL,
@@ -76,7 +76,8 @@ CREATE TABLE `respostes` (
   `vr_3` int(11) DEFAULT NULL,
   `amics_1` int(11) DEFAULT NULL,
   `amics_2` int(11) DEFAULT NULL,
-  `amics_3` int(11) DEFAULT NULL
+  `amics_3` int(11) DEFAULT NULL,
+  FOREIGN KEY (id_alumne) REFERENCES Alumnes (id_alumne)
 );
 
 INSERT INTO Cursos VALUES
