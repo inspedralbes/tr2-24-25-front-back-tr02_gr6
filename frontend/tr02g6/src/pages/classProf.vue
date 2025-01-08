@@ -72,6 +72,9 @@ const habilitarForm = ref(false);
 async function fetchAlumnes(email) {
     try {
         const data = await getAlumnes(email);
+        if(data.includes("No Autenticat")) {
+            router.push('/');
+        }
         alumnes.value = data;
         console.log(data);
     } catch (error) {
@@ -83,6 +86,9 @@ async function fetchAlumnes(email) {
 
 async function fetchClasse(email) {
     try {
+        if(data.includes("No Autenticat")) {
+            router.push('/');
+        }
         const data = await getClasse(email);
         classe.value = data[0].classe;
         console.log(data);

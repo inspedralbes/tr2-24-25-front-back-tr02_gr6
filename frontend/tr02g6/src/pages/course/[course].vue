@@ -68,6 +68,10 @@ const classes = ref([]);
 
 async function fetchTutor() {
   const data = await getTutor(id_classe);
+  if(data.includes("No Autenticat")) {
+            router.push('/');
+        }
+
   tutor.value = data;
 }
 
@@ -83,6 +87,9 @@ const fetchClasses = async () => {
   try {
     console.log("Fetching classes for course:", formattedCourse.value);
     const data = await callFetchClasses(formattedCourse.value, sessionId);
+    if(data.includes("No Autenticat")) {
+            router.push('/');
+        }
     classes.value = data;
     id_classe.value = data.id_classe;
   } catch (error) {

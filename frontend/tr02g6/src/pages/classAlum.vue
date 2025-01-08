@@ -59,6 +59,9 @@ const id_classe= ref("")
 async function fetchAlumnes(email) {
     try {
         const data = await getAlumnes(email);
+        if(data.includes("No Autenticat")) {
+            router.push('/');
+        }
         alumnes.value = data;
         console.log(data);
     } catch (error) {
@@ -69,6 +72,9 @@ async function fetchAlumnes(email) {
 async function  fetchClasse(email) {
     try {
         const data = await getClasse(email);
+        if(data.includes("No Autenticat")) {
+            router.push('/');
+        }
         classe.value = data[0].classe;
         id_classe.value = data[0].id_classe;
         console.log(data);
