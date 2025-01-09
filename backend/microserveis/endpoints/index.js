@@ -202,29 +202,6 @@ app.put("/afegirClasse", async (req, res) => {
 });
 
 
-app.put("/formulari", async (req, res) => {
-    sessionId = req.query.sessionId;
-    userId = req.query.userId;
-    if (!req.query.sessionId || !req.query.userId) {
-        return res.json({missatge: "No Autenticat"});
-    }
-
-    if (!isAuthAlumne(sessionId, userId)) {
-        return res.json({missatge: "No Autenticat"});
-    }
-
-
-    const formulariEstringuejar = req.body;
-    const formulari = JSON.stringify(formulariEstringuejar);
-
-    if (!formulari) {
-        return res.json({missatge: "Falten camps"});
-    }
-        
-        const resposta = await putSQL("formulari", { userId, formulari });
-        res.json(resposta);
-});
-
 app.post("/registre", async (req, res) => {
     try {
         const { email, contrassenya, nom, cognoms } = req.body;

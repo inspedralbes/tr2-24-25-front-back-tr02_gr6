@@ -35,6 +35,7 @@ CREATE TABLE Alumnes (
     nom VARCHAR(50),
     cognoms VARCHAR(50),
     id_classe INT,
+    formulari_fet BOOLEAN DEFAULT FALSE,
     PRIMARY KEY (id_alumne),
     FOREIGN KEY (id_classe) REFERENCES Classes (id_classe)
 );

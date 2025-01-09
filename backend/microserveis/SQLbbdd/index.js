@@ -280,6 +280,36 @@ app.get("/alumnesClasseAlumne", (req, res) => {
     });
 });
 
+app.get("/haFetFormulari", (req, res) => {
+    const alumne_id = req.query.userId;
+
+    if (!alumne_id) {
+        return res.status(400).json({ error: "Falta el paràmetre alumne_id" });
+    }
+
+    pool.getConnection((err, connection) => {
+        if (err) {
+            console.error("Error obtenint connexió del pool:", err);
+            return res.status(500).send("Error al obtenir connexió");
+        }
+
+        const query = `SELECT formulari_fet FROM Alumnes WHERE id_alumne = (?)`;
+
+        connection.query(query, [alumne_id], (err, results) => {
+            connection.release();
+            if (err) {
+                console.error("Error executant la consulta:", err);
+                return res.status(500).json({ error: "Error en retornar l'estat del formulari de l'alumne" });
+            }
+
+            if (results.length === 0) {
+                return res.status(404).json({ message: "No s'han trobat alumnes per aquesta classe" });
+            }
+            res.json(results);
+        });
+    });
+});
+
 app.put("/afegirClasseProfe", (req, res) => {
     const profe_id = req.query.userId;
     const codi_classe = req.query.codi_classe;
@@ -649,6 +679,7 @@ app.put("/formulari", (req, res) => {
                 }
 
                 res.json({ mensaje: "Respostes afegides" });
+                getRespostes(connection);
                 connection.release();
 
             });
@@ -656,6 +687,31 @@ app.put("/formulari", (req, res) => {
     } else {
         res.json({ mensaje: "L'alumne ja ha enviat respostes anteriorment." });
     }
+});
+
+app.put("/formulariAlumne", (req, res) => {
+    const id_alumne = req.query.userId
+
+    pool.getConnection((err, connection) => {
+        if (err) {
+            console.error('Error getting connection from pool:', err);
+            res.status(500).send("Error al obtenir connexió");
+            return;
+        }
+
+        const query = `UPDATE Alumnes SET formulari_fet = 1 WHERE id_alumne = (?);`;
+
+        connection.query(query, [id_alumne], (err, results) => {
+
+            if (err) {
+                console.error('Error:', err);
+            }
+            getAlumnes(connection);
+            connection.release();
+            res.json({ mensaje: "Formulari Fet Afegit" });
+
+        });
+    });
 });
 
 function convertirNomsAId(id_alumne, formulari) {
@@ -713,7 +769,7 @@ function getTutors(connection) {
 }
 
 function getAlumnes(connection) {
-    connection.query('SELECT id_alumne, email, nom, cognoms, id_classe FROM Alumnes', (err, results) => {
+    connection.query('SELECT id_alumne, email, nom, cognoms, id_classe, formulari_fet FROM Alumnes', (err, results) => {
         if (err) {
             console.error('Error:', err);
         } else {
