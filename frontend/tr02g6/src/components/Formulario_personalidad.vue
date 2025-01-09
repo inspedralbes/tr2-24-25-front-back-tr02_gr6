@@ -49,7 +49,7 @@ listaarrays.forEach((array) => {
 
 async function fecthGetAlumnos() {
   try {
-    const llista_alumnes = await getAlumnes();
+    const llista_alumnes = await getAlumnes(email);
     correos.value = llista_alumnes.map(alumne => alumne.email);
     alumnos.value = llista_alumnes.map(alumne => `${alumne.nom} ${alumne.cognoms}`);
     console.log(llista_alumnes);
