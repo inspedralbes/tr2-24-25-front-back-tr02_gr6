@@ -3,10 +3,11 @@ const cors = require('cors');
 const fs = require('fs');
 const http = require('http')
 const { fork } = require('child_process');
-const contrassenya = "hola";
-const { Server } = require('socket.io');
 const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, './.env')});
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
+const contrassenya = process.env.CONTRASSENYA_MICROSERVEIS;
+const { Server } = require('socket.io');
+require('dotenv').config({ path: path.resolve(__dirname, './.env') });
 const port = process.env.PORT_MAIN;
 
 const app = express();
@@ -64,6 +65,11 @@ io.on('connection', (socket) => {
             if (processos[nomServei] && processos[nomServei].actiu) {
                 processos[nomServei].actiu = false;
                 processos[nomServei].referencia.send({ action: 'stop' });
+                if (processos["mongoDB"] && processos["mongoDB"].actiu) {
+                    processos["mongoDB"].referencia.send({ action: 'apagarLog', servei: nomServei });
+                } else {
+                    socket.emit("resposta", `El servei de mongoDB no està actiu o ha fallat!`);
+                }
                 socket.emit("resposta", `${nomServei} aturat`);
             } else if (processos[nomServei]) {
                 socket.emit("resposta", `${nomServei} ja està aturat`);
@@ -82,11 +88,39 @@ io.on('connection', (socket) => {
                 if (!processos[nomServei].referencia) crearServei(nomServei);
                 processos[nomServei].actiu = true;
                 processos[nomServei].referencia.send({ action: 'start' });
+                if (processos["mongoDB"] && processos["mongoDB"].actiu) {
+                    processos["mongoDB"].referencia.send({ action: 'encendreLog', servei: nomServei });
+                } else {
+                    socket.emit("resposta", `El servei de mongoDB no està actiu o ha fallat!`);
+                }
                 socket.emit("resposta", `${nomServei} actiu`);
             } else if (processos[nomServei]) {
                 socket.emit("resposta", `${nomServei} ja està actiu`);
             } else {
                 socket.emit("resposta", "Servei no trobat");
+            }
+        } else {
+            socket.emit("resposta", "No estàs autenticat");
+            console.log("Intent Fraudulent!");
+        }
+    });
+
+    socket.on('getLog', (contrassenyaUser, nomServei) => {
+        if (contrassenyaUser === contrassenya) {
+            if (processos["mongoDB"] && processos["mongoDB"].actiu) {
+                processos["mongoDB"].referencia.send({ action: 'getLog', servei: nomServei });
+
+                processos["mongoDB"].referencia.on('message', (data) => {
+                    if (data.logs) {
+                        socket.emit("logs", data.logs);
+                    } else {
+                        socket.emit("logs", "Encara no hi han logs.");
+                    }
+                });
+            }
+
+            else {
+                socket.emit("resposta", `El servei de mongoDB no està actiu o ha fallat!`);
             }
         } else {
             socket.emit("resposta", "No estàs autenticat");
@@ -100,15 +134,18 @@ io.on('connection', (socket) => {
 });
 
 app.get("/processos", (req, res) => {
-    const contrassenyaUser = req.query.contrassenya
-    if (contrassenyaUser == contrassenya) {
-        console.log("Processos enviats.")
-        res.json(processos);
+    const contrassenyaUser = req.query.contrassenya;
+    if (contrassenyaUser === contrassenya) {
+        const processosArray = Object.keys(processos).map(nom => {
+            return { nom: nom, actiu: processos[nom].actiu };
+        });
+        res.json(processosArray);
     } else {
         res.status(401).send("No estàs autenticat");
-        console.log("Intent Fraudulent!")
+        console.log("Intent Fraudulent!");
     }
 });
+
 
 app.get('/', (req, res) => {
     res.sendFile(`${__dirname}/index.html`);

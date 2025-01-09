@@ -1,20 +1,16 @@
 <template>
   <v-container>
-    <h1>Gestió de {{ formattedCourse }}</h1>
+    <h1 class="mb-5 mt-3">Gestió de {{ formattedCourse }}</h1>
     <v-row>
       <v-col cols="12" md="6" v-for="classe in classes" :key="classe.id_classe">
         <v-card class="mb-4">
           <v-card-title>{{ classe.classe }}</v-card-title>
-          <v-card-subtitle>ID: {{ classe.codi_random }}</v-card-subtitle>
-          <v-card-actions>
-            <v-btn @click="details(user)">INFOc:</v-btn>
-          </v-card-actions>
+          <v-card-subtitle>TUTOR: alguien (implementar enpoint para saber el tutor de una clase)</v-card-subtitle>
         </v-card>
       </v-col>
     </v-row>
     <br><br>
     <v-btn color="primary" @click="details">Afegir Classe</v-btn>
-    <v-btn @click="navegarapantalla">Formulario</v-btn>
 
   </v-container>
   <v-dialog v-model="dialog" max-width="600">
@@ -110,8 +106,6 @@ const hideDetails = async () => {
 const generateRandomCode = () => {
   return Math.random().toString(36).substring(2, 12);
 };
-const navegarapantalla = () =>{
-  router.push('/formPage')
-}
+
 onMounted(fetchClasses);
 </script>

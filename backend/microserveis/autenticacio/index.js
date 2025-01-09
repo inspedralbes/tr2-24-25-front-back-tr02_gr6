@@ -81,10 +81,8 @@ function isAuthProfe(sessionId, tutorId) {
     for (const sessio of sessionsProfeAutenticades) {
         if (sessio.sessionId === sessionId && sessio.tutorId === Number(tutorId)) {
             return true;
-        }
-    }
-    console.log(`Sessió no vàlida per sessionId: ${sessionId}, tutorId: ${tutorId}`);
-    return false;
+        } 
+    } return false;
 }
 
 
@@ -140,6 +138,8 @@ function registrarSessioProfe(sessio) {
     dadesExistents.push(sessio);
     try {
         fs.writeFileSync(filePathSession, JSON.stringify(dadesExistents, null, 2));
+        sessionsProfeAutenticades.length = 0;
+        sessionsProfeAutenticades.push(...dadesExistents);
     } catch (err) {
         console.error("Error escrivint al fitxer:", err);
     }
@@ -154,7 +154,6 @@ function isAuthAlumne(sessionId, alumneId) {
             return true;
         }
     }
-    console.log(`Sessió no vàlida per sessionId: ${sessionId}, alumneId: ${alumneId}`);
     return false;
 }
 
@@ -210,6 +209,8 @@ function registrarSessioAlumne(sessio) {
     dadesExistents.push(sessio);
     try {
         fs.writeFileSync(filePathSession, JSON.stringify(dadesExistents, null, 2));
+        sessionsAlumneAutenticades.length = 0;
+        sessionsAlumneAutenticades.push(...dadesExistents);
     } catch (err) {
         console.error("Error escrivint al fitxer:", err);
     }
@@ -220,10 +221,10 @@ process.on('message', (message) => {
         getSessionsProfe();
         getSessionsAlumne();
         app.listen(port, () => {
-            console.log(`Servei d'Autenticacio corrents a ${port}`);
+            console.log(`Servei d'Autenticació corrent a ${port}`);
         }).on('error', (err) => {
             if (err.code === 'EADDRINUSE') {
-                console.error(`El port ${port} ja està en ús.`);
+                console.log(`El port ${port} ja està en ús, però el servidor està funcionant.`);
             } else {
                 console.error(err);
             }
