@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sociograma</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        text {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+        }
+        .bubble {
+            stroke: #000;
+            stroke-width: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div id="sociograma"></div>
+
+    <script>
+        // Datos del alumno
+        const alumno = {
+            id: 1,
+            nombre: "Alumno 1",
+            totalAgressivitat: 12,
+            agressivitatFisica: 8,
+            agressivitatVerbal: 0,
+            agressivitatRelacional: 4,
+            prosocialitat: 4
+        };
+    
+        // Configuración del contenedor SVG
+        const width = 800;
+        const height = 600;
+    
+        const svg = d3.select("#sociograma")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height);
+    
+        // Coordenadas para la burbuja central
+        const centerX = width / 2;
+        const centerY = height / 2;
+    
+        // Dibujar la burbuja central (más grande)
+        svg.append("circle")
+            .attr("cx", centerX)
+            .attr("cy", centerY)
+            .attr("r", 70) // Radio más grande
+            .attr("fill", "#1E90FF") // Azul
+            .attr("class", "bubble");
+    
+        // Añadir texto al centro (nombre del alumno)
+        svg.append("text")
+            .attr("x", centerX)
+            .attr("y", centerY)
+            .attr("text-anchor", "middle")
+            .attr("dominant-baseline", "middle")
+            .attr("fill", "#fff")
+            .attr("font-size", "14px")
+            .text(alumno.nombre);
+    
+        // Burbujas conectadas con los datos
+        const connectedBubbles = [
+            { name: "Física", value: alumno.agressivitatFisica, color: "#FFA500" }, // Naranja
+            { name: "Verbal", value: alumno.agressivitatVerbal, color: "#FF6347" }, // Rojo
+            { name: "Relacional", value: alumno.agressivitatRelacional, color: "#32CD32" } // Verde
+        ];
+    
+        // Coordenadas polares para las burbujas conectadas
+        const angles = [Math.PI / 4, Math.PI, (7 * Math.PI) / 4]; // Ángulos en radianes
+        const radius = 200; // Distancia desde la burbuja central
+        const bubbleRadius = 40; // Radio de las burbujas conectadas
+    
+        connectedBubbles.forEach((bubble, i) => {
+            // Calcular posiciones x, y
+            const x = centerX + radius * Math.cos(angles[i]);
+            const y = centerY - radius * Math.sin(angles[i]);
+    
+            // Dibujar burbuja conectada
+            svg.append("circle")
+                .attr("cx", x)
+                .attr("cy", y)
+                .attr("r", bubbleRadius) // Más pequeñas que la central
+                .attr("fill", bubble.color)
+                .attr("class", "bubble");
+    
+            // Dibujar mini burbujas formando la flecha
+            const numMiniBubbles = 5;
+            const pathRadius = radius - bubbleRadius - 10; // Ajustar para que no entren en las burbujas conectadas
+    
+            for (let j = 1; j <= numMiniBubbles; j++) {
+                const t = j / (numMiniBubbles + 1); // Posición fraccionada
+                const miniX = centerX + (70 + pathRadius * t) * Math.cos(angles[i]);
+                const miniY = centerY - (70 + pathRadius * t) * Math.sin(angles[i]);
+    
+                svg.append("circle")
+                    .attr("cx", miniX)
+                    .attr("cy", miniY)
+                    .attr("r", 6) // Tamaño de las mini burbujas
+                    .attr("fill", "#808080") // Color gris para las flechas
+                    .attr("class", "bubble");
+            }
+    
+            // Añadir texto dentro de la burbuja conectada
+            svg.append("text")
+                .attr("x", x)
+                .attr("y", y)
+                .attr("text-anchor", "middle")
+                .attr("dominant-baseline", "middle")
+                .attr("fill", "#fff")
+                .text(bubble.name);
+        });
+    </script>
+    
+    
+</body>
+</html>
