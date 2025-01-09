@@ -1,6 +1,6 @@
 
 <template >
-  <div class="bg-indigo-lighten-5 h-screen d-flex align-center">
+  <div class="bg-amber-lighten-3 h-screen d-flex align-center">
     <v-row >
       <v-col>
         <LoginIRegister />
