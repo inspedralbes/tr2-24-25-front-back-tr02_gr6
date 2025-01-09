@@ -43,9 +43,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeMount } from "vue";
+import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { callFetchClasses, redirect } from "@/services/communicationManager";
+import { callFetchClasses } from "@/services/communicationManager";
 import { useSessionStore } from "@/stores/sessionStore";
 import { useUserStore } from "@/stores/userStore";
 
@@ -70,7 +70,13 @@ if (match) {
 const classes = ref([]);
 
 async function fetchClasses() {
-redirect()
+  const sessionStore = useSessionStore();
+  const sessionId = sessionStore.sessionId;
+
+  if (!sessionId) {
+    console.error("No session ID available.");
+    return;
+  }
 
   try {
     const data = await callFetchClasses(formattedCourse.value, sessionId);
@@ -91,7 +97,8 @@ function isTutor(classes){
 function goToClasseProf (){
   router.push(`/classProf`);
 };
-onBeforeMount(fetchClasses)
+
+onMounted(fetchClasses);
 </script>
 
 <style scoped>

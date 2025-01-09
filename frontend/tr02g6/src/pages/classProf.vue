@@ -1,20 +1,41 @@
 <template>
     <v-container>
-        <v-row>
-            <v-col cols="12" class="d-flex align-center">
+        <v-row class="header-row">
+            <v-col cols="12" class="d-flex align-center justify-space-between">
                 <v-btn 
                     icon 
                     class="home-button"
                     @click="inici"
                 >
-                    <v-icon>mdi-home</v-icon>
+                    <v-icon>mdi-arrow-left</v-icon>
                 </v-btn>
-                <h1>BENVINGUT/DA {{ userStore.email }} a {{ classe }}!</h1>
+                <h1 class="header-title">BENVINGUT/DA {{ userStore.email }} a {{ classe }}!</h1>
+                <v-btn 
+                    icon 
+                    class="code-button"
+                    @click="mostrarCodiRandom"
+                >
+                    <v-icon>mdi-eye</v-icon>
+                </v-btn>
             </v-col>
         </v-row>
+
+        <v-row v-if="showCodiRandom" class="my-5">
+            <v-col cols="12">
+                <v-card class="codi-card">
+                    <v-card-title class="codi-title">
+                        Codi de {{ classe }}
+                    </v-card-title>
+                    <v-card-text class="codi-text">
+                        {{ codi_random }}
+                    </v-card-text>
+                </v-card>
+            </v-col>
+        </v-row>
+
         <v-row>
             <v-col cols="12">
-                <h2>ALUMNES REGISTRATS:</h2>
+                <h2 class="alumnes-title">ALUMNES REGISTRATS:</h2>
             </v-col>
         </v-row>
         <v-row align="stretch">
@@ -23,29 +44,31 @@
                 :key="alumne.id_alumne" 
                 cols="12" sm="6" md="4"
             >
-                <v-card>
+                <v-card class="alumne-card" outlined>
                     <v-card-title>
-                        {{ alumne.nom }}
+                        <v-avatar class="me-3" color="orange darken-2" size="40">
+                            {{ alumne.nom.charAt(0).toUpperCase() }}
+                        </v-avatar>
+                        <div>
+                            <h3 class="mb-1">{{ alumne.nom }}</h3>
+                            <p>{{ alumne.email }}</p>
+                        </div>
                     </v-card-title>
                     <v-card-subtitle>
-                        {{ alumne.email }}
+                        <v-chip 
+                            :color="alumne.formulariCompletat ? 'green darken-5' : 'red darken-1'"
+                            dark
+                        >
+                            {{ alumne.formulariCompletat ? 'Formulari Completat' : 'Formulari Pendent' }}
+                        </v-chip>
                     </v-card-subtitle>
                 </v-card>
             </v-col>
         </v-row>
-        <v-row>
-            <v-col cols="12" class="d-flex align-center">
-                <v-switch 
-                class="fixed-button mb-12 mr-10"
-                    v-model="habilitarForm"
-                    label="📝"
-                ></v-switch>
-            </v-col>
-        </v-row>
+
         <v-btn 
             large
             class="form-button fixed-button"
-            :disabled="!habilitarForm"
             @click="navegarapantalla"
         >
             FORMULARI
@@ -60,13 +83,14 @@ import { getAlumnes, getClasse, redirect } from '@/services/communicationManager
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
-
 const userStore = useUserStore();
+
 const alumnes = ref([]);
 const email = userStore.email;
 const classe = ref("");
-
-const habilitarForm = ref(false); 
+const id_classe = ref("");
+const codi_random = ref("");
+const showCodiRandom = ref(false);
 
 async function fetchAlumnes(email) {
     redirect()
@@ -78,40 +102,78 @@ async function fetchAlumnes(email) {
         alumnes.value = data;
         console.log(data);
     } catch (error) {
-        
         console.error("Error al realitzar la solicitud:", error.message);
-        router.push('/');
     }
-}
+};
 
 async function fetchClasse(email) {
     try {
-        if(data.includes("No Autenticat")) {
-            router.push('/');
-        }
         const data = await getClasse(email);
         classe.value = data[0].classe;
-        console.log(data);
+        id_classe.value = data[0].id_classe;
+        codi_random.value = data[0].codi_random;
+        console.log("valores de getclasse" ,data)
     } catch (error) {
         console.error("Error al realitzar la solicitud:", error.message);
     }
-}
+};
+
+const mostrarCodiRandom = () => {
+    showCodiRandom.value = true;
+};
 
 const navegarapantalla = () => {
     router.push('/formPage');
-}
+};
 
 const inici = () => {
     router.push('/home');
-}
+};
 
-onMounted(() => {
-    fetchAlumnes(email);
-    fetchClasse(email);
+onMounted(async () => {
+    await fetchClasse(email);
+    await fetchAlumnes(email);
 });
 </script>
 
 <style>
+.header-row {
+    background-color: orange;
+    color: white;
+    padding: 20px 0;
+}
+.header-title {
+    font-weight: bold;
+    color: white;
+}
+
+.codi-card {
+    background-color: orange;
+    color: white;
+    text-align: center;
+    border-radius: 16px;
+    padding: 30px;
+}
+.codi-title {
+    font-size: 2em;
+    font-weight: bold;
+}
+.codi-text {
+    font-size: 3em;
+    font-weight: bold;
+}
+
+.alumne-card {
+    transition: all 0.3s;
+    padding: 0.5em;
+    background-color: #fff8e1;
+    border-color: orange;
+}
+.alumne-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
 .form-button {
     background-color: orange;
     color: white;
@@ -119,12 +181,18 @@ onMounted(() => {
     font-weight: bold;
     width: 250px;
     height: 60px !important;
+    border-radius: 30px;
 }
-
 .fixed-button {
     position: fixed;
     bottom: 20px;
     right: 20px;
     z-index: 1000;
+}
+
+.home-button,
+.code-button {
+    color: rgb(195, 91, 0);
+    background-color: orange darken-2;
 }
 </style>

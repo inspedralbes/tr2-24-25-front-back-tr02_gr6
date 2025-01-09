@@ -58,9 +58,9 @@ async function fecthGetAlumnos() {
     console.error('Error en obtenir els correus', error);
   }
 }
-onBeforeMount(redirect())
 onMounted(() => {
   fecthGetAlumnos();
+  redirect();
 });
 
 

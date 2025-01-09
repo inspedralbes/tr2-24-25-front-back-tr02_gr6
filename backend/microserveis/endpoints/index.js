@@ -127,15 +127,15 @@ app.get("/classeForma", async (req, res) => {
 });
 
 app.get("/tutor", async (req, res) => {
-    email= req.query.email;
+    id_classe= req.query.id_classe;
     sessionId = req.query.sessionId;
     userId = req.query.userId;
     if (!req.query.sessionId || !req.query.userId) {
         return res.json({missatge: "No Autenticat"});
     } else {
-        const alumnes = await getSQL("tutor", { email, userId });
-        console.log(alumnes)
-        return res.json(alumnes);
+        const tutor = await getSQL("tutor", { id_classe });
+        console.log(tutor)
+        return res.json(tutor);
     }
 });
 

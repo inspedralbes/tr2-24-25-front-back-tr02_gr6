@@ -3,13 +3,13 @@
         <v-container>
             <v-row class="header-row">
                 <v-col cols="12" class="d-flex align-center justify-space-between">
-                    <h1 class="header-titol">BENVINGUT/DA {{ userStore.email }} a {{ classe }}!</h1>
+                    <h1 class="header-title">BENVINGUT/DA {{ userStore.email }} a {{ classe }}!</h1>
                 </v-col>
             </v-row>
 
             <v-tabs v-model="activeTab" align="center">
-                <v-tab class="tabtab">Alumnes Registrats</v-tab>
-                <v-tab class="tabtab" @click="navigateToResult()">Resultats</v-tab>
+                <v-tab>Alumnes Registrats</v-tab>
+                <v-tab>Resultats</v-tab>
             </v-tabs>
 
             <v-tabs-items v-model="activeTab">
@@ -17,7 +17,7 @@
                 <v-tab-item>
                     <v-row>
                         <v-col cols="12">
-                            <h2 class="alumnes-titol">ALUMNES REGISTRATS:</h2>
+                            <h2 class="alumnes-title">ALUMNES REGISTRATS:</h2>
                         </v-col>
                     </v-row>
                     <v-row align="stretch">
@@ -38,13 +38,28 @@
                                 </v-card-title>
                                 <v-card-subtitle>
                                     <v-chip 
-                                        :color="alumne.formulari_fet >0 ? 'green darken-5' : 'red darken-1'"
+                                        :color="alumne.formulariCompletat ? 'green darken-5' : 'red darken-1'"
                                         dark
                                     >
-                                        {{ alumne.formulari_fet >0 ? 'Formulari Completat' : 'Formulari Pendent' }}
+                                        {{ alumne.formulariCompletat ? 'Formulari Completat' : 'Formulari Pendent' }}
                                     </v-chip>
                                 </v-card-subtitle>
                             </v-card>
+                        </v-col>
+                    </v-row>
+                </v-tab-item>
+
+                <v-tab-item>
+                    <v-row>
+                        <v-col cols="12">
+                            <h2 class="results-title">RESULTATS:</h2>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12">
+                            <div class="result-preview">
+                                <iframe src="https://www.empresaiformacio.org/sBid/" frameborder="0" class="result-iframe"></iframe>
+                            </div>
                         </v-col>
                     </v-row>
                 </v-tab-item>
@@ -75,12 +90,15 @@ const alumnes = ref([]);
 const email = userStore.email;
 const classe = ref("");
 const activeTab = ref(0); 
+
 async function fetchAlumnes(email) {
     try {
         const data = await getAlumnes(email);
-        alumnes.value = data
-        console.log(data)
-    }catch (error) {
+        alumnes.value = data.map(alumne => ({
+            ...alumne,
+            formulariCompletat: Math.random() > 0.5, // Simula estado del formulario
+        }));
+    } catch (error) {
         console.error("Error al obtener alumnos:", error.message);
     }
 }
@@ -97,9 +115,6 @@ async function fetchClasse(email) {
 function navegarapantalla() {
     router.push('/formPage');
 }
-function navigateToResult() {
-    router.push('/resultats');
-}
 
 onMounted(async () => {
     await fetchClasse(email);
@@ -113,18 +128,10 @@ onMounted(async () => {
     color: white;
     padding: 20px 0;
 }
-.tabtab {
-  color: rgb(185, 122, 7);
-  text-transform: uppercase;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.header-titol {
+.header-title {
     font-weight: bold;
 }
-.alumnes-titol, .results-title {
+.alumnes-title, .results-title {
     color: orange;
     font-weight: bold;
 }
@@ -142,7 +149,7 @@ onMounted(async () => {
     text-align: center;
     margin-top: 20px;
 }
-.iframe {
+.result-iframe {
     width: 100%;
     height: 500px;
     border: 1px solid orange;

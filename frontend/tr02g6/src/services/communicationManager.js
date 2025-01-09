@@ -211,21 +211,6 @@ export async function getClasse(email) {
     throw error;
   }
 }
-export async function getTutor(email) {
-  try {
-    const response = await fetch(`${URL}/classe?email=${email}&sessionId=${sessionId}&userId=${userId}`);
-    console.log(response)
-    if (!response.ok) {
-      throw new Error(`Error en la solicitud: ${response.status}`);
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error en Communication Manager:", error);
-    throw error;
-  }
-}
-
 
 export async function callPutClass(email, codi_classe) {
   console.log(codi_classe)
@@ -264,3 +249,12 @@ export async function getAlumnes(email) {
   }
 }
 
+export async function getTutor(id_classe) {
+  const tutors = await fetch(`${URL}/tutor?id_classe=${id_classe}&sessionId=${sessionId}&userId=${userId}`);
+  try {
+    const llista_tutors = await tutors.json();
+    return llista_tutors
+  } catch (error) {
+    console.error('Error al obtener datos:', error);
+  }
+}
