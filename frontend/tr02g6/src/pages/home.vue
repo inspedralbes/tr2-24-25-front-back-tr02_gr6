@@ -26,6 +26,8 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore';
+import { onBeforeMount } from 'vue';
+import { redirect } from '@/services/communicationManager';
 
 const userStore = useUserStore();
 const links = [
@@ -42,4 +44,5 @@ const goToCourse = (course) => {
   const formattedCourse = course.toUpperCase().replace(' ', '')
   router.push(`/course/${formattedCourse}`) 
 }
+onBeforeMount(redirect())
 </script>

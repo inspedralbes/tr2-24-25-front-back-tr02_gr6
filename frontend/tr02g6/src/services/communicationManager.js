@@ -7,8 +7,7 @@ import { useSessionStore } from '@/stores/sessionStore';
 const sessionStore = useSessionStore();
 const sessionId = sessionStore.sessionId;
 const userId = sessionStore.userId;
-
-
+import { useRouter } from 'vue-router';
 export async function callPostProf(profesor) {
   // const formProfesor = new FormData();
   console.log(profesor);
@@ -36,7 +35,13 @@ export async function callPostProf(profesor) {
   const nuevoProfesor = await response.json();
   return nuevoProfesor;
 };
-
+export async function redirect(){
+  const router = useRouter();
+  if (!sessionId) {
+    console.error("No session ID available.");
+    router.push("/")
+  }
+}
 
 /*export async function callGetProf(email,password) {
   try {

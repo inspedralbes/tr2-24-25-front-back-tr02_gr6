@@ -24,9 +24,9 @@
 </template>
 
 <script setup>
-import { callPutClass } from '@/services/communicationManager';
+import { callPutClass, redirect } from '@/services/communicationManager';
 import { useUserStore } from '@/stores/userStore';
-import { ref } from 'vue';
+import { onBeforeMount, ref } from 'vue';
 import { useRouter } from 'vue-router'
 const router = useRouter() 
 const emailStore = useUserStore();
@@ -52,6 +52,7 @@ async function putClass() {
         console.error("Error al meterse en la clase", error);
     }
 }
+onBeforeMount(redirect())
 </script>
 
 <style>

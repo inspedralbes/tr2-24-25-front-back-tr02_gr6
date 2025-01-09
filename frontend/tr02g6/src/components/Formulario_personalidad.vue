@@ -1,7 +1,7 @@
 <!-- eslint-disable no-undef -->
 <script setup>
-import { getAlumnes, postResultats } from '@/services/communicationManager';
-import { onMounted, ref, watch } from 'vue'
+import { getAlumnes, postResultats, redirect } from '@/services/communicationManager';
+import { onBeforeMount, onMounted, ref, watch } from 'vue'
 import { useUserStore } from '../stores/userStore';
 const errorMessage = ref("");
 const correos = ref([])
@@ -58,7 +58,7 @@ async function fecthGetAlumnos() {
     console.error('Error en obtenir els correus', error);
   }
 }
-
+onBeforeMount(redirect())
 onMounted(() => {
   fecthGetAlumnos();
 });

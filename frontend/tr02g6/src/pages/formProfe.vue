@@ -31,9 +31,9 @@
 
 <script setup>
 import { useRouter } from "vue-router";
-import { ref, reactive, computed } from "vue";
+import { ref, reactive, computed, onBeforeMount } from "vue";
 import { useUserStore } from "@/stores/userStore";
-import { callAddClass } from "@/services/communicationManager";
+import { callAddClass,redirect } from "@/services/communicationManager";
 
 const userStore = useUserStore();
 const valid = ref(false);
@@ -83,6 +83,7 @@ function cancel() {
     classeData.classe = "";
     alert("Acción cancelada.");
 }
+onBeforeMount(redirect())
 </script>
 
 <style scoped>

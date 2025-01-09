@@ -56,9 +56,8 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useUserStore } from '@/stores/userStore';
-import { getAlumnes, getClasse } from '@/services/communicationManager';
+import { getAlumnes, getClasse, redirect } from '@/services/communicationManager';
 import { useRouter } from 'vue-router';
-import { ro } from 'vuetify/locale';
 
 const router = useRouter();
 
@@ -70,6 +69,7 @@ const classe = ref("");
 const habilitarForm = ref(false); 
 
 async function fetchAlumnes(email) {
+    redirect()
     try {
         const data = await getAlumnes(email);
         if(data.includes("No Autenticat")) {

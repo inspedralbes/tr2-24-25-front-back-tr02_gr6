@@ -49,6 +49,8 @@ import { ref, onMounted } from 'vue';
 import { useUserStore } from '@/stores/userStore';
 import { getAlumnes, getClasse } from '@/services/communicationManager';
 import {useRouter } from 'vue-router';
+import { useSessionStore } from '@/stores/sessionStore';
+import { redirect } from '../services/communicationManager';
 const router = useRouter();
 
 const userStore = useUserStore();
@@ -56,7 +58,10 @@ const alumnes = ref([]);
 const email = userStore.email;
 const classe= ref("") 
 const id_classe= ref("")
+
 async function fetchAlumnes(email) {
+
+    redirect()
     try {
         const data = await getAlumnes(email);
         if(data.includes("No Autenticat")) {
