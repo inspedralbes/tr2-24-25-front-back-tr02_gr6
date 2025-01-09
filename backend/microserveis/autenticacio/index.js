@@ -138,6 +138,8 @@ function registrarSessioProfe(sessio) {
     dadesExistents.push(sessio);
     try {
         fs.writeFileSync(filePathSession, JSON.stringify(dadesExistents, null, 2));
+        sessionsProfeAutenticades.length = 0;
+        sessionsProfeAutenticades.push(...dadesExistents);
     } catch (err) {
         console.error("Error escrivint al fitxer:", err);
     }
@@ -207,6 +209,8 @@ function registrarSessioAlumne(sessio) {
     dadesExistents.push(sessio);
     try {
         fs.writeFileSync(filePathSession, JSON.stringify(dadesExistents, null, 2));
+        sessionsAlumneAutenticades.length = 0;
+        sessionsAlumneAutenticades.push(...dadesExistents);
     } catch (err) {
         console.error("Error escrivint al fitxer:", err);
     }
