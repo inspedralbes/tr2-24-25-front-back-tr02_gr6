@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sociograma</title>
+    <title>Sociograma con Transiciones</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
         text {
@@ -30,30 +30,33 @@
             agressivitatRelacional: 4,
             prosocialitat: 4
         };
-    
+
         // Configuración del contenedor SVG
         const width = 800;
         const height = 600;
-    
         const svg = d3.select("#sociograma")
             .append("svg")
             .attr("width", width)
-            .attr("height", height);
-    
+            .attr("height", height)
+            .attr("viewBox", `0 0 ${width} ${height}`);
+
+        const g = svg.append("g");
+
         // Coordenadas para la burbuja central
         const centerX = width / 2;
         const centerY = height / 2;
-    
+
         // Dibujar la burbuja central (más grande)
-        svg.append("circle")
+        g.append("circle")
             .attr("cx", centerX)
             .attr("cy", centerY)
             .attr("r", 70) // Radio más grande
             .attr("fill", "#1E90FF") // Azul
-            .attr("class", "bubble");
-    
+            .attr("class", "bubble")
+            .on("click", () => resetZoom()); // Reset zoom desde la central
+
         // Añadir texto al centro (nombre del alumno)
-        svg.append("text")
+        g.append("text")
             .attr("x", centerX)
             .attr("y", centerY)
             .attr("text-anchor", "middle")
@@ -61,51 +64,38 @@
             .attr("fill", "#fff")
             .attr("font-size", "14px")
             .text(alumno.nombre);
-    
+
         // Burbujas conectadas con los datos
         const connectedBubbles = [
-            { name: "Física", value: alumno.agressivitatFisica, color: "#FFA500" }, // Naranja
-            { name: "Verbal", value: alumno.agressivitatVerbal, color: "#FF6347" }, // Rojo
-            { name: "Relacional", value: alumno.agressivitatRelacional, color: "#32CD32" } // Verde
+            { name: "Física", value: alumno.agressivitatFisica, color: "#FFA500", x: null, y: null },
+            { name: "Verbal", value: alumno.agressivitatVerbal, color: "#FF6347", x: null, y: null },
+            { name: "Relacional", value: alumno.agressivitatRelacional, color: "#32CD32", x: null, y: null }
         ];
-    
+
         // Coordenadas polares para las burbujas conectadas
         const angles = [Math.PI / 4, Math.PI, (7 * Math.PI) / 4]; // Ángulos en radianes
         const radius = 200; // Distancia desde la burbuja central
         const bubbleRadius = 40; // Radio de las burbujas conectadas
-    
+
         connectedBubbles.forEach((bubble, i) => {
             // Calcular posiciones x, y
             const x = centerX + radius * Math.cos(angles[i]);
             const y = centerY - radius * Math.sin(angles[i]);
-    
+
+            bubble.x = x;
+            bubble.y = y;
+
             // Dibujar burbuja conectada
-            svg.append("circle")
+            g.append("circle")
                 .attr("cx", x)
                 .attr("cy", y)
                 .attr("r", bubbleRadius) // Más pequeñas que la central
                 .attr("fill", bubble.color)
-                .attr("class", "bubble");
-    
-            // Dibujar mini burbujas formando la flecha
-            const numMiniBubbles = 5;
-            const pathRadius = radius - bubbleRadius - 10; // Ajustar para que no entren en las burbujas conectadas
-    
-            for (let j = 1; j <= numMiniBubbles; j++) {
-                const t = j / (numMiniBubbles + 1); // Posición fraccionada
-                const miniX = centerX + (70 + pathRadius * t) * Math.cos(angles[i]);
-                const miniY = centerY - (70 + pathRadius * t) * Math.sin(angles[i]);
-    
-                svg.append("circle")
-                    .attr("cx", miniX)
-                    .attr("cy", miniY)
-                    .attr("r", 6) // Tamaño de las mini burbujas
-                    .attr("fill", "#808080") // Color gris para las flechas
-                    .attr("class", "bubble");
-            }
-    
+                .attr("class", "bubble")
+                .on("click", () => zoomToBubble(bubble));
+
             // Añadir texto dentro de la burbuja conectada
-            svg.append("text")
+            g.append("text")
                 .attr("x", x)
                 .attr("y", y)
                 .attr("text-anchor", "middle")
@@ -113,8 +103,57 @@
                 .attr("fill", "#fff")
                 .text(bubble.name);
         });
+
+        // Función de transformación
+        function transform([x, y, r]) {
+            return `
+                translate(${width / 2}, ${height / 2})
+                scale(${height / r})
+                translate(${-x}, ${-y})
+            `;
+        }
+
+        // Función de zoom a una burbuja
+        let currentTransform = [width / 2, height / 2, height];
+
+        function zoomToBubble(bubble) {
+            const target = [bubble.x, bubble.y, bubbleRadius * 2 + 1];
+            const i = d3.interpolateZoom(currentTransform, target);
+
+            g.transition()
+                .duration(i.duration)
+                .attrTween("transform", () => t => transform(currentTransform = i(t)))
+                .on("end", () => enableZoomOnAllBubbles()); // Rehabilitar zoom para todas las burbujas
+        }
+
+        // Rehabilitar zoom para todas las burbujas
+        function enableZoomOnAllBubbles() {
+            d3.selectAll(".bubble")
+                .on("click", null); // Desvincular antiguos listeners
+
+            g.selectAll("circle")
+                .each(function(d, i) {
+                    const bubble = connectedBubbles[i] || null;
+                    if (bubble) {
+                        d3.select(this).on("click", () => zoomToBubble(bubble));
+                    } else {
+                        d3.select(this).on("click", resetZoom);
+                    }
+                });
+        }
+
+        // Función para resetear el zoom
+        function resetZoom() {
+            const i = d3.interpolateZoom(currentTransform, [width / 2, height / 2, height]);
+
+            g.transition()
+                .duration(i.duration)
+                .attrTween("transform", () => t => transform(currentTransform = i(t)))
+                .on("end", () => enableZoomOnAllBubbles()); // Rehabilitar zoom tras reset
+        }
+
+        // Inicializar con zoom habilitado en todas las burbujas
+        enableZoomOnAllBubbles();
     </script>
-    
-    
 </body>
 </html>
