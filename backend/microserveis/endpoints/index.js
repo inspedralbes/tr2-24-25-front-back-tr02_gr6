@@ -213,8 +213,9 @@ app.put("/formulari", async (req, res) => {
         return res.json({missatge: "No Autenticat"});
     }
 
+
     const formulariEstringuejar = req.body;
-    const formulari = JSON.stringify(formulariEstringuejar)
+    const formulari = JSON.stringify(formulariEstringuejar);
 
     if (!formulari) {
         return res.json({missatge: "Falten camps"});
@@ -301,7 +302,7 @@ async function putSQL(endpoint, params = {}) {
 process.on('message', (message) => {
     if (message.action === 'start') {
         app.listen(port, () => {
-            console.log(`Servei d'Autenticació corrent a ${port}`);
+            console.log(`Servei d'Endpoints corrent a ${port}`);
         }).on('error', (err) => {
             if (err.code === 'EADDRINUSE') {
                 console.log(`El port ${port} ja està en ús, però el servidor està funcionant.`);

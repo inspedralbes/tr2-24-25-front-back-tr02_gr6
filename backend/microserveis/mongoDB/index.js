@@ -42,7 +42,7 @@ async function getLogs(microservei) {
 process.on('message', async (message) => { // Assegura't que és async
     if (message.action === 'start') {
         app.listen(port, () => {
-            console.log(`Servei d'Autenticació corrent a ${port}`);
+            console.log(`Servei de MongoDB corrent a ${port}`);
         }).on('error', (err) => {
             if (err.code === 'EADDRINUSE') {
                 console.log(`El port ${port} ja està en ús, però el servidor està funcionant.`);
@@ -50,7 +50,7 @@ process.on('message', async (message) => { // Assegura't que és async
                 console.error(err);
             }
         });
-        mongoose.connect(`mongodb+srv://${user}:${passsowrd}@${cluster}.hrrx5.mongodb.net/?retryWrites=true&w=majority&appName=TR2G6`)
+        mongoose.connect(`mongodb+srv://${user}:${passsowrd}@${cluster}.hrrx5.mongodb.net/?retryWrites=true&w=majority&appName=TR2G6`).then(() => console.log("Connectat a MongoDB"))
             .catch(err => console.error('Error en connectar a MongoDB Atlas:', err));
     }
     if (message.action === 'stop') {

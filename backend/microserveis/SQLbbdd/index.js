@@ -12,6 +12,7 @@ var tutors = [];
 var alumnes = [];
 var tutorsContrassenya = [];
 var alumnesContrassenya = [];
+var respostes = [];
 
 const dbNom = process.env.DB_NAME;
 const dbHost = process.env.DB_HOST;
@@ -610,34 +611,85 @@ app.put("/classe", (req, res) => {
 
 app.put("/formulari", (req, res) => {
     const id_alumne = req.query.userId
-    const formulari = JSON.stringify(req.query.formulari);
-
-    if (!formulari || !id_alumne) {
-        return res.json("Falten paràmetres");
+    const alumneAmbFormulari = false;
+    for (const resposta in respostes) {
+        if (resposta.id_alumne == id_alumne) {
+            alumneAmbFormulari = true;
+            break;
+        }
     }
+    if (!alumneAmbFormulari) {
+        const formulariSenseIds = JSON.parse(req.query.formulari);
+        const formulari = convertirNomsAId(id_alumne, formulariSenseIds);
 
-    pool.getConnection((err, connection) => {
-        if (err) {
-            console.error('Error getting connection from pool:', err);
-            res.status(500).send("Error al obtenir connexió");
+        if (!Array.isArray(formulari.cauBe)) {
+            console.error('cauBe no és un array:', formulari.cauBe);
+            res.status(400).send('Dades invàlides: cauBe no és un array');
             return;
         }
 
-        const query = `UPDATE Alumnes SET questionari = ? WHERE id_alumne = ?;`;
+        if (!formulari || !id_alumne) {
+            return res.json("Falten paràmetres");
+        }
 
-        connection.query(query, [formulari, id_alumne], (err, results) => {
-
+        pool.getConnection((err, connection) => {
             if (err) {
-                console.error('Error:', err);
-                res.status(500).json({ error: "Error en afegir respostes a l'alumne." });
+                console.error('Error getting connection from pool:', err);
+                res.status(500).send("Error al obtenir connexió");
+                return;
             }
 
-            res.json({ mensaje: "Respostes afegides" });
-            connection.release();
+            const query = `INSERT INTO Respostes (id_alumne, soc_POS_1, soc_POS_2, soc_POS_3, soc_NEG_1, soc_NEG_2, soc_NEG_3, ar_i_1, ar_i_2, ar_i_3, pros_1, pros_2, pros_3, af_1, af_2, af_3, ar_d_1, ar_d_2, ar_d_3, pros_2_1, pros_2_2, pros_2_3, av_1, av_2, av_3, vf_1, vf_2, vf_3, vv_1, vv_2, vv_3, vr_1, vr_2, vr_3, amics_1, amics_2, amics_3) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
 
+            connection.query(query, [id_alumne, formulari.cauBe[0], formulari.cauBe[1], formulari.cauBe[2], formulari.noCauBe[0], formulari.noCauBe[1], formulari.noCauBe[2], formulari.correRumors[0], formulari.correRumors[1], formulari.correRumors[2], formulari.ajuda[0], formulari.ajuda[1], formulari.ajuda[2], formulari.donaEmpentes[0], formulari.donaEmpentes[1], formulari.donaEmpentes[2], formulari.noDeixaParticipar[0], formulari.noDeixaParticipar[1], formulari.noDeixaParticipar[2], formulari.anima[0], formulari.anima[1], formulari.anima[2], formulari.insulta[0], formulari.insulta[1], formulari.insulta[2], formulari.esEmpentat[0], formulari.esEmpentat[1], formulari.esEmpentat[2], formulari.esInsultat[0], formulari.esInsultat[1], formulari.esInsultat[2], formulari.esAillat[0], formulari.esAillat[1], formulari.esAillat[2], formulari.esAmic[0], formulari.esAmic[1], formulari.esAmic[2]], (err, results) => {
+
+                if (err) {
+                    console.error('Error:', err);
+                    res.status(500).json({ error: "Error en afegir respostes a l'alumne." });
+                }
+
+                res.json({ mensaje: "Respostes afegides" });
+                connection.release();
+
+            });
         });
-    });
+    } else {
+        res.json({ mensaje: "L'alumne ja ha enviat respostes anteriorment." });
+    }
 });
+
+function convertirNomsAId(id_alumne, formulari) {
+    var alumneResposta = null;
+    for (let i = 0; i < alumnes.length; i++) {
+        if (alumnes[i].id_alumne == id_alumne) {
+            alumneResposta = alumnes[i];
+        }
+    }
+    var alumnesDeLaSevaClasse = [];
+    for (let i = 0; i < alumnes.length; i++) {
+        if (alumnes[i].id_classe == alumneResposta.id_classe) {
+            alumnesDeLaSevaClasse.push(alumnes[i]);
+        }
+    }
+    for (let categoria in formulari) {
+        let arrayRespostes = formulari[categoria];
+        for (let i = 0; i < arrayRespostes.length; i++) {
+            let nomCompletFormulari = arrayRespostes[i];
+            let nomCompletArray = nomCompletFormulari.split(" ", 2);
+            let nomFormulari = nomCompletArray[0];
+            let cognomFormulari = nomCompletArray[1];
+            for (let j = 0; j < alumnes.length; j++) {
+                let nomBBDD = alumnes[j].nom;
+                let cognomBBDD = alumnes[j].cognoms;
+                if (nomFormulari.trim().toLowerCase() === nomBBDD.trim().toLowerCase() &&
+                    cognomFormulari.trim().toLowerCase() === cognomBBDD.trim().toLowerCase()) {
+                    arrayRespostes[i] = alumnes[j].id_alumne;
+                }
+            }
+        }
+    }
+    return formulari;
+}
 
 
 function getClasses(connection) {
@@ -690,6 +742,16 @@ function getAlumnesContrassenya(connection) {
     });
 }
 
+function getRespostes(connection) {
+    connection.query('SELECT * FROM Respostes', (err, results) => {
+        if (err) {
+            console.error('Error:', err);
+        } else {
+            respostes = results;
+        }
+    });
+}
+
 function generarCodiAleatori() {
     const lletres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
     let codi = '';
@@ -723,7 +785,7 @@ function jaExisteix(nouUser) {
 process.on('message', (message) => {
     if (message.action === 'start') {
         app.listen(port, () => {
-            console.log(`Servei d'Autenticació corrent a ${port}`);
+            console.log(`Servei de BBDD corrent a ${port}`);
         }).on('error', (err) => {
             if (err.code === 'EADDRINUSE') {
                 console.log(`El port ${port} ja està en ús, però el servidor està funcionant.`);
@@ -740,8 +802,10 @@ process.on('message', (message) => {
             getClasses(connection);
             getTutors(connection);
             getAlumnes(connection);
+            getRespostes(connection);
             getTutorsContrassenya(connection);
             getAlumnesContrassenya(connection);
+
 
             connection.release();
         });
