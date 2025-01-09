@@ -3,6 +3,8 @@
 import { getAlumnes, postResultats } from '@/services/communicationManager';
 import { onMounted, ref, watch } from 'vue'
 import { useUserStore } from '../stores/userStore';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 const errorMessage = ref("");
 const correos = ref([])
 const alumnos = ref([])
@@ -63,6 +65,9 @@ onMounted(() => {
   fecthGetAlumnos();
 });
 
+const navegarapantalla = () => {
+    router.push('classAlum');
+};
 
 async function fetchPostResultats() {
   try {
@@ -195,7 +200,7 @@ async function fetchPostResultats() {
       <v-card id="mensajeagradecimiento" max-width="400" text="Les dades introduïdes son completament privades."
         title="Respostes Enviades.">
         <template #actions>
-          <v-btn text="Vale" @click="dialog = false" />
+          <v-btn text="Vale" @click="navegarapantalla()" />
         </template>
       </v-card>
     </v-dialog>

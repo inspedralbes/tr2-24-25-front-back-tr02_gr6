@@ -10,6 +10,8 @@
                     <v-icon>mdi-home</v-icon>
                 </v-btn>
                 <h1>BENVINGUT/DA {{ userStore.email }} a {{ classe }}!</h1>
+                <br>
+                <h1>CODI DE LA CLASSE: {{ codiRandom }}</h1>
             </v-col>
         </v-row>
         <v-row>
@@ -23,7 +25,7 @@
                 :key="alumne.id_alumne" 
                 cols="12" sm="6" md="4"
             >
-                <v-card>
+            <v-card :class="alumne.formulari_fet == 1 ? 'tarjeta-verda' : 'tarjeta-vermella'">
                     <v-card-title>
                         {{ alumne.nom }}
                     </v-card-title>
@@ -58,15 +60,15 @@ import { ref, onMounted } from 'vue';
 import { useUserStore } from '@/stores/userStore';
 import { getAlumnes, getClasse } from '@/services/communicationManager';
 import { useRouter } from 'vue-router';
+import { io } from 'socket.io-client';
 
 const router = useRouter();
-
 const userStore = useUserStore();
 const alumnes = ref([]);
 const email = userStore.email;
 const classe = ref("");
-
-const habilitarForm = ref(false); 
+const codiRandom = ref("");
+const socket = io(import.meta.env.VITE_API_ROUTE_SOCKET);
 
 async function fetchAlumnes(email) {
     try {
@@ -82,6 +84,7 @@ async function fetchClasse(email) {
     try {
         const data = await getClasse(email);
         classe.value = data[0].classe;
+        codiRandom.value = data[0].codi_random;
         console.log(data);
     } catch (error) {
         console.error("Error al realitzar la solicitud:", error.message);
@@ -90,11 +93,15 @@ async function fetchClasse(email) {
 
 const navegarapantalla = () => {
     router.push('/formPage');
-}
+};
 
 const inici = () => {
     router.push('/home');
-}
+};
+
+socket.on('actualitzarAlumnes', () => {
+    fetchAlumnes(email);
+});
 
 onMounted(() => {
     fetchAlumnes(email);
@@ -117,5 +124,15 @@ onMounted(() => {
     bottom: 20px;
     right: 20px;
     z-index: 1000;
+}
+
+.tarjeta-verda {
+    background-color: green;
+    color: white;
+}
+
+.tarjeta-vermella {
+    background-color: red;
+    color: white;
 }
 </style>
