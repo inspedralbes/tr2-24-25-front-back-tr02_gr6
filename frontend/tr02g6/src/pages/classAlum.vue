@@ -52,12 +52,13 @@
             </v-tabs-items>
 
             <v-btn 
-                large
-                class="form-button fixed-button"
-                @click="navegarapantalla"
-            >
-                FORMULARI
-            </v-btn>
+    large
+    class="form-button fixed-button"
+    @click="navegarapantalla"
+    :disabled="resposta"
+>
+    FORMULARI
+</v-btn>
         </v-container>
     </v-app>
 </template>
@@ -77,7 +78,7 @@ const alumnes = ref([]);
 const email = userStore.email;
 const codiRandom = ref("");
 const socket = io(import.meta.env.VITE_API_ROUTE_SOCKET);
-
+const resposta = ref(false);
 const classe = ref("");
 const activeTab = ref(0); 
 async function fetchAlumnes(email) {
@@ -106,6 +107,7 @@ async function comprovarFormulari(email) {
     try {
         const data = await getFormulariRespost(email);
         formulariRespost.value = data.resposta; // Guarda el valor de resposta en formulariRespost
+        resposta.value = data.resposta;
         console.log(data);
     } catch (error) {
         console.error("Error al realitzar la solicitud:", error.message);
