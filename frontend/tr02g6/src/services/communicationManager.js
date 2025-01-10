@@ -292,9 +292,16 @@ export function getAlumnes(email) {
   });
 }
 
-export async function getResultats() {
+export async function getResultats(id_clase) {
   try {
-    const resultat = await fetch('http:localhost:3000/respostes')
-    
+    let resultat = await fetch(`/resultats/${id_clase}`)
+    if (!resultat.ok) {
+      console.error('Error al obtener resultados');
+    }
+    const resultats = await resultat.json();
+    console.log(resultats);
+    return resultats;
+  } catch (error) {
+    console.error('Error en el comunication manager al obtener resultados: ', error)
   }
 }

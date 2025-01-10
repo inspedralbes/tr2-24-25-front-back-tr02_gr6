@@ -22,7 +22,7 @@
 
 <script>
     const data = {
-        central: { id: "1", class: "1", name: "" },
+        central: { id: "1", class: "1", name: "Carlos" },
         fields: [
             {
                 name: "Agressivitat",
@@ -65,6 +65,7 @@
     const fieldRadius = 100;
     const subfieldScale = d3.scaleSqrt().domain([0, 20]).range([10, 40]);
 
+    // Central circle
     const centralGroup = svg.append("g")
         .attr("class", "main-circle")
         .attr("transform", `translate(${width / 2}, ${height / 2})`);
@@ -77,17 +78,21 @@
         .attr("dy", ".35em")
         .text(data.central.name);
 
+    // Position fields around central circle
     const angleScale = d3.scaleLinear()
         .domain([0, data.fields.length])
         .range([0, 2 * Math.PI]);
 
     let fieldsToShow = data.fields.flatMap(field => {
         if (field.name === "Popularitat") {
+            // Mostrar solo el subcampo con "X" en Popularitat
             const activeField = field.subfields.find(subfield => subfield.value === "X");
             return activeField ? [{ name: field.name, value: activeField.name }] : [];
         } else if (field.subfields) {
+            // Mostrar todos los campos con subcampos normales
             return [field];
         } else {
+            // Mostrar campos sin subcampos como Prosocialitat
             return [field];
         }
     });
@@ -101,14 +106,17 @@
             .attr("class", "field-group")
             .attr("transform", `translate(${x}, ${y})`);
 
+        // Field circle
         fieldGroup.append("circle")
             .attr("r", fieldRadius)
             .attr("fill", "lightgray");
 
+        // Field label
         fieldGroup.append("text")
             .attr("dy", ".35em")
             .text(field.name);
-            
+
+        // Subfields
         if (field.subfields) {
             const subAngleScale = d3.scaleLinear()
                 .domain([0, field.subfields.length])
@@ -119,7 +127,7 @@
                 const subX = Math.cos(subAngle) * (fieldRadius - 20);
                 const subY = Math.sin(subAngle) * (fieldRadius - 20);
 
-                const subRadius = subfieldScale(subfield.value || 1);
+                const subRadius = subfieldScale(subfield.value || 1); // Default size for non-numeric values
 
                 const subGroup = fieldGroup.append("g")
                     .attr("class", "subfield-group")
@@ -139,12 +147,12 @@
                     .text(subfield.value);
             });
         } else if (field.value !== undefined) {
+            // For fields without subfields (e.g., Prosocialitat or Popularitat)
             fieldGroup.append("text")
                 .attr("dy", "1.5em")
                 .text(field.value);
         }
     });
-
 </script>
 </body>
 </html>
