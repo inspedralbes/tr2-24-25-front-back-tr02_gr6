@@ -91,7 +91,7 @@ async function fetchPostResultats() {
         esAmic: amigos.value,
       }
       console.log(formulariEnviar);
-      const resultats = await postResultats(formulariEnviar);
+      const resultats = await postResultats(email, formulariEnviar);
       console.log("Formulario enviado con éxito:", resultats);
       cae_bien.value = '';
       cae_no_bien.value = '';

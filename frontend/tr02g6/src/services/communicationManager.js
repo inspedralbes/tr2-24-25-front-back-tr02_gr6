@@ -108,37 +108,6 @@ console.log(email)
   }
 }
 
-export async function postResultats(formulari) {
-  try {
-    const sessionStore = useSessionStore();
-    const sessionId = sessionStore.sessionId;
-    const userId = sessionStore.userId;
-
-    if (!sessionId || !userId) {
-      throw new Error("No hay sessionId o userId almacenado");
-    }
-
-    const response = await fetch(`${URL}/formulari?sessionId=${sessionId}&userId=${userId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formulari),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Error al agregar clase: ${errorText}`);
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error en callAddClass:", error);
-    throw error;
-  }
-}
-
 /*export async function callGetClasses() {
   try {
     const response = await fetch(`${URL}/classes`, {
@@ -224,6 +193,35 @@ export async function getFormulariRespost(email) {
   }
 }
 
+export async function postResultats(email, formulari) {
+  const socket = io(`${URL_SOCKET}`);
+  return new Promise((resolve, reject) => {
+    console.log(formulari);
+    console.log(email);
+    console.log(sessionId);
+    console.log(userId);
+    socket.on('connect', () => {
+      console.log('Socket connectat amb èxit.');
+
+      socket.once('formulariAfegit', (data) => {
+        socket.disconnect();
+        resolve(data);
+      });
+
+      socket.once('error', (error) => {
+        socket.disconnect();
+        reject(new Error(error.missatge || 'Error en afegir el formulari'));
+      });
+
+      socket.emit('afegirFormulari', { email, formulari, sessionId, userId });
+    });
+
+    socket.on('connect_error', (err) => {
+      console.error('Error de connexió al socket:', err);
+      reject(new Error('No es pot connectar al servidor de WebSocket.'));
+    });
+  });
+}
 
 export function callPutClass(email, codi_classe) {
   const socket = io(`${URL_SOCKET}`);

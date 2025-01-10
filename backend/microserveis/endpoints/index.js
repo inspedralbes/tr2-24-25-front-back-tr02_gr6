@@ -30,7 +30,6 @@ io.on('connection', (socket) => {
     console.log('Usuari connectat:', socket.id);
 
     socket.on('getClasses', async (sessionId, userId, email) => {
-        // Comprobaciones de autenticación
         if (!sessionId || !userId) {
             return socket.emit('error', { missatge: "No Autenticat" });
         }
@@ -43,7 +42,6 @@ io.on('connection', (socket) => {
             } else {
                 return socket.emit('error', { missatge: "No Autenticat" });
             }
-            // Emitir la lista actualizada de alumnes
             socket.emit('alumnes', alumnes);
         } catch (error) {
             console.error("Error processant 'getClasses':", error);
@@ -69,6 +67,30 @@ io.on('connection', (socket) => {
         }
         
         socket.emit('classeAfegida', resposta);
+        socket.broadcast.emit('actualitzarAlumnes', { email, sessionId, userId });
+    });
+
+    socket.on('afegirFormulari', async (data) => {
+        const { email, formulari, sessionId, userId } = data;
+        console.log(formulari)
+        if (!sessionId || !userId) {
+            return socket.emit('error', "No Autenticat");
+        }
+
+        if (!isAuthAlumne(sessionId, userId)) {
+            return socket.emit('error', "No Autenticat");
+        }
+
+        const formulariAfegir = JSON.stringify(formulari);
+
+        if (!formulariAfegir) {
+            return socket.emit('error', "Falten camps");
+        }
+
+        const resposta = await putSQL("formulari", { userId, formulariAfegir });
+        const resposta2 = await putSQL("formulariAlumne", {userId});
+        console.log(resposta2);
+        socket.emit('formulariAfegit', resposta);
         socket.broadcast.emit('actualitzarAlumnes', { email, sessionId, userId });
     });
 
@@ -186,31 +208,6 @@ app.get("/formulariRespost", async (req, res) => {
         return res.json(resposta);
     }
     
-});
-
-app.put("/formulari", async (req, res) => {
-    sessionId = req.query.sessionId;
-    userId = req.query.userId;
-    if (!req.query.sessionId || !req.query.userId) {
-        return res.json({missatge: "No Autenticat"});
-    }
-
-    if (!isAuthAlumne(sessionId, userId)) {
-        return res.json({missatge: "No Autenticat"});
-    }
-
-
-    const formulariEstringuejar = req.body;
-    const formulari = JSON.stringify(formulariEstringuejar);
-
-    if (!formulari) {
-        return res.json({missatge: "Falten camps"});
-    }
-        
-        const resposta = await putSQL("formulari", { userId, formulari });
-        const resposta2 = await putSQL("formulariAlumne", {userId});
-        console.log(resposta2);
-        res.json(resposta);
 });
 
 app.get("/haFetFormulari", async (req, res) => {

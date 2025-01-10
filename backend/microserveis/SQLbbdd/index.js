@@ -682,7 +682,7 @@ app.put("/formulari", (req, res) => {
         }
     }
     if (!alumneAmbFormulari) {
-        const formulariSenseIds = JSON.parse(req.query.formulari);
+        const formulariSenseIds = JSON.parse(req.query.formulariAfegir);
         const formulari = convertirNomsAId(id_alumne, formulariSenseIds);
 
         if (!Array.isArray(formulari.cauBe)) {

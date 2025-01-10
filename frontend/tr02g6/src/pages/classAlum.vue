@@ -55,7 +55,7 @@ import { useRouter } from 'vue-router';
 import { io } from 'socket.io-client';
 
 const router = useRouter();
-const formulariRespost = ref(); // Inicializa la referencia para formulariRespost
+const formulariRespost = ref();
 const userStore = useUserStore();
 const alumnes = ref([]);
 const email = userStore.email;
