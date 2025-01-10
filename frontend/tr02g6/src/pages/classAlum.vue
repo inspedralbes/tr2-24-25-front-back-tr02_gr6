@@ -65,14 +65,19 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useUserStore } from '@/stores/userStore';
-import { getAlumnes, getClasse } from '@/services/communicationManager';
+import { getAlumnes, getClasse, getFormulariRespost } from '@/services/communicationManager';
 import { useRouter } from 'vue-router';
+import { io } from 'socket.io-client';
 
 const router = useRouter();
+const formulariRespost = ref();
 const userStore = useUserStore();
 
 const alumnes = ref([]);
 const email = userStore.email;
+const codiRandom = ref("");
+const socket = io(import.meta.env.VITE_API_ROUTE_SOCKET);
+
 const classe = ref("");
 const activeTab = ref(0); 
 async function fetchAlumnes(email) {
@@ -85,25 +90,46 @@ async function fetchAlumnes(email) {
     }
 }
 
+
 async function fetchClasse(email) {
     try {
         const data = await getClasse(email);
-        classe.value = data[0]?.classe || "";
+        classe.value = data[0].classe;
+        codiRandom.value = data[0].codi_random;
+        console.log(data);
     } catch (error) {
         console.error("Error al obtener la clase:", error.message);
     }
 }
 
-function navegarapantalla() {
-    router.push('/formPage');
-}
-function navigateToResult() {
-    router.push('/resultats');
+async function comprovarFormulari(email) {
+    try {
+        const data = await getFormulariRespost(email);
+        formulariRespost.value = data.resposta; // Guarda el valor de resposta en formulariRespost
+        console.log(data);
+    } catch (error) {
+        console.error("Error al realitzar la solicitud:", error.message);
+    }
 }
 
-onMounted(async () => {
-    await fetchClasse(email);
-    await fetchAlumnes(email);
+const navegarapantalla = () => {
+    if (!formulariRespost.value) { // Comprueba si formulariRespost es false
+        router.push('/formPage');
+    }
+};
+
+const inici = () => {
+    router.push('/home');
+};
+
+socket.on('actualitzarAlumnes', () => {
+    fetchAlumnes(email);
+});
+
+onMounted(() => {
+    fetchAlumnes(email);
+    fetchClasse(email);
+    comprovarFormulari(email).then(() => console.log("Valor:" + formulariRespost.value));
 });
 </script>
 
@@ -160,5 +186,35 @@ onMounted(async () => {
     position: fixed;
     bottom: 20px;
     right: 20px;
+}
+
+.grey--text {
+    color: white;
+    background-color: grey;
+}
+
+.tarjeta-verda {
+    background-color: green;
+    color: white;
+}
+
+.tarjeta-vermella {
+    background-color: red;
+    color: white;
+}
+
+.grey--text {
+    color: white;
+    background-color: grey;
+}
+
+.tarjeta-verda {
+    background-color: green;
+    color: white;
+}
+
+.tarjeta-vermella {
+    background-color: red;
+    color: white;
 }
 </style>

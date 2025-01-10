@@ -3,6 +3,8 @@
 import { getAlumnes, postResultats, redirect } from '@/services/communicationManager';
 import { onBeforeMount, onMounted, ref, watch } from 'vue'
 import { useUserStore } from '../stores/userStore';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 const errorMessage = ref("");
 const correos = ref([])
 const alumnos = ref([])
@@ -63,6 +65,9 @@ onMounted(() => {
   redirect();
 });
 
+const navegarapantalla = () => {
+    router.push('classAlum');
+};
 
 async function fetchPostResultats() {
   try {
@@ -86,7 +91,7 @@ async function fetchPostResultats() {
         esAmic: amigos.value,
       }
       console.log(formulariEnviar);
-      const resultats = await postResultats(formulariEnviar);
+      const resultats = await postResultats(email, formulariEnviar);
       console.log("Formulario enviado con éxito:", resultats);
       cae_bien.value = '';
       cae_no_bien.value = '';
@@ -195,7 +200,7 @@ async function fetchPostResultats() {
       <v-card id="mensajeagradecimiento" max-width="400" text="Les dades introduïdes son completament privades."
         title="Respostes Enviades.">
         <template #actions>
-          <v-btn text="Vale" @click="dialog = false" />
+          <v-btn text="Vale" @click="navegarapantalla()" />
         </template>
       </v-card>
     </v-dialog>

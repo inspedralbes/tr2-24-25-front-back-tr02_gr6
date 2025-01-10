@@ -44,7 +44,7 @@
                 :key="alumne.id_alumne" 
                 cols="12" sm="6" md="4"
             >
-                <v-card class="alumne-card" outlined>
+            <v-card :class="alumne.formulari_fet == 1 ? 'tarjeta-verda' : 'tarjeta-vermella'">
                     <v-card-title>
                         <v-avatar class="me-3" color="orange darken-2" size="40">
                             {{ alumne.nom.charAt(0).toUpperCase() }}
@@ -81,6 +81,7 @@ import { ref, onMounted } from 'vue';
 import { useUserStore } from '@/stores/userStore';
 import { getAlumnes, getClasse, redirect } from '@/services/communicationManager';
 import { useRouter } from 'vue-router';
+import { io } from 'socket.io-client';
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -88,6 +89,8 @@ const userStore = useUserStore();
 const alumnes = ref([]);
 const email = userStore.email;
 const classe = ref("");
+const codiRandom = ref("");
+const socket = io(import.meta.env.VITE_API_ROUTE_SOCKET);
 const id_classe = ref("");
 const codi_random = ref("");
 const showCodiRandom = ref(false);
@@ -125,10 +128,15 @@ const mostrarCodiRandom = () => {
 const navegarapantalla = () => {
     router.push('/formPage');
 };
+};
 
 const inici = () => {
     router.push('/home');
 };
+
+socket.on('actualitzarAlumnes', () => {
+    fetchAlumnes(email);
+});
 
 onMounted(async () => {
     await fetchClasse(email);
@@ -188,6 +196,16 @@ onMounted(async () => {
     bottom: 20px;
     right: 20px;
     z-index: 1000;
+}
+
+.tarjeta-verda {
+    background-color: green;
+    color: white;
+}
+
+.tarjeta-vermella {
+    background-color: red;
+    color: white;
 }
 
 .home-button,

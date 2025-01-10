@@ -12,6 +12,7 @@ var tutors = [];
 var alumnes = [];
 var tutorsContrassenya = [];
 var alumnesContrassenya = [];
+var respostes = [];
 
 const dbNom = process.env.DB_NAME;
 const dbHost = process.env.DB_HOST;
@@ -59,6 +60,7 @@ app.get("/classes", (req, res) => {
 app.get("/classeFormaProfe", (req, res) => {
     const email = req.query.email;
     console.log("EMAIL DE SQL", email)
+    console.log("EMAIL DE SQL", email)
     pool.getConnection((err, connection) => {
         if (err) {
             console.error('Error getting connection from pool:', err);
@@ -67,12 +69,20 @@ app.get("/classeFormaProfe", (req, res) => {
         }
         const query = `SELECT id_classe FROM Tutors WHERE email=?`;
         connection.query(query, [email], (err, results) => {
+        const query = `SELECT id_classe FROM Tutors WHERE email=?`;
+        connection.query(query, [email], (err, results) => {
             if (err) {
+                classes = err;
                 console.error('Error:', err);
             } else {
                 classes = results;
                 console.log("RESULTADO DE SQL", classes)
+                console.log("RESULTADO DE SQL", classes)
             }
+
+            res.json(classes);
+        });
+    });
 
             res.json(classes);
         });
@@ -113,11 +123,17 @@ app.get("/tutor", (req, res) => {
         const query = `SELECT email FROM Tutors WHERE id_classe=?`;
         connection.query(query, [id_classe], (err, results) => {
             if (err) {
+                classes = err;
                 console.error('Error:', err);
             } else {
                 classes = results;
                 console.log("RESULTADO DE SQL", classes)
+                console.log("RESULTADO DE SQL", classes)
             }
+
+            res.json(classes);
+        });
+    });
 
             res.json(classes);
         });
@@ -126,6 +142,7 @@ app.get("/tutor", (req, res) => {
 
 app.get("/classeAlum", (req, res) => {
     const email = req.query.email;
+    console.log("EMAIL DE SQL", email)
     console.log("EMAIL DE SQL", email)
     pool.getConnection((err, connection) => {
         if (err) {
@@ -139,6 +156,7 @@ app.get("/classeAlum", (req, res) => {
     WHERE email = ?
 )`;
         connection.query(query, [email], (err, results) => {
+        connection.query(query, [email], (err, results) => {
             if (err) {
                 console.error('Error:', err);
             } else {
@@ -148,9 +166,14 @@ app.get("/classeAlum", (req, res) => {
             res.json(classes);
         });
     });
+
+            res.json(classes);
+        });
+    });
 });
 app.get("/classeProf", (req, res) => {
     const email = req.query.email;
+    console.log("EMAIL DE SQL", email)
     console.log("EMAIL DE SQL", email)
     pool.getConnection((err, connection) => {
         if (err) {
@@ -164,6 +187,7 @@ app.get("/classeProf", (req, res) => {
     WHERE email = ?
 )`;
         connection.query(query, [email], (err, results) => {
+        connection.query(query, [email], (err, results) => {
             if (err) {
                 console.error('Error:', err);
             } else {
@@ -171,6 +195,36 @@ app.get("/classeProf", (req, res) => {
             }
 
             res.json(classes);
+        });
+    });
+
+            res.json(classes);
+        });
+    });
+});
+
+app.get("/formulariRespost", (req, res) => {
+    const email = req.query.email;
+    console.log("EMAIL DE SQL", email);
+    pool.getConnection((err, connection) => {
+        if (err) {
+            console.error('Error getting connection from pool:', err);
+            res.status(500).send("Error al obtenir connexió");
+            return;
+        }
+        const query = `SELECT formulari_fet FROM Alumnes WHERE email = ?`;
+        connection.query(query, [email], (err, results) => {
+            if (err) {
+                console.error('Error:', err);
+                res.status(500).send("Error al realitzar la consulta");
+            } else {
+                if (results.length > 0 && results[0].formulari_fet) {
+                    res.json({ resposta: true });
+                } else {
+                    res.json({ resposta: false });
+                }
+            }
+            connection.release();
         });
     });
 });
@@ -189,7 +243,7 @@ app.get("/alumnesClasseProfe", (req, res) => {
         }
 
         const query = `
-            SELECT a.id_alumne, a.email, a.nom, a.cognoms
+            SELECT a.id_alumne, a.email, a.nom, a.cognoms, a.formulari_fet
             FROM Alumnes a
             INNER JOIN Tutors t ON a.id_classe = t.id_classe
             WHERE t.email = ?
@@ -201,9 +255,11 @@ app.get("/alumnesClasseProfe", (req, res) => {
                 console.error("Error executant la consulta:", err);
                 return res.status(500).json({ error: "Error en retornar els alumnes" });
             }
+
             if (results.length === 0) {
                 return res.status(404).json({ message: "No s'han trobat alumnes per aquest professor" });
             }
+
             res.json(results);
         });
     });
@@ -256,6 +312,8 @@ app.get("/JSON", (req, res) => {
                 console.error("Error executant la consulta:", err);
                 return res.status(500).json({ error: "Error en retornar els alumnes" });
             }
+
+
             if (results.length === 0) {
                 return res.status(404).json({ message: "No s'han trobat alumnes per aquest professor" });
             }
@@ -278,7 +336,7 @@ app.get("/alumnesClasseAlumne", (req, res) => {
         }
 
         const query = `
-            SELECT *
+            SELECT a.id_alumne, a.email, a.nom, a.cognoms, a.formulari_fet
             FROM Alumnes a
             WHERE a.id_classe = (
                 SELECT id_classe
@@ -292,6 +350,37 @@ app.get("/alumnesClasseAlumne", (req, res) => {
             if (err) {
                 console.error("Error executant la consulta:", err);
                 return res.status(500).json({ error: "Error en retornar els alumnes" });
+            }
+
+
+            if (results.length === 0) {
+                return res.status(404).json({ message: "No s'han trobat alumnes per aquesta classe" });
+            }
+            res.json(results);
+        });
+    });
+});
+
+app.get("/haFetFormulari", (req, res) => {
+    const alumne_id = req.query.userId;
+
+    if (!alumne_id) {
+        return res.status(400).json({ error: "Falta el paràmetre alumne_id" });
+    }
+
+    pool.getConnection((err, connection) => {
+        if (err) {
+            console.error("Error obtenint connexió del pool:", err);
+            return res.status(500).send("Error al obtenir connexió");
+        }
+
+        const query = `SELECT formulari_fet FROM Alumnes WHERE id_alumne = (?)`;
+
+        connection.query(query, [alumne_id], (err, results) => {
+            connection.release();
+            if (err) {
+                console.error("Error executant la consulta:", err);
+                return res.status(500).json({ error: "Error en retornar l'estat del formulari de l'alumne" });
             }
 
             if (results.length === 0) {
@@ -417,7 +506,7 @@ app.put("/afegirClasseAlumne", (req, res) => {
 
 
                 res.json({
-                    message: `Alumne amb correu ${alumne_email} ha estat assignat a la classe amb codi ${codi_classe}`,
+                    message: `OK`,
                 });
 
             });
@@ -466,6 +555,7 @@ app.post("/classes", (req, res) => {
     const { classe, codi_random, id_curs } = req.body;
     const email = req.query.email
     console.log(email, "SQL EMAIL")
+    console.log(email, "SQL EMAIL")
     if (!classe || !codi_random || !id_curs) {
         return res.json("Faltan paràmetres: classe, codi_random o id_curs");
     }
@@ -489,6 +579,7 @@ WHERE email=? ;
                 res.status(500).json({ error: "Error en crear la classe" });
             }
             else {
+            else {
                 connection.query(query2, [codi_random, email], (err, results) => {
                     if (err) {
                         console.error('Error:', err);
@@ -503,7 +594,9 @@ WHERE email=? ;
         });
 
     });
+    });
 
+});
 });
 
 app.post("/registre", (req, res) => {
@@ -639,11 +732,56 @@ app.put("/classe", (req, res) => {
 
 app.put("/formulari", (req, res) => {
     const id_alumne = req.query.userId
-    const formulari = JSON.stringify(req.query.formulari);
-
-    if (!formulari || !id_alumne) {
-        return res.json("Falten paràmetres");
+    const alumneAmbFormulari = false;
+    for (const resposta in respostes) {
+        if (resposta.id_alumne == id_alumne) {
+            alumneAmbFormulari = true;
+            break;
+        }
     }
+    if (!alumneAmbFormulari) {
+        const formulariSenseIds = JSON.parse(req.query.formulariAfegir);
+        const formulari = convertirNomsAId(id_alumne, formulariSenseIds);
+
+        if (!Array.isArray(formulari.cauBe)) {
+            console.error('cauBe no és un array:', formulari.cauBe);
+            res.status(400).send('Dades invàlides: cauBe no és un array');
+            return;
+        }
+
+        if (!formulari || !id_alumne) {
+            return res.json("Falten paràmetres");
+        }
+
+        pool.getConnection((err, connection) => {
+            if (err) {
+                console.error('Error getting connection from pool:', err);
+                res.status(500).send("Error al obtenir connexió");
+                return;
+            }
+
+            const query = `INSERT INTO Respostes (id_alumne, soc_POS_1, soc_POS_2, soc_POS_3, soc_NEG_1, soc_NEG_2, soc_NEG_3, ar_i_1, ar_i_2, ar_i_3, pros_1, pros_2, pros_3, af_1, af_2, af_3, ar_d_1, ar_d_2, ar_d_3, pros_2_1, pros_2_2, pros_2_3, av_1, av_2, av_3, vf_1, vf_2, vf_3, vv_1, vv_2, vv_3, vr_1, vr_2, vr_3, amics_1, amics_2, amics_3) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
+
+            connection.query(query, [id_alumne, formulari.cauBe[0], formulari.cauBe[1], formulari.cauBe[2], formulari.noCauBe[0], formulari.noCauBe[1], formulari.noCauBe[2], formulari.correRumors[0], formulari.correRumors[1], formulari.correRumors[2], formulari.ajuda[0], formulari.ajuda[1], formulari.ajuda[2], formulari.donaEmpentes[0], formulari.donaEmpentes[1], formulari.donaEmpentes[2], formulari.noDeixaParticipar[0], formulari.noDeixaParticipar[1], formulari.noDeixaParticipar[2], formulari.anima[0], formulari.anima[1], formulari.anima[2], formulari.insulta[0], formulari.insulta[1], formulari.insulta[2], formulari.esEmpentat[0], formulari.esEmpentat[1], formulari.esEmpentat[2], formulari.esInsultat[0], formulari.esInsultat[1], formulari.esInsultat[2], formulari.esAillat[0], formulari.esAillat[1], formulari.esAillat[2], formulari.esAmic[0], formulari.esAmic[1], formulari.esAmic[2]], (err, results) => {
+
+                if (err) {
+                    console.error('Error:', err);
+                    res.status(500).json({ error: "Error en afegir respostes a l'alumne." });
+                }
+
+                res.json({ mensaje: "Respostes afegides" });
+                getRespostes(connection);
+                connection.release();
+
+            });
+        });
+    } else {
+        res.json({ mensaje: "L'alumne ja ha enviat respostes anteriorment." });
+    }
+});
+
+app.put("/formulariAlumne", (req, res) => {
+    const id_alumne = req.query.userId
 
     pool.getConnection((err, connection) => {
         if (err) {
@@ -652,21 +790,53 @@ app.put("/formulari", (req, res) => {
             return;
         }
 
-        const query = `UPDATE Alumnes SET questionari = ? WHERE id_alumne = ?;`;
+        const query = `UPDATE Alumnes SET formulari_fet = 1 WHERE id_alumne = (?);`;
 
-        connection.query(query, [formulari, id_alumne], (err, results) => {
+        connection.query(query, [id_alumne], (err, results) => {
 
             if (err) {
                 console.error('Error:', err);
-                res.status(500).json({ error: "Error en afegir respostes a l'alumne." });
             }
-
-            res.json({ mensaje: "Respostes afegides" });
+            getAlumnes(connection);
             connection.release();
+            res.json({ mensaje: "Formulari Fet Afegit" });
 
         });
     });
 });
+
+function convertirNomsAId(id_alumne, formulari) {
+    var alumneResposta = null;
+    for (let i = 0; i < alumnes.length; i++) {
+        if (alumnes[i].id_alumne == id_alumne) {
+            alumneResposta = alumnes[i];
+        }
+    }
+    var alumnesDeLaSevaClasse = [];
+    for (let i = 0; i < alumnes.length; i++) {
+        if (alumnes[i].id_classe == alumneResposta.id_classe) {
+            alumnesDeLaSevaClasse.push(alumnes[i]);
+        }
+    }
+    for (let categoria in formulari) {
+        let arrayRespostes = formulari[categoria];
+        for (let i = 0; i < arrayRespostes.length; i++) {
+            let nomCompletFormulari = arrayRespostes[i];
+            let nomCompletArray = nomCompletFormulari.split(" ", 2);
+            let nomFormulari = nomCompletArray[0];
+            let cognomFormulari = nomCompletArray[1];
+            for (let j = 0; j < alumnes.length; j++) {
+                let nomBBDD = alumnes[j].nom;
+                let cognomBBDD = alumnes[j].cognoms;
+                if (nomFormulari.trim().toLowerCase() === nomBBDD.trim().toLowerCase() &&
+                    cognomFormulari.trim().toLowerCase() === cognomBBDD.trim().toLowerCase()) {
+                    arrayRespostes[i] = alumnes[j].id_alumne;
+                }
+            }
+        }
+    }
+    return formulari;
+}
 
 
 function getClasses(connection) {
@@ -690,7 +860,7 @@ function getTutors(connection) {
 }
 
 function getAlumnes(connection) {
-    connection.query('SELECT id_alumne, email, nom, cognoms, id_classe FROM Alumnes', (err, results) => {
+    connection.query('SELECT id_alumne, email, nom, cognoms, id_classe, formulari_fet FROM Alumnes', (err, results) => {
         if (err) {
             console.error('Error:', err);
         } else {
@@ -715,6 +885,16 @@ function getAlumnesContrassenya(connection) {
             console.error('Error:', err);
         } else {
             alumnesContrassenya = results;
+        }
+    });
+}
+
+function getRespostes(connection) {
+    connection.query('SELECT * FROM Respostes', (err, results) => {
+        if (err) {
+            console.error('Error:', err);
+        } else {
+            respostes = results;
         }
     });
 }
@@ -752,7 +932,7 @@ function jaExisteix(nouUser) {
 process.on('message', (message) => {
     if (message.action === 'start') {
         app.listen(port, () => {
-            console.log(`Servei d'Autenticació corrent a ${port}`);
+            console.log(`Servei de BBDD corrent a ${port}`);
         }).on('error', (err) => {
             if (err.code === 'EADDRINUSE') {
                 console.log(`El port ${port} ja està en ús, però el servidor està funcionant.`);
@@ -769,8 +949,10 @@ process.on('message', (message) => {
             getClasses(connection);
             getTutors(connection);
             getAlumnes(connection);
+            getRespostes(connection);
             getTutorsContrassenya(connection);
             getAlumnesContrassenya(connection);
+
 
             connection.release();
         });

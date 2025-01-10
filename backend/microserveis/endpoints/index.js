@@ -3,15 +3,102 @@ const cors = require('cors');
 const fetch = globalThis.fetch;
 const { isAuthProfe } = require('../autenticacio/index');
 const { isAuthAlumne } = require('../autenticacio/index');
+const http = require('http')
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
+const { Server } = require('socket.io');
 const URL = process.env.URL;
 const port = process.env.PORT_ENDPOINTS;
+const portSocket = process.env.PORT_ENDPOINTS_SOCKET;
 const portBBDD = process.env.PORT_BBDD;
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+const server = http.createServer(app);
+
+const io = new Server(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST", "PUT", "DELETE"],
+        transports: ["websocket", "polling"]
+    }
+});
+
+io.on('connection', (socket) => {
+    console.log('Usuari connectat:', socket.id);
+
+    socket.on('getClasses', async (sessionId, userId, email) => {
+        if (!sessionId || !userId) {
+            return socket.emit('error', { missatge: "No Autenticat" });
+        }
+        try {
+            let alumnes;
+            if (isAuthProfe(sessionId, userId)) {
+                alumnes = await getSQL("alumnesClasseProfe", { email, sessionId, userId });
+            } else if (isAuthAlumne(sessionId, userId)) {
+                alumnes = await getSQL("alumnesClasseAlumne", { email, sessionId, userId });
+            } else {
+                return socket.emit('error', { missatge: "No Autenticat" });
+            }
+            socket.emit('alumnes', alumnes);
+        } catch (error) {
+            console.error("Error processant 'getClasses':", error);
+            socket.emit('error', { missatge: "Error en processar la sol·licitud" });
+        }
+    });
+
+    socket.on('afegirClasse', async (data) => {
+        const { codi_classe, email, sessionId, userId } = data;
+
+        if (!sessionId || !userId) {
+            return socket.emit('error', "No Autenticat");
+        }
+
+        let resposta;
+
+        if (isAuthProfe(sessionId, userId)) {
+            resposta = await putSQL("afegirClasseProfe", { codi_classe, email, sessionId, userId });
+        } else if (isAuthAlumne(sessionId, userId)) {
+            resposta = await putSQL("afegirClasseAlumne", { codi_classe, email, sessionId, userId });
+        } else {
+            return socket.emit('error', { missatge: "No Autenticat" });
+        }
+        
+        socket.emit('classeAfegida', resposta);
+        socket.broadcast.emit('actualitzarAlumnes', { email, sessionId, userId });
+    });
+
+    socket.on('afegirFormulari', async (data) => {
+        const { email, formulari, sessionId, userId } = data;
+        console.log(formulari)
+        if (!sessionId || !userId) {
+            return socket.emit('error', "No Autenticat");
+        }
+
+        if (!isAuthAlumne(sessionId, userId)) {
+            return socket.emit('error', "No Autenticat");
+        }
+
+        const formulariAfegir = JSON.stringify(formulari);
+
+        if (!formulariAfegir) {
+            return socket.emit('error', "Falten camps");
+        }
+
+        const resposta = await putSQL("formulari", { userId, formulariAfegir });
+        const resposta2 = await putSQL("formulariAlumne", {userId});
+        console.log(resposta2);
+        socket.emit('formulariAfegit', resposta);
+        socket.broadcast.emit('actualitzarAlumnes', { email, sessionId, userId });
+    });
+
+    socket.on('disconnect', () => {
+        console.log('Usuari desconnectat:', socket.id);
+    });
+});
+
 
 app.get("/classes", async (req, res) => {
     sessionId = req.query.sessionId;
@@ -96,14 +183,46 @@ app.get("/classe", async (req, res) => {
     }
     if (isAuthProfe(sessionId, userId)) {
         const alumnes = await getSQL("classeProf", { email,sessionId, userId });
+        console.log(alumnes)
         return res.json(alumnes);
     }
 
     if (isAuthAlumne(sessionId, userId)){
         const alumnes = await getSQL("classeAlum", { email,sessionId, userId });
+        console.log(alumnes)
         return res.json(alumnes);
     }
     
+});
+
+app.get("/formulariRespost", async (req, res) => {
+    sessionId = req.query.sessionId;
+    userId = req.query.userId;
+    email= req.query.email;
+    if (!req.query.sessionId || !req.query.userId) {
+        return res.json({missatge: "No Autenticat"});
+    }
+
+    if (isAuthAlumne(sessionId, userId)){
+        const resposta = await getSQL("formulariRespost", { email });
+        return res.json(resposta);
+    }
+    
+});
+
+app.get("/haFetFormulari", async (req, res) => {
+    sessionId = req.query.sessionId;
+    userId = req.query.userId;
+    if (!req.query.sessionId || !req.query.userId) {
+        return res.json({missatge: "No Autenticat"});
+    }
+
+    if (isAuthAlumne(sessionId, userId)){
+        const haFetFormulari = await getSQL("haFetFormulari", { userId });
+        return res.json(haFetFormulari);
+    }
+
+    res.json({missatge: "No Autenticat"});
 });
 
 app.get("/classeForma", async (req, res) => {
@@ -214,28 +333,6 @@ app.put("/afegirClasse", async (req, res) => {
 });
 
 
-app.put("/formulari", async (req, res) => {
-    sessionId = req.query.sessionId;
-    userId = req.query.userId;
-    if (!req.query.sessionId || !req.query.userId) {
-        return res.json({missatge: "No Autenticat"});
-    }
-
-    if (!isAuthAlumne(sessionId, userId)) {
-        return res.json({missatge: "No Autenticat"});
-    }
-
-    const formulariEstringuejar = req.body;
-    const formulari = JSON.stringify(formulariEstringuejar)
-
-    if (!formulari) {
-        return res.json({missatge: "Falten camps"});
-    }
-        
-        const resposta = await putSQL("formulari", { userId, formulari });
-        res.json(resposta);
-});
-
 app.post("/registre", async (req, res) => {
     try {
         const { email, contrassenya, nom, cognoms } = req.body;
@@ -313,13 +410,16 @@ async function putSQL(endpoint, params = {}) {
 process.on('message', (message) => {
     if (message.action === 'start') {
         app.listen(port, () => {
-            console.log(`Servei d'Autenticació corrent a ${port}`);
+            console.log(`Servei d'Endpoints corrent a ${port}`);
         }).on('error', (err) => {
             if (err.code === 'EADDRINUSE') {
                 console.log(`El port ${port} ja està en ús, però el servidor està funcionant.`);
             } else {
                 console.error(err);
             }
+        });
+        server.listen(portSocket, () => {
+            console.log(`Servidor Sockets Endpoints corrent a ${portSocket}`);
         });
     }
     if (message.action === 'stop') {

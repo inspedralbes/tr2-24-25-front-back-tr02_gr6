@@ -3,7 +3,9 @@
 
 const URL_AUTH = import.meta.env.VITE_API_ROUTE_AUTH;
 const URL = import.meta.env.VITE_API_ROUTE;
+const URL_SOCKET = import.meta.env.VITE_API_ROUTE_SOCKET;
 import { useSessionStore } from '@/stores/sessionStore';
+import { io } from 'socket.io-client';
 const sessionStore = useSessionStore();
 const sessionId = sessionStore.sessionId;
 const userId = sessionStore.userId;
@@ -111,37 +113,6 @@ console.log(email)
   }
 }
 
-export async function postResultats(formulari) {
-  try {
-    const sessionStore = useSessionStore();
-    const sessionId = sessionStore.sessionId;
-    const userId = sessionStore.userId;
-
-    if (!sessionId || !userId) {
-      throw new Error("No hay sessionId o userId almacenado");
-    }
-
-    const response = await fetch(`${URL}/formulari?sessionId=${sessionId}&userId=${userId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formulari),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Error al agregar clase: ${errorText}`);
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error en callAddClass:", error);
-    throw error;
-  }
-}
-
 /*export async function callGetClasses() {
   try {
     const response = await fetch(`${URL}/classes`, {
@@ -212,18 +183,9 @@ export async function getClasse(email) {
   }
 }
 
-export async function callPutClass(email, codi_classe) {
-  console.log(codi_classe)
-  console.log(email)
+export async function getFormulariRespost(email) {
   try {
-    const response = await fetch(`${URL}/afegirClasse?codi_classe=${codi_classe}&email=${email}&sessionId=${sessionId}&userId=${userId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, codi_classe }),
-    });
-
+    const response = await fetch(`${URL}/formulariRespost?email=${email}&sessionId=${sessionId}&userId=${userId}`);
     console.log(response)
     if (!response.ok) {
       throw new Error(`Error en la solicitud: ${response.status}`);
@@ -236,18 +198,105 @@ export async function callPutClass(email, codi_classe) {
   }
 }
 
+export async function postResultats(email, formulari) {
+  const socket = io(`${URL_SOCKET}`);
+  return new Promise((resolve, reject) => {
+    console.log(formulari);
+    console.log(email);
+    console.log(sessionId);
+    console.log(userId);
+    socket.on('connect', () => {
+      console.log('Socket connectat amb èxit.');
 
-export async function getAlumnes(email) {
-  console.log(sessionId);
-  console.log(userId);
-  const alumnes = await fetch(`${URL}/alumnesClasse?email=${email}&sessionId=${sessionId}&userId=${userId}`);
-  try {
-    const llista_alumnes = await alumnes.json();
-    return llista_alumnes
-  } catch (error) {
-    console.error('Error al obtener datos:', error);
-  }
+      socket.once('formulariAfegit', (data) => {
+        socket.disconnect();
+        resolve(data);
+      });
+
+      socket.once('error', (error) => {
+        socket.disconnect();
+        reject(new Error(error.missatge || 'Error en afegir el formulari'));
+      });
+
+      socket.emit('afegirFormulari', { email, formulari, sessionId, userId });
+    });
+
+    socket.on('connect_error', (err) => {
+      console.error('Error de connexió al socket:', err);
+      reject(new Error('No es pot connectar al servidor de WebSocket.'));
+    });
+  });
 }
+
+export function callPutClass(email, codi_classe) {
+  const socket = io(`${URL_SOCKET}`);
+  return new Promise((resolve, reject) => {
+    console.log(codi_classe);
+    console.log(email);
+    console.log(sessionId);
+    console.log(userId);
+
+    socket.on('connect', () => {
+      console.log('Socket connectat amb èxit.');
+
+      socket.once('classeAfegida', (data) => {
+        socket.disconnect();
+        resolve(data);
+      });
+
+      socket.once('error', (error) => {
+        socket.disconnect();
+        reject(new Error(error.missatge || 'Error en afegir la classe'));
+      });
+
+      socket.emit('afegirClasse', { email, codi_classe, sessionId, userId });
+    });
+
+    socket.on('connect_error', (err) => {
+      console.error('Error de connexió al socket:', err);
+      reject(new Error('No es pot connectar al servidor de WebSocket.'));
+    });
+  });
+}
+
+
+export function getAlumnes(email) {
+  const socket = io(`${URL_SOCKET}`);
+
+  return new Promise((resolve, reject) => {
+    console.log(sessionId);
+    console.log(userId);
+
+    socket.on('connect', () => {
+      console.log('Socket connectat amb èxit.');
+
+      socket.on('actualitzarAlumnes', () => {
+        console.log('Rebent actualitzarAlumnes, tornant a demanar les classes...');
+        socket.emit('getClasses', sessionId, userId, email);
+      });
+
+      socket.on('alumnes', (data) => {
+        console.log('Alumnes rebuts:', data);
+        resolve(data);
+      });
+
+      socket.on('error', (error) => {
+        reject(new Error(error.missatge || 'Error en obtenir dades'));
+      });
+
+      socket.emit('getClasses', sessionId, userId, email);
+    });
+
+    socket.on('connect_error', (err) => {
+      console.error('Error de connexió al socket:', err);
+      reject(new Error('No es pot connectar al servidor de WebSocket.'));
+    });
+
+  });
+}
+
+
+
 
 export async function getTutor(id_classe) {
   const tutors = await fetch(`${URL}/tutor?id_classe=${id_classe}&sessionId=${sessionId}&userId=${userId}`);
@@ -258,3 +307,4 @@ export async function getTutor(id_classe) {
     console.error('Error al obtener datos:', error);
   }
 }
+
