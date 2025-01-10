@@ -27,7 +27,7 @@
                           Email
                         </div>
                         <v-text-field
-                          v-model="professor.email"
+                          v-model="user.email"
                           density="compact"
                           :placeholder="identifierPlaceholder"
                           :rules="[(v) => !!v || 'Aquest camp és obligatori']"
@@ -42,7 +42,7 @@
                         </div>
 
                         <v-text-field
-                          v-model="professor.contrassenya"
+                          v-model="user.contrassenya"
                           :append-inner-icon="
                             visible ? 'mdi-eye-off' : 'mdi-eye'
                           "
@@ -112,7 +112,7 @@
                               Nom
                             </div>
                             <v-text-field
-                              v-model="professor.nom"
+                              v-model="user.nom"
                               density="compact"
                               :placeholder="'Nom'"
                               :rules="[
@@ -128,7 +128,7 @@
                               Cognoms
                             </div>
                             <v-text-field
-                              v-model="professor.cognoms"
+                              v-model="user.cognoms"
                               density="compact"
                               :placeholder="'Cognoms'"
                               :rules="[
@@ -145,7 +145,7 @@
                           Email
                         </div>
                         <v-text-field
-                          v-model="professor.email"
+                          v-model="user.email"
                           density="compact"
                           :placeholder="'email@example.com'"
                           :rules="[(v) => !!v || 'Aquest camp és obligatori']"
@@ -158,7 +158,7 @@
                           Contrassenya
                         </div>
                         <v-text-field
-                          v-model="professor.contrassenya"
+                          v-model="user.contrassenya"
                           :append-inner-icon="
                             visible ? 'mdi-eye-off' : 'mdi-eye'
                           "
@@ -197,15 +197,15 @@
 
 <script setup>
 import { ref, reactive } from "vue";
-import { callPostProf, callGetProf } from "@/services/communicationManager";
+import { callPostProf, callGetProf,callGetClasseFormaPart } from "@/services/communicationManager";
 import { useRouter } from "vue-router";
-
+const router = useRouter();
 import { useSessionStore } from "@/stores/sessionStore"; 
-import {useUserStore} from "@/stores/userStore"; import { useAuthStore } from "@/stores/userauth"
-const authStore = useAuthStore()
+import { useUserStore } from "@/stores/userStore"; 
+
 const step = ref(1);
 
-const professor = reactive({
+const user = reactive({
   nom: "",
   cognoms: "",
   email: "",
@@ -214,44 +214,83 @@ const professor = reactive({
 
 const visible = ref(false);
 const errorMessage = ref("");
-const router = useRouter();
-
+const sessionStore = useSessionStore();
+const emailStore = useUserStore();
 const identifierPlaceholder = "email@example.com";
 const passwordPlaceholder = "Insereix contrasenya";
 
-async function handleLogin() {
-  try {
-    const data = await callGetProf(professor.email, professor.contrassenya);
-    if (data && data.sessionId ) {
-      const sessionStore = useSessionStore(); 
-      sessionStore.setSessionId(data.sessionId);
-      sessionStore.setUserId(data.tutorId || data.alumneId); 
-      const emailStore = useUserStore();
-      emailStore.setEmail(professor.email);
-      console.log()
-      router.push("/home");0
-    } else {
-      errorMessage.value = "Email o contrassenya incorrectes.";
+function esProfe(email) {
+    const teNumeros = /\d/;
+    return !teNumeros.test(email);
+}
+
+async function teClasse(email) {
+    try {
+        const obj = await callGetClasseFormaPart(email);
+        const data = JSON.stringify(obj);
+
+        console.log("Data received in teClasse:", data);
+
+        if (data.includes("null")) {
+            console.log(" data is null");
+            return false;
+        }
+                console.log("data not null")
+        return true;
+    } catch (error) {
+        console.error("Error in teClasse:", error);
+        return false;
     }
-  } catch (error) {
-    errorMessage.value = "Error al iniciar sessió. Si us plau, torna a intentar-ho.";
-    console.error("Error al iniciar sessió:", error);
-  }
+}
+
+async function handleLogin() {
+    try {
+        const data = await callGetProf(user.email, user.contrassenya);
+
+        if (data && data.sessionId) {
+            sessionStore.setSessionId(data.sessionId);
+            sessionStore.setUserId(data.tutorId || data.alumneId);
+            emailStore.setEmail(user.email);
+            emailStore.setName(user.nom);
+            const email = user.email;
+            const esProfeCheck = esProfe(email);
+            const teClasseCheck = await teClasse(email); 
+
+            if (esProfeCheck && teClasseCheck) {
+                console.log("PROFE Y CON CLASE");
+                router.push("/classProf");
+              } else if (esProfeCheck && !teClasseCheck) {
+                console.log("Ets professor, però no formes part de cap classe.");
+                router.push("/formProfe");
+            } else if (!esProfeCheck && !teClasseCheck) {
+                console.log("ALUMNO Y SIN CLASE");
+                router.push("/codeClass");
+            } else {
+                console.log("ALUMNO Y CON CLASE");
+                router.push("/classAlum")
+              }
+        } else {
+            errorMessage.value = "Email o contrassenya incorrectes.";
+        }
+    } catch (error) {
+        errorMessage.value = "Error al iniciar sessió. Si us plau, torna a intentar-ho.";
+        console.error("Error al iniciar sessió:", error);
+    }
 }
 
 async function handleRegister() {
   if (
-    !professor.nom ||
-    !professor.cognoms ||
-    !professor.email ||
-    !professor.contrassenya
+    !user.nom ||
+    !user.cognoms ||
+    !user.email ||
+    !user.contrassenya
   ) {
     alert("Si us plau, omple tos els camps.");
     return;
   }
 
   try {
-    const response = await callPostProf(professor);
+    const response = await callPostProf(user);
     if (response.error == "Usat."){
       alert("Correu en ús.");
     } else {

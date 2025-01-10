@@ -1,7 +1,8 @@
 <!-- eslint-disable no-undef -->
 <script setup>
-import { getAlumnes, postResultats } from '@/services/communicationManager';
-import { onMounted, ref, watch } from 'vue'
+import { getAlumnes, postResultats, redirect } from '@/services/communicationManager';
+import { onBeforeMount, onMounted, ref, watch } from 'vue'
+import { useUserStore } from '../stores/userStore';
 const errorMessage = ref("");
 const correos = ref([])
 const alumnos = ref([])
@@ -24,7 +25,8 @@ const limitSelections = (selectedItems) => {
     selectedItems.shift();
   }
 };
-
+  const sessionStore = useUserStore();
+  const email = sessionStore.email
 const listaarrays = [
   cae_bien,
   cae_no_bien,
@@ -47,7 +49,7 @@ listaarrays.forEach((array) => {
 
 async function fecthGetAlumnos() {
   try {
-    const llista_alumnes = await getAlumnes();
+    const llista_alumnes = await getAlumnes(email);
     correos.value = llista_alumnes.map(alumne => alumne.email);
     alumnos.value = llista_alumnes.map(alumne => `${alumne.nom} ${alumne.cognoms}`);
     console.log(llista_alumnes);
@@ -56,9 +58,9 @@ async function fecthGetAlumnos() {
     console.error('Error en obtenir els correus', error);
   }
 }
-
 onMounted(() => {
   fecthGetAlumnos();
+  redirect();
 });
 
 

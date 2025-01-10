@@ -57,7 +57,8 @@ INSERT INTO Cursos VALUES
 (1, '1ESO'),
 (2, '2ESO'),
 (3, '3ESO'),
-(4, '4ESO');
+(4, '4ESO'),
+(5, 'PFI');
 
 INSERT INTO Classes (classe, codi_random, id_curs) VALUES ('1A', 'WeWdewXWnY' ,1);
 INSERT INTO Classes (classe, codi_random, id_curs) VALUES ('1B', 'BZviGgYIyL' ,1);
