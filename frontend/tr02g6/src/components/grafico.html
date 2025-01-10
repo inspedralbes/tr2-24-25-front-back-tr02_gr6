@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráfica de Burbujas</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        text {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            text-anchor: middle;
+        }
+        .main-circle text {
+            font-size: 16px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<svg width="800" height="800"></svg>
+
+<script>
+    const data = {
+        central: { id: "1", class: "1", name: "" },
+        fields: [
+            {
+                name: "Agressivitat",
+                subfields: [
+                    { name: "Física", value: 8 },
+                    { name: "Verbal", value: 0 },
+                    { name: "Relacional", value: 4 }
+                ]
+            },
+            {
+                name: "Prosocialitat",
+                value: 4 // No tiene subcampos
+            },
+            {
+                name: "Victimització",
+                subfields: [
+                    { name: "Física", value: 2 },
+                    { name: "Verbal", value: 5 },
+                    { name: "Relacional", value: 11 }
+                ]
+            },
+            {
+                name: "Popularitat",
+                subfields: [
+                    { name: "Popular", value: "X" },
+                    { name: "Rebutjat", value: " " },
+                    { name: "Ignorat", value: " " },
+                    { name: "Controvertit", value: " " },
+                    { name: "Norma", value: " " }
+                ]
+            }
+        ]
+    };
+
+    const svg = d3.select("svg");
+    const width = +svg.attr("width");
+    const height = +svg.attr("height");
+
+    const centralRadius = 50;
+    const fieldRadius = 100;
+    const subfieldScale = d3.scaleSqrt().domain([0, 20]).range([10, 40]);
+
+    const centralGroup = svg.append("g")
+        .attr("class", "main-circle")
+        .attr("transform", `translate(${width / 2}, ${height / 2})`);
+
+    centralGroup.append("circle")
+        .attr("r", centralRadius)
+        .attr("fill", "lightblue");
+
+    centralGroup.append("text")
+        .attr("dy", ".35em")
+        .text(data.central.name);
+
+    const angleScale = d3.scaleLinear()
+        .domain([0, data.fields.length])
+        .range([0, 2 * Math.PI]);
+
+    let fieldsToShow = data.fields.flatMap(field => {
+        if (field.name === "Popularitat") {
+            const activeField = field.subfields.find(subfield => subfield.value === "X");
+            return activeField ? [{ name: field.name, value: activeField.name }] : [];
+        } else if (field.subfields) {
+            return [field];
+        } else {
+            return [field];
+        }
+    });
+
+    fieldsToShow.forEach((field, i) => {
+        const angle = angleScale(i);
+        const x = width / 2 + Math.cos(angle) * 200;
+        const y = height / 2 + Math.sin(angle) * 200;
+
+        const fieldGroup = svg.append("g")
+            .attr("class", "field-group")
+            .attr("transform", `translate(${x}, ${y})`);
+
+        fieldGroup.append("circle")
+            .attr("r", fieldRadius)
+            .attr("fill", "lightgray");
+
+        fieldGroup.append("text")
+            .attr("dy", ".35em")
+            .text(field.name);
+            
+        if (field.subfields) {
+            const subAngleScale = d3.scaleLinear()
+                .domain([0, field.subfields.length])
+                .range([0, 2 * Math.PI]);
+
+            field.subfields.forEach((subfield, j) => {
+                const subAngle = subAngleScale(j);
+                const subX = Math.cos(subAngle) * (fieldRadius - 20);
+                const subY = Math.sin(subAngle) * (fieldRadius - 20);
+
+                const subRadius = subfieldScale(subfield.value || 1);
+
+                const subGroup = fieldGroup.append("g")
+                    .attr("class", "subfield-group")
+                    .attr("transform", `translate(${subX}, ${subY})`);
+
+                subGroup.append("circle")
+                    .attr("r", subRadius)
+                    .attr("fill", "white")
+                    .attr("stroke", "black");
+
+                subGroup.append("text")
+                    .attr("dy", ".35em")
+                    .text(subfield.name);
+
+                subGroup.append("text")
+                    .attr("dy", "1.5em")
+                    .text(subfield.value);
+            });
+        } else if (field.value !== undefined) {
+            fieldGroup.append("text")
+                .attr("dy", "1.5em")
+                .text(field.value);
+        }
+    });
+
+</script>
+</body>
+</html>

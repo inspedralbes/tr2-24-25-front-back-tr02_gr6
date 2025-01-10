@@ -292,6 +292,9 @@ export function getAlumnes(email) {
   });
 }
 
-
-
-
+export async function getResultats() {
+  try {
+    const resultat = await fetch('http:localhost:3000/respostes')
+    
+  }
+}
