@@ -2,23 +2,23 @@
     <v-container>
         <v-row class="header-row">
             <v-col cols="12" class="d-flex align-center justify-space-between">
-                <v-btn 
-                    icon 
-                    class="home-button"
-                    @click="inici"
-                >
+                <v-btn icon class="home-button" @click="inici" >
                     <v-icon>mdi-arrow-left</v-icon>
                 </v-btn>
                 <h1 class="header-title">BENVINGUT/DA {{ userStore.email }} a {{ classe }}!</h1>
                 <v-btn 
                     icon 
-                    class="code-button"
+                    class="code-buthton"
                     @click="mostrarCodiRandom"
                 >
                     <v-icon>mdi-eye</v-icon>
                 </v-btn>
             </v-col>
         </v-row>
+            <v-tabs v-model="activeTab" align="center">
+                <v-tab class="tabtab">Alumnes Registrats</v-tab>
+                <v-tab class="tabtab" @click="navigateToResult()">Resultats</v-tab>
+            </v-tabs>
 
         <v-row v-if="showCodiRandom" class="my-5">
             <v-col cols="12">
@@ -44,7 +44,7 @@
                 :key="alumne.id_alumne" 
                 cols="12" sm="6" md="4"
             >
-            <v-card :class="alumne.formulari_fet == 1 ? 'tarjeta-verda' : 'tarjeta-vermella'">
+            <v-card class="alumne-card" outlined>
                     <v-card-title>
                         <v-avatar class="me-3" color="orange darken-2" size="40">
                             {{ alumne.nom.charAt(0).toUpperCase() }}
@@ -56,23 +56,15 @@
                     </v-card-title>
                     <v-card-subtitle>
                         <v-chip 
-                            :color="alumne.formulariCompletat ? 'green darken-5' : 'red darken-1'"
+                            :color="alumne.formulari_fet? 'green darken-5' : 'red darken-1'"
                             dark
                         >
-                            {{ alumne.formulariCompletat ? 'Formulari Completat' : 'Formulari Pendent' }}
+                            {{ alumne.formulari_fet >0 ? 'Formulari Completat' : 'Formulari Pendent' }}
                         </v-chip>
                     </v-card-subtitle>
                 </v-card>
             </v-col>
         </v-row>
-
-        <v-btn 
-            large
-            class="form-button fixed-button"
-            @click="navegarapantalla"
-        >
-            FORMULARI
-        </v-btn>
     </v-container>
 </template>
 
@@ -125,12 +117,11 @@ const mostrarCodiRandom = () => {
     showCodiRandom.value = true;
 };
 
-const navegarapantalla = () => {
-    router.push('/formPage');
-};
+function navigateToResult (){
+    router.push('/resultats');
 };
 
-const inici = () => {
+function inici(){
     router.push('/home');
 };
 
@@ -153,6 +144,14 @@ onMounted(async () => {
 .header-title {
     font-weight: bold;
     color: white;
+}
+.tabtab,
+.alumnes-title {
+  color: rgb(185, 122, 7);
+  text-transform: uppercase;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 .codi-card {

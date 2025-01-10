@@ -118,8 +118,8 @@ const navegarapantalla = () => {
     }
 };
 
-const inici = () => {
-    router.push('/home');
+const navigateToResult = () => {
+    router.push('/resultats');
 };
 
 socket.on('actualitzarAlumnes', () => {

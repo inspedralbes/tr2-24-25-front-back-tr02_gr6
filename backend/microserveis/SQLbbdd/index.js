@@ -60,7 +60,6 @@ app.get("/classes", (req, res) => {
 app.get("/classeFormaProfe", (req, res) => {
     const email = req.query.email;
     console.log("EMAIL DE SQL", email)
-    console.log("EMAIL DE SQL", email)
     pool.getConnection((err, connection) => {
         if (err) {
             console.error('Error getting connection from pool:', err);
@@ -69,25 +68,19 @@ app.get("/classeFormaProfe", (req, res) => {
         }
         const query = `SELECT id_classe FROM Tutors WHERE email=?`;
         connection.query(query, [email], (err, results) => {
-        const query = `SELECT id_classe FROM Tutors WHERE email=?`;
-        connection.query(query, [email], (err, results) => {
             if (err) {
                 classes = err;
                 console.error('Error:', err);
             } else {
                 classes = results;
                 console.log("RESULTADO DE SQL", classes)
-                console.log("RESULTADO DE SQL", classes)
             }
 
             res.json(classes);
         });
     });
-
-            res.json(classes);
-        });
-    });
 });
+
 app.get("/classeFormaAlumne", (req, res) => {
     const email = req.query.email;
     console.log("EMAIL DE SQL", email)
@@ -128,22 +121,16 @@ app.get("/tutor", (req, res) => {
             } else {
                 classes = results;
                 console.log("RESULTADO DE SQL", classes)
-                console.log("RESULTADO DE SQL", classes)
             }
-
-            res.json(classes);
-        });
-    });
 
             res.json(classes);
         });
     });
 });
 
+
 app.get("/classeAlum", (req, res) => {
     const email = req.query.email;
-    console.log("EMAIL DE SQL", email)
-    console.log("EMAIL DE SQL", email)
     pool.getConnection((err, connection) => {
         if (err) {
             console.error('Error getting connection from pool:', err);
@@ -156,7 +143,6 @@ app.get("/classeAlum", (req, res) => {
     WHERE email = ?
 )`;
         connection.query(query, [email], (err, results) => {
-        connection.query(query, [email], (err, results) => {
             if (err) {
                 console.error('Error:', err);
             } else {
@@ -166,15 +152,10 @@ app.get("/classeAlum", (req, res) => {
             res.json(classes);
         });
     });
-
-            res.json(classes);
-        });
-    });
 });
+
 app.get("/classeProf", (req, res) => {
     const email = req.query.email;
-    console.log("EMAIL DE SQL", email)
-    console.log("EMAIL DE SQL", email)
     pool.getConnection((err, connection) => {
         if (err) {
             console.error('Error getting connection from pool:', err);
@@ -187,16 +168,11 @@ app.get("/classeProf", (req, res) => {
     WHERE email = ?
 )`;
         connection.query(query, [email], (err, results) => {
-        connection.query(query, [email], (err, results) => {
             if (err) {
                 console.error('Error:', err);
             } else {
                 classes = results;
             }
-
-            res.json(classes);
-        });
-    });
 
             res.json(classes);
         });
@@ -555,7 +531,6 @@ app.post("/classes", (req, res) => {
     const { classe, codi_random, id_curs } = req.body;
     const email = req.query.email
     console.log(email, "SQL EMAIL")
-    console.log(email, "SQL EMAIL")
     if (!classe || !codi_random || !id_curs) {
         return res.json("Faltan paràmetres: classe, codi_random o id_curs");
     }
@@ -579,7 +554,6 @@ WHERE email=? ;
                 res.status(500).json({ error: "Error en crear la classe" });
             }
             else {
-            else {
                 connection.query(query2, [codi_random, email], (err, results) => {
                     if (err) {
                         console.error('Error:', err);
@@ -595,9 +569,6 @@ WHERE email=? ;
 
     });
     });
-
-});
-});
 
 app.post("/registre", (req, res) => {
     const nouUser = {

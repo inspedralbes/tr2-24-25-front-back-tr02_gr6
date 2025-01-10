@@ -44,6 +44,11 @@ const userStore = useUserStore();
 const email=userStore.email
 const activeTab = ref(1); 
 const classe = ref("");
+function esProfe(email) {
+    const teNumeros = /\d/;
+    return !teNumeros.test(email);
+}
+
 
 async function fetchClasse(){
     try {
@@ -58,8 +63,11 @@ function navegarapantalla() {
     router.push('/formPage');
 }
 function navigateToAlum() {
+    if(esProfe(email)){
+        router.push('/classProf');}
     router.push('/classAlum');
 }
+
     onMounted(fetchClasse)
 
 </script>
