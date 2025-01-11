@@ -1,158 +1,198 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gráfica de Burbujas</title>
+    <title>Visualización de Resultados</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
-        text {
-            font-family: Arial, sans-serif;
-            font-size: 12px;
-            text-anchor: middle;
+        .node {
+            cursor: pointer;
         }
-        .main-circle text {
-            font-size: 16px;
-            font-weight: bold;
+
+        .circle {
+            fill: lightblue;
+            stroke: #1f77b4;
+            stroke-width: 2px;
+        }
+
+        .label {
+            font-size: 14px;
+            text-anchor: middle;
+            fill: black;
+        }
+
+        .subcircle {
+            fill: lightcoral;
+            stroke: #ff6347;
+            stroke-width: 2px;
+        }
+
+        /* Estilos para los SVG en cuadrícula */
+        .svg-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 3 columnas */
+            gap: 20px;
         }
     </style>
 </head>
 <body>
-<svg width="800" height="800"></svg>
+    <div class="svg-container" id="charts-container"></div>
 
-<script>
-    const data = {
-        central: { id: "1", class: "1", name: "Carlos" },
-        fields: [
-            {
-                name: "Agressivitat",
-                subfields: [
-                    { name: "Física", value: 8 },
-                    { name: "Verbal", value: 0 },
-                    { name: "Relacional", value: 4 }
-                ]
-            },
-            {
-                name: "Prosocialitat",
-                value: 4 // No tiene subcampos
-            },
-            {
-                name: "Victimització",
-                subfields: [
-                    { name: "Física", value: 2 },
-                    { name: "Verbal", value: 5 },
-                    { name: "Relacional", value: 11 }
-                ]
-            },
-            {
-                name: "Popularitat",
-                subfields: [
-                    { name: "Popular", value: "X" },
-                    { name: "Rebutjat", value: " " },
-                    { name: "Ignorat", value: " " },
-                    { name: "Controvertit", value: " " },
-                    { name: "Norma", value: " " }
-                ]
-            }
-        ]
-    };
+    <script>
+        // Cargar los datos desde el servidor
+        fetch('http://localhost:19999/resultats/1') // Reemplaza '1' con el id_clase deseado
+            .then(response => response.json())
+            .then(data => createCharts(data));
 
-    const svg = d3.select("svg");
-    const width = +svg.attr("width");
-    const height = +svg.attr("height");
+        function createCharts(data) {
+            const container = d3.select("#charts-container");
 
-    const centralRadius = 50;
-    const fieldRadius = 100;
-    const subfieldScale = d3.scaleSqrt().domain([0, 20]).range([10, 40]);
+            const width = 2000 / 3; // Ajustar el ancho de cada gráfico
+            const height = 1300 / 2; // Ajustar el alto de cada gráfico
 
-    // Central circle
-    const centralGroup = svg.append("g")
-        .attr("class", "main-circle")
-        .attr("transform", `translate(${width / 2}, ${height / 2})`);
+            const radius = 80; // Radio de los círculos principales
+            const subRadius = 20; // Radio de los subcírculos
 
-    centralGroup.append("circle")
-        .attr("r", centralRadius)
-        .attr("fill", "lightblue");
+            // Crear un gráfico para cada alumno
+            data.forEach((alumno, index) => {
+                const svg = container.append("div")
+                    .append("svg")
+                    .attr("width", width)
+                    .attr("height", height)
+                    .attr("id", `visualization-${index}`);
 
-    centralGroup.append("text")
-        .attr("dy", ".35em")
-        .text(data.central.name);
+                const centerX = width / 2;
+                const centerY = height / 2;
 
-    // Position fields around central circle
-    const angleScale = d3.scaleLinear()
-        .domain([0, data.fields.length])
-        .range([0, 2 * Math.PI]);
+                // Grupo principal
+                const group = svg.append("g")
+                    .attr("transform", `translate(${centerX}, ${centerY})`);
 
-    let fieldsToShow = data.fields.flatMap(field => {
-        if (field.name === "Popularitat") {
-            // Mostrar solo el subcampo con "X" en Popularitat
-            const activeField = field.subfields.find(subfield => subfield.value === "X");
-            return activeField ? [{ name: field.name, value: activeField.name }] : [];
-        } else if (field.subfields) {
-            // Mostrar todos los campos con subcampos normales
-            return [field];
-        } else {
-            // Mostrar campos sin subcampos como Prosocialitat
-            return [field];
-        }
-    });
+                // Nodo central (Nombre del alumno)
+                group.append("circle")
+                    .attr("class", "circle")
+                    .attr("r", radius)
+                    .style("fill", "#FFD700");
 
-    fieldsToShow.forEach((field, i) => {
-        const angle = angleScale(i);
-        const x = width / 2 + Math.cos(angle) * 200;
-        const y = height / 2 + Math.sin(angle) * 200;
+                group.append("text")
+                    .attr("class", "label")
+                    .attr("y", 5)
+                    .text(alumno.name);
 
-        const fieldGroup = svg.append("g")
-            .attr("class", "field-group")
-            .attr("transform", `translate(${x}, ${y})`);
+                // Mostrar valor debajo del nombre
+                group.append("text")
+                    .attr("class", "label")
+                    .attr("y", 25) // Desplazar un poco hacia abajo
 
-        // Field circle
-        fieldGroup.append("circle")
-            .attr("r", fieldRadius)
-            .attr("fill", "lightgray");
+                // Datos principales
+                const mainFields = [
+                    { name: "Agressivitat", children: alumno.children[0].children },
+                    { name: "Prosocialitat", value: alumno.children[1].value },
+                    { name: "Victimització", children: alumno.children[2].children },
+                ];
 
-        // Field label
-        fieldGroup.append("text")
-            .attr("dy", ".35em")
-            .text(field.name);
+                // Distribuir nodos principales alrededor del centro
+                const positions = [
+                    { x: 0, y: -1 }, // Arriba
+                    { x: 1, y: 0 },  // Derecha
+                    { x: -1, y: 0 }, // Izquierda
+                    { x: 0, y: 1 },  // Abajo
+                ];
 
-        // Subfields
-        if (field.subfields) {
-            const subAngleScale = d3.scaleLinear()
-                .domain([0, field.subfields.length])
-                .range([0, 2 * Math.PI]);
+                mainFields.forEach((field, i) => {
+                    const pos = positions[i];
+                    const x = centerX + pos.x * (radius + 100);
+                    const y = centerY + pos.y * (radius + 100);
 
-            field.subfields.forEach((subfield, j) => {
-                const subAngle = subAngleScale(j);
-                const subX = Math.cos(subAngle) * (fieldRadius - 20);
-                const subY = Math.sin(subAngle) * (fieldRadius - 20);
+                    const mainGroup = svg.append("g")
+                        .attr("transform", `translate(${x}, ${y})`);
 
-                const subRadius = subfieldScale(subfield.value || 1); // Default size for non-numeric values
+                    // Circulo principal
+                    mainGroup.append("circle")
+                        .attr("class", "circle")
+                        .attr("r", field.name === "Prosocialitat" ? radius * (field.value / 10) : radius) // Cambiar tamaño según valor
+                        .style("fill", field.name === "Prosocialitat" ? "#90EE90" : "#ADD8E6");
 
-                const subGroup = fieldGroup.append("g")
-                    .attr("class", "subfield-group")
-                    .attr("transform", `translate(${subX}, ${subY})`);
+                    // Texto del círculo principal
+                    mainGroup.append("text")
+                        .attr("class", "label")
+                        .attr("y", 5)
+                        .text(field.name);
 
-                subGroup.append("circle")
-                    .attr("r", subRadius)
-                    .attr("fill", "white")
-                    .attr("stroke", "black");
+                    // Mostrar valor debajo del nombre
+                    mainGroup.append("text")
+                        .attr("class", "label")
+                        .attr("y", 25)
 
-                subGroup.append("text")
-                    .attr("dy", ".35em")
-                    .text(subfield.name);
+                    // Si tiene subcampos, añadirlos dentro
+                    if (field.children) {
+                        const subAngleStep = (2 * Math.PI) / field.children.length;
+                        field.children.forEach((subField, j) => {
+                            const subAngle = j * subAngleStep;
+                            const subX = x + Math.cos(subAngle) * (radius - 20);
+                            const subY = y + Math.sin(subAngle) * (radius - 20);
 
-                subGroup.append("text")
-                    .attr("dy", "1.5em")
-                    .text(subfield.value);
+                            svg.append("circle")
+                                .attr("class", "subcircle")
+                                .attr("r", subRadius * (subField.value / 10)) // Tamaño proporcional
+                                .attr("cx", subX)
+                                .attr("cy", subY);
+
+                            svg.append("text")
+                                .attr("class", "label")
+                                .attr("x", subX)
+                                .attr("y", subY + 5)
+                                .text(subField.name);
+
+                            // Mostrar valor debajo del nombre del subcampo
+                            svg.append("text")
+                                .attr("class", "label")
+                                .attr("x", subX)
+                                .attr("y", subY + 25) // Desplazar un poco hacia abajo
+                                .text(`${subField.value}`); // Mostrar el valor
+                        });
+                    }
+                });
+
+                // Mostrar los nodos para Popular, Rebutjat, Ignorat, Controvertit y Normatiu solo si tienen un valor no vacío
+                const conditionalFields = [
+                    alumno.children[3],
+                    alumno.children[4],
+                    alumno.children[5],
+                    alumno.children[6],
+                    alumno.children[7],
+                ].filter(field => field.value && field.value.trim() !== ""); // Filtrar campos no vacíos
+                const conditionalPositions = [
+                    { x: 0, y: 1 }, // Abajo del nodo central
+                ];
+
+                conditionalFields.forEach((field, i) => {
+                  const pos = conditionalPositions[0];
+                  const x = centerX + pos.x * (radius + 100) + (i * 100); // Separar horizontalmente
+                    const y = centerY + pos.y * (radius + 100);
+
+                    const conditionGroup = svg.append("g")
+                        .attr("transform", `translate(${x}, ${y})`);
+
+                    conditionGroup.append("circle")
+                        .attr("class", "circle")
+                        .attr("r", radius)
+                        .style("fill", "#FFA07A");
+
+                    conditionGroup.append("text")
+                        .attr("class", "label")
+                        .attr("y", 5)
+                        .text(field.name);
+
+                    // Mostrar valor debajo del nombre
+                    conditionGroup.append("text")
+                        .attr("class", "label")
+                        .attr("y", 25) // Desplazar un poco hacia abajo
+                        .text(`${field.value}`); // Mostrar el valor
+                });
             });
-        } else if (field.value !== undefined) {
-            // For fields without subfields (e.g., Prosocialitat or Popularitat)
-            fieldGroup.append("text")
-                .attr("dy", "1.5em")
-                .text(field.value);
         }
-    });
-</script>
+    </script>
 </body>
 </html>
