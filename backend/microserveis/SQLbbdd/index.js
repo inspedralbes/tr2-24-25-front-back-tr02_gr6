@@ -778,29 +778,48 @@ app.put("/formulariAlumne", (req, res) => {
 });
 app.get("/resultats", (req, res) => {
     const id_classe = req.query.id_classe;
+    
+    if (!id_classe) {
+        return res.status(400).send("Falta el parámetro id_classe");
+    }
 
     pool.getConnection((err, connection) => {
         if (err) {
-            console.error('Error getting connection from pool:', err);
-            res.status(500).send("Error al obtenir connexió");
-            return;
+            console.error('Error al obtener la conexión:', err);
+            return res.status(500).send("Error al obtener conexión");
         }
-        const query = ` SELECT
-                r.id_enquesta,
+
+        const query = `
+            SELECT
+                r.id_classe,
                 r.id_alumne,
                 r.totalAgressivitat,
-                r.agressivitatFisica, r.agressivitatVerbal, r.agressivitatRelacional,
+                r.agressivitatFisica,
+                r.agressivitatVerbal,
+                r.agressivitatRelacional,
                 r.totalAgressivitat_SN,
-                r.agressivitatFisica_SN, r.agressivitatVerbal_SN, r.agressivitatRelacional_SN,
+                r.agressivitatFisica_SN,
+                r.agressivitatVerbal_SN,
+                r.agressivitatRelacional_SN,
                 r.prosocialitat,
                 r.prosocialitat_SN,
                 r.totalVictimitzacio,
-                r.victimitzacioFisica, r.victimitzacioVerbal, r.victimitzacioRelacional,
+                r.victimitzacioFisica,
+                r.victimitzacioVerbal,
+                r.victimitzacioRelacional,
                 r.totalVictimitzacio_SN,
-                r.victimitzacioFisica_SN, r.victimitzacioVerbal_SN, r.victimitzacioRelacional_SN,
-                r.popular_SN, r.rebutjat_SN, r.ignorat_SN, r.controvertit_SN, r.normal_SN,
-                r.triesPositives, r.triesNegatives,
-                a.nom_alumne
+                r.victimitzacioFisica_SN,
+                r.victimitzacioVerbal_SN,
+                r.victimitzacioRelacional_SN,
+                r.popular_SN,
+                r.rebutjat_SN,
+                r.ignorat_SN,
+                r.controvertit_SN,
+                r.normal_SN,
+                r.triesPositives,
+                r.triesNegatives,
+                a.nom,
+                a.cognom
             FROM
                 resultats AS r
             INNER JOIN
@@ -808,21 +827,23 @@ app.get("/resultats", (req, res) => {
             ON
                 r.id_alumne = a.id_alumne
             WHERE
-                r.id_clase = ?
-`;
+                r.id_classe = ?;
+        `;
+        
         connection.query(query, [id_classe], (err, results) => {
+            connection.release(); 
+
             if (err) {
-                classes = err;
-                console.error('Error:', err);
-            } else {
-                classes = results;
-                console.log("RESULTADO DE SQL", classes)
+                console.error('Error en la consulta SQL:', err);
+                return res.status(500).send("Error al obtener los resultados");
             }
 
-            res.json(classes);
+            console.log("RESULTADO DE SQL:", results);
+            res.json(results); 
         });
     });
 });
+
 
 function convertirNomsAId(id_alumne, formulari) {
     var alumneResposta = null;

@@ -82,7 +82,7 @@ CREATE TABLE `Respostes` (
 );
 
 CREATE TABLE `resultats` (
-  `id_enquesta` int(11) NOT NULL,
+  `id_classe` int(11) NOT NULL,
   `id_alumne` int(11) NOT NULL,
   `totalAgressivitat` int(11) DEFAULT NULL,
   `agressivitatFisica` int(11) DEFAULT NULL,
@@ -115,7 +115,7 @@ CREATE TABLE `resultats` (
 -- Volcado de datos para la tabla `resultats`
 --
 
-INSERT INTO `resultats` (`id_enquesta`, `id_alumne`, `totalAgressivitat`, `agressivitatFisica`, `agressivitatVerbal`, `agressivitatRelacional`, `totalAgressivitat_SN`, `agressivitatFisica_SN`, `agressivitatVerbal_SN`, `agressivitatRelacional_SN`, `prosocialitat`, `prosocialitat_SN`, `totalVictimitzacio`, `victimitzacioFisica`, `victimitzacioVerbal`, `victimitzacioRelacional`, `totalVictimitzacio_SN`, `victimitzacioFisica_SN`, `victimitzacioVerbal_SN`, `victimitzacioRelacional_SN`, `popular_SN`, `rebutjat_SN`, `ignorat_SN`, `controvertit_SN`, `normal_SN`, `triesPositives`, `triesNegatives`) VALUES
+INSERT INTO `resultats` (`id_classe`, `id_alumne`, `totalAgressivitat`, `agressivitatFisica`, `agressivitatVerbal`, `agressivitatRelacional`, `totalAgressivitat_SN`, `agressivitatFisica_SN`, `agressivitatVerbal_SN`, `agressivitatRelacional_SN`, `prosocialitat`, `prosocialitat_SN`, `totalVictimitzacio`, `victimitzacioFisica`, `victimitzacioVerbal`, `victimitzacioRelacional`, `totalVictimitzacio_SN`, `victimitzacioFisica_SN`, `victimitzacioVerbal_SN`, `victimitzacioRelacional_SN`, `popular_SN`, `rebutjat_SN`, `ignorat_SN`, `controvertit_SN`, `normal_SN`, `triesPositives`, `triesNegatives`) VALUES
 (1, 1, 12, 8, 0, 4, 'X', 'X', ' ', ' ', 4, 'X', 18, 2, 5, 11, 'X', ' ', ' ', 'X', ' ', ' ', ' ', ' ', ' ', 1, 4),
 (1, 2, 6, 1, 4, 1, ' ', ' ', ' ', ' ', 3, ' ', 0, 0, 0, 0, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 3, 2),
 (1, 3, 10, 2, 3, 5, ' ', ' ', ' ', ' ', 2, ' ', 2, 0, 2, 0, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 4, 1),

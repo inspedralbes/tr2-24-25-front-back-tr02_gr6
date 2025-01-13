@@ -308,3 +308,23 @@ export async function getTutor(id_classe) {
   }
 }
 
+
+export async function getSociograma() {
+  try {
+    if (!sessionId || !userId) {
+      throw new Error('No hay sessionId o userId almacenado');
+    }
+
+    const response = await fetch(`${URL}/resultats?sessionId=${sessionId}&userId=${userId}`);
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Error al obtener datos del sociograma: ${errorText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error en getSociograma:", error);
+    throw error;
+  }
+}

@@ -1,177 +1,110 @@
-
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Visualizar Resultados - Encuesta</title>
-
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-        crossorigin="anonymous">
-  <!-- Estilos opcionales -->
-  <style>
-    .check-icon {
-      color: green;
-      font-weight: bold;
-    }
-    .graph-container {
-      border: 1px solid #ccc;
-      width: 100%;
-      height: 500px;
-      position: relative;
-      margin-top: 30px;
-    }
-    /* Si quieres que D3 ocupe todo el contenedor */
-    svg {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gráfico Sociograma</title>
+  <!-- Agrega estilos según lo necesites -->
+  <link rel="stylesheet" href="styles.css">
+  <!-- Si usas D3.js u otra librería para el gráfico -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
-<body class="bg-light">
-<div class="container py-4">
+<body>
+  <div id="sociograma-container">
+    <h1>Sociograma</h1>
+    <div id="chart"></div>
+  </div>
 
-  <h1>Visualizar Resultados de Encuesta</h1>
-  
-  <!-- Formulario para pedir ID de Encuesta -->
-  <form method="POST" class="row g-3 mb-4">
-    <div class="col-auto">
-      <label for="id_enquesta" class="col-form-label">ID de Encuesta:</label>
-    </div>
-    <div class="col-auto">
-      <input type="number" class="form-control" name="id_enquesta" id="id_enquesta"
-             value="<?php echo htmlspecialchars($idEncuesta); ?>" required>
-    </div>
-    <div class="col-auto">
-      <button type="submit" class="btn btn-primary">Mostrar Resultados</button>
-    </div>
-  </form>
+  <script>
+    // Paso 1: Obtén los parámetros de la URL
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get('sessionId');
+    const userId = params.get('userId');
+    const id_classe = params.get('id_classe'); // Opcional, si es necesario
 
-  <!-- Mensajes de error -->
+    // Verifica si los parámetros están presentes
+    if (!sessionId || !userId) {
+      document.getElementById('sociograma-container').innerHTML = `
+        <p style="color: red;">Error: sessionId o userId faltante en la URL.</p>`;
+      throw new Error('Faltan sessionId o userId.');
+    }
 
+    // Paso 2: Llama al backend para obtener los datos
+    async function fetchSociogramaData() {
+      try {
+        const response = await fetch(`http://localhost:3000/resultats?sessionId=${sessionId}&userId=${userId}&id_classe=${id_classe}`);
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Error al obtener datos del sociograma: ${errorText}`);
+        }
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
-        crossorigin="anonymous"></script>
-
-<!-- D3.js (v7 o posterior) -->
-<script src="https://d3js.org/d3.v7.min.js"></script>
-
-<script>
-  /************************************************************
-   * EJEMPLO DE SOCIOGRAMA BÁSICO CON D3
-   * - Creamos un array de "nodes" (cada fila = 1 alumno)
-   * - Creamos "links" si se cumple una condición
-   ************************************************************/
-
-  // 1. Tomar datos de PHP -> JavaScript
-  // Este array de objetos es la "tabla" que obtuviste
-
-  // 2. Crear nodos
-  // Supongamos que cada fila tiene 'id_alumne' y 'nom_alumne'
-  // y que es único. Si no, ajusta la logic
-  const nodes = dataFilas.map(f => ({
-    id: f.id_alumne,
-    name: f.nom_alumne
-  }));
-
-  // 3. Crear links
-  // Ejemplo: si "popular_SN" === "X" en ambos, los enlazamos
-  // (Es una condición inventada. Ajusta a lo que quieras.)
-  // Podrías también enlazar "Rebutjat" con "Ignorat", etc.
-  let links = [];
-  for (let i=0; i<nodes.length; i++) {
-    for (let j=i+1; j<nodes.length; j++) {
-      const f1 = dataFilas[i];
-      const f2 = dataFilas[j];
-      // Condición de ejemplo: ambos son "populares"
-      if (f1.popular_SN === 'X' && f2.popular_SN === 'X') {
-        links.push({ source: f1.id_alumne, target: f2.id_alumne });
+        const data = await response.json();
+        console.log('Datos recibidos:', data);
+        return data;
+      } catch (error) {
+        console.error('Error al cargar datos del sociograma:', error);
+        document.getElementById('sociograma-container').innerHTML = `
+          <p style="color: red;">Error al cargar datos del sociograma.</p>`;
       }
     }
-  }
 
-  // Configuramos el width/height del SVG
-  const width  = document.getElementById('graphContainer').clientWidth;
-  const height = document.getElementById('graphContainer').clientHeight;
+    // Paso 3: Renderiza el gráfico con los datos obtenidos
+    async function renderSociograma() {
+      const data = await fetchSociogramaData();
+      if (!data) return;
 
-  // 4. Creamos el SVG en d3
-  const svg = d3.select('#graphContainer')
-    .append('svg')
-    .attr('width', width)
-    .attr('height', height);
+      const width = 800;
+      const height = 600;
 
-  // 5. Fuerza
-  const forceSimulation = d3.forceSimulation(nodes)
-    .force('link', d3.forceLink(links).id(d => d.id).distance(80))
-    .force('charge', d3.forceManyBody().strength(-100))
-    .force('center', d3.forceCenter(width / 2, height / 2));
+      // Crear SVG para el gráfico
+      const svg = d3.select('#chart')
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height);
 
-  // 6. Dibujar los enlaces
-  const link = svg.selectAll('.link')
-    .data(links)
-    .enter()
-    .append('line')
-    .attr('stroke', '#999')
-    .attr('stroke-width', 2);
+      // Ejemplo simple: Renderizar nodos de alumnos
+      const nodes = data.map((d) => ({
+        id: d.id_alumne,
+        name: d.nom_alumne,
+        aggressiveness: d.totalAgressivitat,
+      }));
 
-  // 7. Dibujar los nodos
-  const node = svg.selectAll('.node')
-    .data(nodes)
-    .enter()
-    .append('circle')
-    .attr('r', 15)
-    .attr('fill', '#69b3a2')
-    .call(drag(forceSimulation));
+      const simulation = d3.forceSimulation(nodes)
+        .force('charge', d3.forceManyBody().strength(-50))
+        .force('center', d3.forceCenter(width / 2, height / 2))
+        .force('collision', d3.forceCollide(20));
 
-  // Texto en nodos (opcional)
-  const labels = svg.selectAll('.label')
-    .data(nodes)
-    .enter()
-    .append('text')
-    .text(d => d.name || d.id)
-    .attr('font-size', '12px')
-    .attr('text-anchor', 'middle')
-    .attr('dy', '.35em')
-    .attr('fill', 'white');
+      const nodeElements = svg.selectAll('circle')
+        .data(nodes)
+        .enter()
+        .append('circle')
+        .attr('r', 15)
+        .attr('fill', 'steelblue')
+        .attr('stroke', 'white')
+        .attr('stroke-width', 2);
 
-  // 8. En cada tick, actualizamos posiciones
-  forceSimulation.on('tick', () => {
-    link
-      .attr('x1', d => d.source.x)
-      .attr('y1', d => d.source.y)
-      .attr('x2', d => d.target.x)
-      .attr('y2', d => d.target.y);
+      const labelElements = svg.selectAll('text')
+        .data(nodes)
+        .enter()
+        .append('text')
+        .text((d) => d.name)
+        .attr('font-size', '12px')
+        .attr('text-anchor', 'middle')
+        .attr('dy', 4);
 
-    node
-      .attr('cx', d => d.x)
-      .attr('cy', d => d.y);
+      simulation.on('tick', () => {
+        nodeElements
+          .attr('cx', (d) => d.x)
+          .attr('cy', (d) => d.y);
 
-    labels
-      .attr('x', d => d.x)
-      .attr('y', d => d.y);
-  });
-
-  // Drag & drop para nodos
-  function drag(simulation) {
-    function dragstarted(event, d) {
-      if (!event.active) simulation.alphaTarget(0.3).restart();
-      d.fx = d.x; d.fy = d.y;
+        labelElements
+          .attr('x', (d) => d.x)
+          .attr('y', (d) => d.y);
+      });
     }
-    function dragged(event, d) {
-      d.fx = event.x; d.fy = event.y;
-    }
-    function dragended(event, d) {
-      if (!event.active) simulation.alphaTarget(0);
-      d.fx = null; d.fy = null;
-    }
-    return d3.drag()
-      .on('start', dragstarted)
-      .on('drag', dragged)
-      .on('end', dragended);
-  }
 
-</script>
+    // Ejecuta la función de renderizado
+    renderSociograma();
+  </script>
 </body>
+</html>
