@@ -71,8 +71,9 @@ io.on('connection', (socket) => {
     });
 
     socket.on('afegirFormulari', async (data) => {
-        const { email, formulari, sessionId, userId } = data;
+        const { id_classe,email, formulari, sessionId, userId } = data;
         console.log(formulari)
+        console.log(id_classe)
         if (!sessionId || !userId) {
             return socket.emit('error', "No Autenticat");
         }
@@ -87,7 +88,7 @@ io.on('connection', (socket) => {
             return socket.emit('error', "Falten camps");
         }
 
-        const resposta = await putSQL("formulari", { userId, formulariAfegir });
+        const resposta = await putSQL("formulari", { id_classe, userId, formulariAfegir });
         const resposta2 = await putSQL("formulariAlumne", {userId});
         console.log(resposta2);
         socket.emit('formulariAfegit', resposta);
