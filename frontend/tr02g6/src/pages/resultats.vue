@@ -18,7 +18,7 @@
                     <v-row>
                         <v-col cols="12">
                             <div class="result-preview">
-                                <iframe src="../../public/grafico.html" frameborder="0" class="result-iframe"></iframe>
+                                <iframe src="../../public/grafico2.html" frameborder="0" class="result-iframe"></iframe>
                             </div>
                         </v-col>
                     </v-row>
