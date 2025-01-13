@@ -349,6 +349,19 @@ app.post("/registre", async (req, res) => {
     
 });
 
+  app.get("/resultats", async (req, res) => {
+    id_classe= req.query.id_classe;
+    sessionId = req.query.sessionId;
+    userId = req.query.userId;
+    if (!req.query.sessionId || !req.query.userId) {
+        return res.json({missatge: "No Autenticat"});
+    } else {
+        const resultats = await getSQL("resultats", { id_classe });
+        console.log(resultats)
+        return res.json(resultats);
+    }
+});
+
 
 async function getSQL(endpoint, params = {}) {
     const queryParams = new URLSearchParams(params).toString();

@@ -103,4 +103,9 @@ function navigateToAlum() {
     bottom: 20px;
     right: 20px;
 }
+.result-iframe{
+    width: 1000px;
+    height: 1000px
+
+}
 </style>

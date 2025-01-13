@@ -775,6 +775,29 @@ app.put("/formulariAlumne", (req, res) => {
         });
     });
 });
+app.get("/resultats", (req, res) => {
+    const id_classe = req.query.id_classe;
+
+    pool.getConnection((err, connection) => {
+        if (err) {
+            console.error('Error getting connection from pool:', err);
+            res.status(500).send("Error al obtenir connexió");
+            return;
+        }
+        const query = `SELECT email FROM Tutors WHERE id_classe=?`;
+        connection.query(query, [id_classe], (err, results) => {
+            if (err) {
+                classes = err;
+                console.error('Error:', err);
+            } else {
+                classes = results;
+                console.log("RESULTADO DE SQL", classes)
+            }
+
+            res.json(classes);
+        });
+    });
+});
 
 function convertirNomsAId(id_alumne, formulari) {
     var alumneResposta = null;
