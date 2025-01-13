@@ -13,6 +13,7 @@ var alumnes = [];
 var tutorsContrassenya = [];
 var alumnesContrassenya = [];
 var respostes = [];
+var resultats = [];
 
 const dbNom = process.env.DB_NAME;
 const dbHost = process.env.DB_HOST;
@@ -784,7 +785,31 @@ app.get("/resultats", (req, res) => {
             res.status(500).send("Error al obtenir connexió");
             return;
         }
-        const query = `SELECT email FROM Tutors WHERE id_classe=?`;
+        const query = ` SELECT
+                r.id_enquesta,
+                r.id_alumne,
+                r.totalAgressivitat,
+                r.agressivitatFisica, r.agressivitatVerbal, r.agressivitatRelacional,
+                r.totalAgressivitat_SN,
+                r.agressivitatFisica_SN, r.agressivitatVerbal_SN, r.agressivitatRelacional_SN,
+                r.prosocialitat,
+                r.prosocialitat_SN,
+                r.totalVictimitzacio,
+                r.victimitzacioFisica, r.victimitzacioVerbal, r.victimitzacioRelacional,
+                r.totalVictimitzacio_SN,
+                r.victimitzacioFisica_SN, r.victimitzacioVerbal_SN, r.victimitzacioRelacional_SN,
+                r.popular_SN, r.rebutjat_SN, r.ignorat_SN, r.controvertit_SN, r.normal_SN,
+                r.triesPositives, r.triesNegatives,
+                a.nom_alumne
+            FROM
+                resultats AS r
+            INNER JOIN
+                alumnes AS a
+            ON
+                r.id_alumne = a.id_alumne
+            WHERE
+                r.id_clase = ?
+`;
         connection.query(query, [id_classe], (err, results) => {
             if (err) {
                 classes = err;
