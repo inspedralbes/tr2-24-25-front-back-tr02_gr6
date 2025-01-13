@@ -138,7 +138,7 @@ app.get("/classeAlum", (req, res) => {
             res.status(500).send("Error al obtenir connexió");
             return;
         }
-        const query = `SELECT c.classe,c.codi_random FROM Classes c JOIN Alumnes a ON c.id_classe = a.id_classe WHERE a.id_classe = (
+        const query = `SELECT c.id_classe, c.classe,c.codi_random FROM Classes c JOIN Alumnes a ON c.id_classe = a.id_classe WHERE a.id_classe = (
     SELECT id_classe
     FROM Alumnes
     WHERE email = ?
@@ -780,13 +780,13 @@ app.get("/resultats", (req, res) => {
     const id_classe = req.query.id_classe;
     
     if (!id_classe) {
-        return res.status(400).send("Falta el parámetro id_classe");
+        return res.status(400).json("Falta el parámetro id_classe");
     }
 
     pool.getConnection((err, connection) => {
         if (err) {
             console.error('Error al obtener la conexión:', err);
-            return res.status(500).send("Error al obtener conexión");
+            return res.status(500).json("Error al obtener conexión");
         }
 
         const query = `
@@ -819,7 +819,7 @@ app.get("/resultats", (req, res) => {
                 r.triesPositives,
                 r.triesNegatives,
                 a.nom,
-                a.cognom
+                a.cognoms
             FROM
                 resultats AS r
             INNER JOIN
@@ -835,10 +835,10 @@ app.get("/resultats", (req, res) => {
 
             if (err) {
                 console.error('Error en la consulta SQL:', err);
-                return res.status(500).send("Error al obtener los resultados");
+                return res.status(500).json("Error al obtener los resultados");
             }
 
-            console.log("RESULTADO DE SQL:", results);
+            console.log("RESULTADO DE SQL en /resultats:", results);
             res.json(results); 
         });
     });

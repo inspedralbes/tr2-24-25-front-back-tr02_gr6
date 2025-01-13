@@ -168,6 +168,20 @@ export async function callGetClasseFormaPart(email) {
   }
 }
 
+export async function getResultats(id_classe) {
+  try {
+    console.log("ID QJAAJSJH",id_classe.value)
+    const response = await fetch(`${URL}/resultats?id_classe=${id_classe.value}&sessionId=${sessionId}&userId=${userId}`);
+    const data = await response.json();
+    console.log("Datos recibidos:", data);
+    return data;
+  } catch (error) {
+    console.error("Error en Communication Manager:", error);
+    throw error;
+  }
+}
+
+
 export async function getClasse(email) {
   try {
     const response = await fetch(`${URL}/classe?email=${email}&sessionId=${sessionId}&userId=${userId}`);
@@ -309,22 +323,3 @@ export async function getTutor(id_classe) {
 }
 
 
-export async function getSociograma() {
-  try {
-    if (!sessionId || !userId) {
-      throw new Error('No hay sessionId o userId almacenado');
-    }
-
-    const response = await fetch(`${URL}/resultats?sessionId=${sessionId}&userId=${userId}`);
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Error al obtener datos del sociograma: ${errorText}`);
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error en getSociograma:", error);
-    throw error;
-  }
-}

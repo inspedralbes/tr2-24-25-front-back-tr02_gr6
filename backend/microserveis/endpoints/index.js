@@ -356,8 +356,8 @@ app.post("/registre", async (req, res) => {
     if (!req.query.sessionId || !req.query.userId) {
         return res.json({missatge: "No Autenticat"});
     } else {
-        const resultats = await getSQL("resultats", { id_classe });
-        console.log(resultats)
+        const resultats = await getSQL("resultats", { id_classe,sessionId,userId });
+        console.log("RESULTADOS DEL EDNPOINT /rESUKTATS",resultats)
         return res.json(resultats);
     }
 });
