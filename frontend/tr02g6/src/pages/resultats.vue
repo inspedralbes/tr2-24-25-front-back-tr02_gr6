@@ -46,7 +46,12 @@ const activeTab = ref(1);
 const classe = ref("");
 function esProfe(email) {
     const teNumeros = /\d/;
-    return !teNumeros.test(email);
+    if(teNumeros.test(email)){
+        return false;
+    }
+    else{
+        return true;
+    }
 }
 
 
@@ -65,8 +70,10 @@ function navegarapantalla() {
 function navigateToAlum() {
     if(esProfe(email)){
         router.push('/classProf');}
+        else{
     router.push('/classAlum');
-}
+        }
+    }
 
     onMounted(fetchClasse)
 

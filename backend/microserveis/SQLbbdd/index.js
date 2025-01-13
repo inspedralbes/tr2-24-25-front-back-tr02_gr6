@@ -207,7 +207,6 @@ app.get("/formulariRespost", (req, res) => {
 
 app.get("/alumnesClasseProfe", (req, res) => {
     const email = req.query.email;
-
     if (!email) {
         return res.status(400).json({ error: "Falta el paràmetre email" });
     }
@@ -224,6 +223,7 @@ app.get("/alumnesClasseProfe", (req, res) => {
             INNER JOIN Tutors t ON a.id_classe = t.id_classe
             WHERE t.email = ?
         `;
+        try{
 
         connection.query(query, [email], (err, results) => {
             connection.release();
@@ -238,6 +238,8 @@ app.get("/alumnesClasseProfe", (req, res) => {
 
             res.json(results);
         });
+    }catch(err){
+        console.log(err);}
     });
 });
 
@@ -661,6 +663,34 @@ app.delete("/classe", (req, res) => {
                 getClasses(connection);
                 res.json({ missatge: "classe eliminada" });
                 console.log(`Classe: ${idClasse} eliminada correctament!`)
+            }
+            connection.release();
+        });
+    });
+});
+app.delete("/deleteUser", (req, res) => {
+    const email = req.query.email
+    if (!email) {
+        return res.status(400).send("Falta el paràmetre email");
+    }
+    pool.getConnection((err, connection) => {
+        if (err) {
+            console.error('Error getting connection from pool:', err);
+            res.status(500).send("Error al obtenir connexió");
+            return;
+        }
+
+        const query = `DELETE FROM Alumnes WHERE email = (?)`;
+
+
+        connection.query(query, [email], (err, results) => {
+            if (err) {
+                console.error('Error:', err);
+                res.status(500).json({ error: "Error en eliminar la classe" });
+            } else {
+                getAlumnes(connection);
+                res.json({ missatge: "alumne eliminat" });
+                console.log(`Alumne: ${email} eliminat correctament!`)
             }
             connection.release();
         });

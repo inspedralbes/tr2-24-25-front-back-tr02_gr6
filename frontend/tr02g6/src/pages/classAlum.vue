@@ -27,6 +27,9 @@
                             cols="12" sm="6" md="4"
                         >
                             <v-card class="alumne-card" outlined>
+                                <v-btn icon class="delete-button" @click="deleteUser" >
+                                    <v-icon></v-icon>
+                                </v-btn>
                                 <v-card-title>
                                     <v-avatar class="me-3" color="orange darken-2" size="40">
                                         {{ alumne.nom.charAt(0).toUpperCase() }}
@@ -100,6 +103,15 @@ async function fetchClasse(email) {
         console.log(data);
     } catch (error) {
         console.error("Error al obtener la clase:", error.message);
+    }
+}
+
+async function deleteUser(email) {
+    try {
+        const data = await deleteUser(email);
+        console.log(data);
+    } catch (error) {
+        console.error("Error al eliminar el alumno:", error.message);
     }
 }
 

@@ -30,11 +30,11 @@ export async function callPostProf(profesor) {
   // console.log(formProfesor);
 
   if (!response.ok) {
-    const errorText = await response.text();
+    const errorText = response.text();
     throw new Error(`Error al registrar el profesor: ${errorText}`);
   }
 
-  const nuevoProfesor = await response.json();
+  const nuevoProfesor = response.json();
   return nuevoProfesor;
 };
 export async function redirect(){
@@ -51,7 +51,7 @@ export async function redirect(){
     if (!response.ok) {
       throw new Error(`Error en la solicitud: ${response.status}`);
     }
-    const data = await response.json();
+    const data = response.json();
   
  
     return data;
@@ -70,11 +70,11 @@ export async function callFetchClasses(course) {
     const response = await fetch(`${URL}/classes/${course}?sessionId=${sessionId}&userId=${userId}`);
     console.log(response)
     if (!response.ok) {
-      const errorText = await response.text();
+      const errorText = response.text();
       throw new Error(`Error al obtener datos de clases: ${errorText}`);
     }
 
-    const data = await response.json();
+    const data = response.json();
     console.log(data);
     return data;
   } catch (error) {
@@ -101,11 +101,11 @@ console.log(email)
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
+      const errorText = response.text();
       throw new Error(`Error al agregar clase: ${errorText}`);
     }
 
-    const data = await response.json();
+    const data = response.json();
     return data;
   } catch (error) {
     console.error("Error en callAddClass:", error);
@@ -126,7 +126,7 @@ console.log(email)
       throw new Error(`Error en la solicitud: ${response.status} ${response.statusText}`);
     }
 
-    const data = await response.json();
+    const data = response.json();
     console.log("Clases obtenidas:", data);
 
     return data;
@@ -142,7 +142,7 @@ export async function callGetProf(email, password) {
     if (!response.ok) {
       throw new Error(`Error en la solicitud: ${response.status}`);
     }
-    const data = await response.json();
+    const data = response.json();
 
 
     return data;
@@ -160,7 +160,7 @@ export async function callGetClasseFormaPart(email) {
     if (!response.ok) {
       throw new Error(`Error en la solicitud: ${response.status}`);
     }
-    const data = await response.json();
+    const data = response.json();
     return data;
   } catch (error) {
     console.error("Error en Communication Manager:", error);
@@ -175,7 +175,21 @@ export async function getClasse(email) {
     if (!response.ok) {
       throw new Error(`Error en la solicitud: ${response.status}`);
     }
-    const data = await response.json();
+    const data = response.json();
+    return data;
+  } catch (error) {
+    console.error("Error en Communication Manager:", error);
+    throw error;
+  }
+}
+export async function deleteUser(email) {
+  try {
+    const response = await fetch(`${URL}/deleteUser?email=${email}&sessionId=${sessionId}&userId=${userId}`);
+    console.log(response)
+    if (!response.ok) {
+      throw new Error(`Error en la solicitud: ${response.status}`);
+    }
+    const data = response.json();
     return data;
   } catch (error) {
     console.error("Error en Communication Manager:", error);
@@ -190,7 +204,7 @@ export async function getFormulariRespost(email) {
     if (!response.ok) {
       throw new Error(`Error en la solicitud: ${response.status}`);
     }
-    const data = await response.json();
+    const data = response.json();
     return data;
   } catch (error) {
     console.error("Error en Communication Manager:", error);

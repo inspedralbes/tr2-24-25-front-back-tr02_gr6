@@ -155,6 +155,7 @@ app.get("/alumnes", async (req, res) => {
 });
 
 app.get("/alumnesClasse", async (req, res) => {
+    try{
     sessionId = req.query.sessionId;
     userId = req.query.userId;
     email= req.query.email;
@@ -170,14 +171,17 @@ app.get("/alumnesClasse", async (req, res) => {
         const alumnes = await getSQL("alumnesClasseAlumne", { email,sessionId, userId });
         return res.json(alumnes);
     }
-
+} catch(error){
+    console.log("Error /alumnesClasse: " + error);
     res.json({missatge: "No Autenticat"});
+}
 });
 
 app.get("/classe", async (req, res) => {
     sessionId = req.query.sessionId;
     userId = req.query.userId;
     email= req.query.email;
+    try{
     if (!req.query.sessionId || !req.query.userId) {
         return res.json({missatge: "No Autenticat"});
     }
@@ -192,8 +196,11 @@ app.get("/classe", async (req, res) => {
         console.log(alumnes)
         return res.json(alumnes);
     }
-    
-});
+}catch(error){   
+        res.json({missatge: error});
+    }
+}
+);
 
 app.get("/formulariRespost", async (req, res) => {
     sessionId = req.query.sessionId;
@@ -226,6 +233,7 @@ app.get("/haFetFormulari", async (req, res) => {
 });
 
 app.get("/classeForma", async (req, res) => {
+    try{
     email= req.query.email;
     sessionId = req.query.sessionId;
     userId = req.query.userId;
@@ -242,8 +250,11 @@ app.get("/classeForma", async (req, res) => {
         console.log(alumnes)
         return res.json(alumnes);
     }
-
-});
+    }
+    catch(error){  
+        console.log("Error /classeForma: " + error);
+    }
+    });
 
 app.get("/tutor", async (req, res) => {
     id_classe= req.query.id_classe;
@@ -293,6 +304,20 @@ app.delete("/classes", async (req, res) => {
         res.json(classes);
     }
 });
+
+app.delete("/deleteUser", async (req, res) => {
+    sessionId = req.query.sessionId;
+    userId = req.query.userId;
+    email = req.query.email;
+    if (!req.query.sessionId || !req.query.userId) {
+        res.json({missatge: "No Autenticat"});
+    } else {
+        const alumnes = await deleteSQL("deleteUser", { idClasse });
+        res.json(alumnes);
+    }
+});
+
+
 
 app.put("/classes", async (req, res) => {
     sessionId = req.query.sessionId;
