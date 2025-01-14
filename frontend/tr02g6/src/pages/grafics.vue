@@ -10,6 +10,7 @@
       <v-tabs v-model="activeTab" align="center">
         <v-tab class="tabtab" @click="navigateToAlum()">Alumnes Registrats</v-tab>
         <v-tab class="tabtab">Resultats</v-tab>
+        <v-tab class="tabtab" @click="navigateToGrafic()">Gràfics específics</v-tab>
       </v-tabs>
 
       <v-row>
@@ -260,6 +261,11 @@ function initD3Chart(category, svgElement, filterFn, sizeValueFn = null) {
 function navegarapantalla() {
   router.push("/formPage");
 }
+
+function navigateToGrafic() {
+  router.push("/grafico");
+}
+
 
 function navigateToAlum() {
   if (esProfe(email)) {

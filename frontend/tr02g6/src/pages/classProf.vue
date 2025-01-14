@@ -11,10 +11,11 @@
                 </v-btn>
             </v-col>
         </v-row>
-        <v-tabs v-model="activeTab" align="center">
-            <v-tab class="tabtab">Alumnes Registrats</v-tab>
-            <v-tab class="tabtab" @click="navigateToResult()">Resultats</v-tab>
-        </v-tabs>
+            <v-tabs v-model="activeTab" align="center">
+                <v-tab class="tabtab">Alumnes Registrats</v-tab>
+                <v-tab class="tabtab" @click="navigateToResult()">Resultats</v-tab>
+                <v-tab class="tabtab" @click="navigateToGrafic()">Gràfics específics</v-tab>
+            </v-tabs>
 
         <v-row v-if="showCodiRandom" class="my-5">
             <v-col cols="12">
@@ -56,6 +57,7 @@ import { useUserStore } from '@/stores/userStore';
 import { getAlumnes, getClasse, getProcessData, redirect } from '@/services/communicationManager';
 import { useRouter } from 'vue-router';
 import { io } from 'socket.io-client';
+const activeTab = ref(0);
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -125,6 +127,10 @@ function navigateToResult() {
   } else {
     router.push('/grafics');
   }
+}
+
+function navigateToGrafic() {
+    router.push("/grafico");
 }
 
 function inici() {
