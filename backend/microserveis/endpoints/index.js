@@ -71,8 +71,9 @@ io.on('connection', (socket) => {
     });
 
     socket.on('afegirFormulari', async (data) => {
-        const { email, formulari, sessionId, userId } = data;
+        const { id_classe,email, formulari, sessionId, userId } = data;
         console.log(formulari)
+        console.log(id_classe)
         if (!sessionId || !userId) {
             return socket.emit('error', "No Autenticat");
         }
@@ -87,7 +88,7 @@ io.on('connection', (socket) => {
             return socket.emit('error', "Falten camps");
         }
 
-        const resposta = await putSQL("formulari", { userId, formulariAfegir });
+        const resposta = await putSQL("formulari", { id_classe, userId, formulariAfegir });
         const resposta2 = await putSQL("formulariAlumne", {userId});
         console.log(resposta2);
         socket.emit('formulariAfegit', resposta);
@@ -111,6 +112,21 @@ app.get("/classes", async (req, res) => {
         return res.json(classes);
     }
 });
+
+app.get("/process", async (req, res) => {
+    id_classe = req.query.id_classe;
+    sessionId = req.query.sessionId;
+    userId = req.query.userId;
+    console.log("DATAS DEL /process",id_classe,sessionId,userId)
+    if (!req.query.sessionId || !req.query.userId) {
+        return res.json("Falten Camps");
+    }
+    if (isAuthProfe(sessionId, userId)||isAuthAlumne(sessionId, userId)) {
+        const classes = await getSQL("process", {id_classe});
+        return res.json(classes);
+    }
+});
+
 
 app.get("/classes/:course_code", async (req, res) => {
     sessionId = req.query.sessionId;
@@ -357,7 +373,6 @@ app.post("/registre", async (req, res) => {
         return res.json({missatge: "No Autenticat"});
     } else {
         const resultats = await getSQL("resultats", { id_classe,sessionId,userId });
-        console.log("RESULTADOS DEL EDNPOINT /rESUKTATS",resultats)
         return res.json(resultats);
     }
 });

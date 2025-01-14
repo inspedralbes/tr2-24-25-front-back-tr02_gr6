@@ -2,23 +2,19 @@
     <v-container>
         <v-row class="header-row">
             <v-col cols="12" class="d-flex align-center justify-space-between">
-                <v-btn icon class="home-button" @click="inici" >
+                <v-btn icon class="home-button" @click="inici">
                     <v-icon>mdi-arrow-left</v-icon>
                 </v-btn>
                 <h1 class="header-title">BENVINGUT/DA {{ userStore.email }} a {{ classe }}!</h1>
-                <v-btn 
-                    icon 
-                    class="code-buthton"
-                    @click="mostrarCodiRandom"
-                >
+                <v-btn icon class="code-buthton" @click="mostrarCodiRandom">
                     <v-icon>mdi-eye</v-icon>
                 </v-btn>
             </v-col>
         </v-row>
-            <v-tabs v-model="activeTab" align="center">
-                <v-tab class="tabtab">Alumnes Registrats</v-tab>
-                <v-tab class="tabtab" @click="navigateToResult()">Resultats</v-tab>
-            </v-tabs>
+        <v-tabs v-model="activeTab" align="center">
+            <v-tab class="tabtab">Alumnes Registrats</v-tab>
+            <v-tab class="tabtab" @click="navigateToResult()">Resultats</v-tab>
+        </v-tabs>
 
         <v-row v-if="showCodiRandom" class="my-5">
             <v-col cols="12">
@@ -38,60 +34,44 @@
                 <h2 class="alumnes-title">ALUMNES REGISTRATS:</h2>
             </v-col>
         </v-row>
-        <v-row align="stretch">
-            <v-col 
-                v-for="alumne in alumnes" 
-                :key="alumne.id_alumne" 
-                cols="12" sm="6" md="4"
-            >
-            <v-card class="alumne-card" outlined>
-                    <v-card-title>
-                        <v-avatar class="me-3" color="orange darken-2" size="40">
-                            {{ alumne.nom.charAt(0).toUpperCase() }}
-                        </v-avatar>
+        <v-row align="stretch"> <v-col v-for="alumne in alumnes" :key="alumne.id_alumne" cols="12" sm="6" md="4">
+                <v-card class="alumne-card" outlined> <v-card-title> <v-avatar class="me-3" color="orange darken-2"
+                            size="40"> {{ alumne.nom.charAt(0).toUpperCase() }} </v-avatar>
                         <div>
                             <h3 class="mb-1">{{ alumne.nom }}</h3>
                             <p>{{ alumne.email }}</p>
-                        </div>
-                    </v-card-title>
-                    <v-card-subtitle>
-                        <v-chip 
-                            :color="alumne.formulari_fet? 'green darken-5' : 'red darken-1'"
-                            dark
-                        >
-                            {{ alumne.formulari_fet >0 ? 'Formulari Completat' : 'Formulari Pendent' }}
-                        </v-chip>
-                    </v-card-subtitle>
-                </v-card>
-            </v-col>
-        </v-row>
+                        </div> 
+                        <v-btn icon color="red darken-2" class="ms-auto"
+                            @click="deleteAlumne(alumne.id_alumne)"> <v-icon>mdi-delete</v-icon> </v-btn>
+                    </v-card-title> <v-card-subtitle> <v-chip
+                            :color="alumne.formulari_fet ? 'green darken-5' : 'red darken-1'" dark> {{
+                                alumne.formulari_fet > 0 ? 'Formulari Completat' : 'Formulari Pendent' }} </v-chip>
+                    </v-card-subtitle> </v-card> </v-col> </v-row>
     </v-container>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useUserStore } from '@/stores/userStore';
-import { getAlumnes, getClasse, redirect } from '@/services/communicationManager';
+import { getAlumnes, getClasse, getProcessData, redirect } from '@/services/communicationManager';
 import { useRouter } from 'vue-router';
 import { io } from 'socket.io-client';
 
 const router = useRouter();
 const userStore = useUserStore();
-
+const aparece = ref("")
 const alumnes = ref([]);
 const email = userStore.email;
 const classe = ref("");
-const codiRandom = ref("");
 const socket = io(import.meta.env.VITE_API_ROUTE_SOCKET);
 const id_classe = ref("");
 const codi_random = ref("");
 const showCodiRandom = ref(false);
-
 async function fetchAlumnes(email) {
     redirect()
     try {
         const data = await getAlumnes(email);
-        if(data.includes("No Autenticat")) {
+        if (data.includes("No Autenticat")) {
             router.push('/');
         }
         alumnes.value = data;
@@ -100,6 +80,17 @@ async function fetchAlumnes(email) {
         console.error("Error al realitzar la solicitud:", error.message);
     }
 };
+async function deleteAlumne(idAlumne) {
+  try {
+    await deleteAlumne(idAlumne, id_classe.value);
+    console.log(idAlumne)
+    alumnes.value = alumnes.value.filter(alumne => alumne.id_alumne !== idAlumne);
+
+    console.log(`Alumno con ID ${idAlumne} eliminado.`);
+  } catch (error) {
+    console.error(`Error al eliminar el alumno con ID ${idAlumne}:`, error.message);
+  }
+}
 
 async function fetchClasse(email) {
     try {
@@ -107,23 +98,40 @@ async function fetchClasse(email) {
         classe.value = data[0].classe;
         id_classe.value = data[0].id_classe;
         codi_random.value = data[0].codi_random;
-        console.log("valores de getclasse" ,data)
+        console.log("valores de getclasse",id_classe.value)
     } catch (error) {
         console.error("Error al realitzar la solicitud:", error.message);
     }
 };
 
+async function fetchProcessData() {
+    try {
+        const data = await getProcessData(id_classe.value);
+        aparece.value = data[0].id_classe;
+        console.log("PROCEEEEEEEEEEEEEES DAAAAAAAAAAAAAAAAAAAATAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",aparece.value)
+    } catch (error) {
+        console.error("Error al realitzar la solicitud:", error.message);
+    }
+};
+
+
 const mostrarCodiRandom = () => {
     showCodiRandom.value = true;
 };
 
-function navigateToResult (){
+function navigateToResult() {
+  if (!aparece.value || aparece.value === "" || Number(aparece.value) < 1) {
     router.push('/resultats');
-};
+  } else {
+    router.push('/grafics');
+  }
+}
 
-function inici(){
+function inici() {
     router.push('/home');
 };
+
+console.log(aparece.value)
 
 socket.on('actualitzarAlumnes', () => {
     fetchAlumnes(email);
@@ -131,6 +139,7 @@ socket.on('actualitzarAlumnes', () => {
 
 onMounted(async () => {
     await fetchClasse(email);
+    await fetchProcessData();
     await fetchAlumnes(email);
 });
 </script>
@@ -141,17 +150,19 @@ onMounted(async () => {
     color: white;
     padding: 20px 0;
 }
+
 .header-title {
     font-weight: bold;
     color: white;
 }
+
 .tabtab,
 .alumnes-title {
-  color: rgb(185, 122, 7);
-  text-transform: uppercase;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 20px;
+    color: rgb(185, 122, 7);
+    text-transform: uppercase;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
 }
 
 .codi-card {
@@ -161,10 +172,12 @@ onMounted(async () => {
     border-radius: 16px;
     padding: 30px;
 }
+
 .codi-title {
     font-size: 2em;
     font-weight: bold;
 }
+
 .codi-text {
     font-size: 3em;
     font-weight: bold;
@@ -176,6 +189,7 @@ onMounted(async () => {
     background-color: #fff8e1;
     border-color: orange;
 }
+
 .alumne-card:hover {
     transform: scale(1.05);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
@@ -190,6 +204,7 @@ onMounted(async () => {
     height: 60px !important;
     border-radius: 30px;
 }
+
 .fixed-button {
     position: fixed;
     bottom: 20px;

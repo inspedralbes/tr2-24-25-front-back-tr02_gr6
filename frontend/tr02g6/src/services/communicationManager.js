@@ -82,6 +82,29 @@ export async function callFetchClasses(course) {
     throw error;
   }
 }
+
+export async function getProcessData(id_classe) {
+ console.log("ID DE ÑA CÑASE MI LOKA 009 TK #BEFFA",id_classe)
+  try {
+    if (!sessionId || !userId) {
+      throw new Error('No hay sessionId o userId almacenado');
+    }
+
+    const response = await fetch(`${URL}/process/?id_classe=${id_classe}&sessionId=${sessionId}&userId=${userId}`);
+    console.log(response)
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Error al obtener datos de clases: ${errorText}`);
+    }
+
+    const data = await response.json();
+    console.log(data);
+    return data;
+  } catch (error) {
+    console.error("Error en Communication Manager:", error);
+    throw error;
+  }
+}
 export async function callAddClass(email,classeData) {
   try {
     const sessionStore = useSessionStore();
@@ -190,6 +213,7 @@ export async function getClasse(email) {
       throw new Error(`Error en la solicitud: ${response.status}`);
     }
     const data = await response.json();
+    console.log(data)
     return data;
   } catch (error) {
     console.error("Error en Communication Manager:", error);
@@ -212,9 +236,10 @@ export async function getFormulariRespost(email) {
   }
 }
 
-export async function postResultats(email, formulari) {
+export async function postResultats(id_classe, email, formulari) {
   const socket = io(`${URL_SOCKET}`);
   return new Promise((resolve, reject) => {
+    console.log(id_classe);
     console.log(formulari);
     console.log(email);
     console.log(sessionId);
@@ -231,12 +256,11 @@ export async function postResultats(email, formulari) {
         socket.disconnect();
         reject(new Error(error.missatge || 'Error en afegir el formulari'));
       });
-
-      socket.emit('afegirFormulari', { email, formulari, sessionId, userId });
+      console.log("Emit afegirFormulari: ", { id_classe, email, formulari, sessionId, userId });
+      socket.emit('afegirFormulari', { id_classe, email, formulari, sessionId, userId });
     });
 
     socket.on('connect_error', (err) => {
-      console.error('Error de connexió al socket:', err);
       reject(new Error('No es pot connectar al servidor de WebSocket.'));
     });
   });
@@ -267,7 +291,6 @@ export function callPutClass(email, codi_classe) {
     });
 
     socket.on('connect_error', (err) => {
-      console.error('Error de connexió al socket:', err);
       reject(new Error('No es pot connectar al servidor de WebSocket.'));
     });
   });
@@ -302,7 +325,6 @@ export function getAlumnes(email) {
     });
 
     socket.on('connect_error', (err) => {
-      console.error('Error de connexió al socket:', err);
       reject(new Error('No es pot connectar al servidor de WebSocket.'));
     });
 

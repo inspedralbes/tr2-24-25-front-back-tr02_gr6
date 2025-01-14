@@ -155,6 +155,28 @@ app.get("/classeAlum", (req, res) => {
     });
 });
 
+app.get("/process", (req, res) => {
+    const id_classe = req.query.id_classe;
+    pool.getConnection((err, connection) => {
+        if (err) {
+            console.error('Error getting connection from pool:', err);
+            res.status(500).send("Error al obtenir connexió");
+            return;
+        }
+        const query = `SELECT * FROM resultats WHERE id_classe = ? `;
+        connection.query(query, [id_classe], (err, results) => {
+            if (err) {
+                console.error('Error:', err);
+            } else {
+                classes = results;
+            }
+
+            res.json(classes);
+        });
+    });
+});
+
+
 app.get("/classeProf", (req, res) => {
     const email = req.query.email;
     pool.getConnection((err, connection) => {
@@ -163,7 +185,7 @@ app.get("/classeProf", (req, res) => {
             res.status(500).send("Error al obtenir connexió");
             return;
         }
-        const query = `SELECT c.classe,c.id_classe,c.codi_random FROM Classes c JOIN Tutors a ON c.id_classe = a.id_classe WHERE a.id_classe = (
+        const query = `SELECT c.id_classe,c.classe,c.codi_random FROM Classes c JOIN Tutors a ON c.id_classe = a.id_classe WHERE a.id_classe = (
     SELECT id_classe
     FROM Tutors
     WHERE email = ?
@@ -703,6 +725,7 @@ app.put("/classe", (req, res) => {
 });
 
 app.put("/formulari", (req, res) => {
+    const id_classe=req.query.id_classe;
     const id_alumne = req.query.userId
     const alumneAmbFormulari = false;
     for (const resposta in respostes) {
@@ -732,9 +755,9 @@ app.put("/formulari", (req, res) => {
                 return;
             }
 
-            const query = `INSERT INTO Respostes (id_alumne, soc_POS_1, soc_POS_2, soc_POS_3, soc_NEG_1, soc_NEG_2, soc_NEG_3, ar_i_1, ar_i_2, ar_i_3, pros_1, pros_2, pros_3, af_1, af_2, af_3, ar_d_1, ar_d_2, ar_d_3, pros_2_1, pros_2_2, pros_2_3, av_1, av_2, av_3, vf_1, vf_2, vf_3, vv_1, vv_2, vv_3, vr_1, vr_2, vr_3, amics_1, amics_2, amics_3) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
+            const query = `INSERT INTO Respostes (id_classe, id_alumne, soc_POS_1, soc_POS_2, soc_POS_3, soc_NEG_1, soc_NEG_2, soc_NEG_3, ar_i_1, ar_i_2, ar_i_3, pros_1, pros_2, pros_3, af_1, af_2, af_3, ar_d_1, ar_d_2, ar_d_3, pros_2_1, pros_2_2, pros_2_3, av_1, av_2, av_3, vf_1, vf_2, vf_3, vv_1, vv_2, vv_3, vr_1, vr_2, vr_3, amics_1, amics_2, amics_3) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
 
-            connection.query(query, [id_alumne, formulari.cauBe[0], formulari.cauBe[1], formulari.cauBe[2], formulari.noCauBe[0], formulari.noCauBe[1], formulari.noCauBe[2], formulari.correRumors[0], formulari.correRumors[1], formulari.correRumors[2], formulari.ajuda[0], formulari.ajuda[1], formulari.ajuda[2], formulari.donaEmpentes[0], formulari.donaEmpentes[1], formulari.donaEmpentes[2], formulari.noDeixaParticipar[0], formulari.noDeixaParticipar[1], formulari.noDeixaParticipar[2], formulari.anima[0], formulari.anima[1], formulari.anima[2], formulari.insulta[0], formulari.insulta[1], formulari.insulta[2], formulari.esEmpentat[0], formulari.esEmpentat[1], formulari.esEmpentat[2], formulari.esInsultat[0], formulari.esInsultat[1], formulari.esInsultat[2], formulari.esAillat[0], formulari.esAillat[1], formulari.esAillat[2], formulari.esAmic[0], formulari.esAmic[1], formulari.esAmic[2]], (err, results) => {
+            connection.query(query, [id_classe, id_alumne, formulari.cauBe[0], formulari.cauBe[1], formulari.cauBe[2], formulari.noCauBe[0], formulari.noCauBe[1], formulari.noCauBe[2], formulari.correRumors[0], formulari.correRumors[1], formulari.correRumors[2], formulari.ajuda[0], formulari.ajuda[1], formulari.ajuda[2], formulari.donaEmpentes[0], formulari.donaEmpentes[1], formulari.donaEmpentes[2], formulari.noDeixaParticipar[0], formulari.noDeixaParticipar[1], formulari.noDeixaParticipar[2], formulari.anima[0], formulari.anima[1], formulari.anima[2], formulari.insulta[0], formulari.insulta[1], formulari.insulta[2], formulari.esEmpentat[0], formulari.esEmpentat[1], formulari.esEmpentat[2], formulari.esInsultat[0], formulari.esInsultat[1], formulari.esInsultat[2], formulari.esAillat[0], formulari.esAillat[1], formulari.esAillat[2], formulari.esAmic[0], formulari.esAmic[1], formulari.esAmic[2]], (err, results) => {
 
                 if (err) {
                     console.error('Error:', err);
@@ -837,8 +860,6 @@ app.get("/resultats", (req, res) => {
                 console.error('Error en la consulta SQL:', err);
                 return res.status(500).json("Error al obtener los resultados");
             }
-
-            console.log("RESULTADO DE SQL en /resultats:", results);
             res.json(results); 
         });
     });

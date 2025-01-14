@@ -1,6 +1,6 @@
 <!-- eslint-disable no-undef -->
 <script setup>
-import { getAlumnes, postResultats, redirect } from '@/services/communicationManager';
+import { getAlumnes, getClasse, postResultats, redirect } from '@/services/communicationManager';
 import { onBeforeMount, onMounted, ref, watch } from 'vue'
 import { useUserStore } from '../stores/userStore';
 import { useRouter } from 'vue-router';
@@ -43,12 +43,34 @@ const listaarrays = [
   victima_no_deja_participar,
   amigos
 ];
+const id_classe=ref("")
+
+async function rellenarAutomatico() {
+  const getRandomAlumnos = () => {
+    const shuffled = [...alumnos.value].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, 3);
+  };
+
+  listaarrays.forEach((array) => {
+    array.value = getRandomAlumnos();
+  });
+}
+
+
 listaarrays.forEach((array) => {
   watch(array, (newVal) => {
     limitSelections(newVal);
   });
 });
-
+async function fetchClasse(){
+    try {
+        const data = await getClasse(email);
+        id_classe.value = data[0].id_classe;
+        console.log("ID DE LA CLASSE:   ",id_classe.value);
+    } catch (error) {
+        console.error("Error:", error.message);
+    }
+}
 async function fecthGetAlumnos() {
   try {
     const llista_alumnes = await getAlumnes(email);
@@ -60,9 +82,10 @@ async function fecthGetAlumnos() {
     console.error('Error en obtenir els correus', error);
   }
 }
-onMounted(() => {
-  fecthGetAlumnos();
+onMounted(async () => {
   redirect();
+  await fecthGetAlumnos();
+  await fetchClasse();
 });
 
 const navegarapantalla = () => {
@@ -91,7 +114,7 @@ async function fetchPostResultats() {
         esAmic: amigos.value,
       }
       console.log(formulariEnviar);
-      const resultats = await postResultats(email, formulariEnviar);
+      const resultats = await postResultats(id_classe.value,email, formulariEnviar);
       console.log("Formulario enviado con éxito:", resultats);
       cae_bien.value = '';
       cae_no_bien.value = '';
@@ -190,6 +213,10 @@ async function fetchPostResultats() {
       <v-text-field disabled :label="amigos[1]" />
       <v-text-field disabled :label="amigos[2]" />
     </div>
+    <v-btn type="button" color="primary" @click="rellenarAutomatico">
+      Rellenar automáticamente
+    </v-btn>
+
     <v-btn type="submit" @click="fetchPostResultats">
       Enviar
     </v-btn>

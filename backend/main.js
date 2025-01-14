@@ -9,6 +9,7 @@ const contrassenya = process.env.CONTRASSENYA_MICROSERVEIS;
 const { Server } = require('socket.io');
 require('dotenv').config({ path: path.resolve(__dirname, './.env') });
 const port = process.env.PORT_MAIN;
+const { spawn } = require('child_process');
 
 const app = express();
 app.use(cors());
@@ -132,6 +133,31 @@ io.on('connection', (socket) => {
         console.log('user disconnected');
     });
 });
+
+app.use(express.json());
+
+app.post('/run-calculations', (req, res) => {
+  const { id_classe } = req.body;
+  if (!id_classe) {
+    return res.status(400).send({ error: 'id_classe is required' });
+  }
+
+  const process = spawn('node', ['main2.js', id_classe]);
+
+  process.stdout.on('data', (data) => {
+    console.log(`stdout: ${data}`);
+  });
+
+  process.stderr.on('data', (data) => {
+    console.error(`stderr: ${data}`);
+  });
+
+  process.on('close', (code) => {
+    console.log(`Proceso finalizado con código ${code}`);
+    res.send({ message: 'Cálculo completado', code });
+  });
+});
+
 
 app.get("/processos", (req, res) => {
     const contrassenyaUser = req.query.contrassenya;
