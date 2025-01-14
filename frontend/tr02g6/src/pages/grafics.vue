@@ -91,7 +91,7 @@ async function getidClase() {
 
 async function fetchSociograma() {
   try {
-    const data = await getResultats(id_classe);
+    const data = await getResultats(id_classe.value);
     sociogramaData.value = data;
 
     console.log("bolas", data);

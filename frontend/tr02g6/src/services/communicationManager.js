@@ -193,8 +193,8 @@ export async function callGetClasseFormaPart(email) {
 
 export async function getResultats(id_classe) {
   try {
-    console.log("ID QJAAJSJH",id_classe.value)
-    const response = await fetch(`${URL}/resultats?id_classe=${id_classe.value}&sessionId=${sessionId}&userId=${userId}`);
+    console.log("ID QJAAJSJH",id_classe)
+    const response = await fetch(`${URL}/resultats?id_classe=${id_classe}&sessionId=${sessionId}&userId=${userId}`);
     const data = await response.json();
     console.log("Datos recibidos:", data);
     return data;

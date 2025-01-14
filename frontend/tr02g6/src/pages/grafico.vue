@@ -233,6 +233,7 @@ function renderGraphs(alumnes) {
   
   async function fetchSociograma() {
   const sociogramaData = await getResultats(id_classe.value);
+  console.log(id_classe.value)
   data.value = sociogramaData;
   filterAlumnes();
 }
