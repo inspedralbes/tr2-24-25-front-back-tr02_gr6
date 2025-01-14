@@ -11,10 +11,11 @@
                 </v-btn>
             </v-col>
         </v-row>
-        <v-tabs v-model="activeTab" align="center">
-            <v-tab class="tabtab">Alumnes Registrats</v-tab>
-            <v-tab class="tabtab" @click="navigateToResult()">Resultats</v-tab>
-        </v-tabs>
+            <v-tabs v-model="activeTab" align="center">
+                <v-tab class="tabtab">Alumnes Registrats</v-tab>
+                <v-tab class="tabtab" @click="navigateToResult()">Resultats</v-tab>
+                <v-tab class="tabtab" @click="navigateToGrafic()">Gràfics específics</v-tab>
+            </v-tabs>
 
         <v-row v-if="showCodiRandom" class="my-5">
             <v-col cols="12">
@@ -42,7 +43,7 @@
                             <p>{{ alumne.email }}</p>
                         </div> 
                         <v-btn icon color="red darken-2" class="ms-auto"
-                            @click="deleteAlumne(alumne.id_alumne)"> <v-icon>mdi-delete</v-icon> </v-btn>
+                            @click="localDeleteAlumne(alumne.id_alumne)"> <v-icon>mdi-delete</v-icon> </v-btn>
                     </v-card-title> <v-card-subtitle> <v-chip
                             :color="alumne.formulari_fet ? 'green darken-5' : 'red darken-1'" dark> {{
                                 alumne.formulari_fet > 0 ? 'Formulari Completat' : 'Formulari Pendent' }} </v-chip>
@@ -53,9 +54,10 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useUserStore } from '@/stores/userStore';
-import { getAlumnes, getClasse, getProcessData, redirect } from '@/services/communicationManager';
+import { getAlumnes, getClasse, getProcessData, redirect,deleteAlumne } from '@/services/communicationManager';
 import { useRouter } from 'vue-router';
 import { io } from 'socket.io-client';
+const activeTab = ref(0);
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -80,9 +82,9 @@ async function fetchAlumnes(email) {
         console.error("Error al realitzar la solicitud:", error.message);
     }
 };
-async function deleteAlumne(idAlumne) {
+async function localDeleteAlumne(idAlumne) {
   try {
-    await deleteAlumne(idAlumne, id_classe.value);
+    await deleteAlumne(idAlumne);
     console.log(idAlumne)
     alumnes.value = alumnes.value.filter(alumne => alumne.id_alumne !== idAlumne);
 
@@ -125,6 +127,10 @@ function navigateToResult() {
   } else {
     router.push('/grafics');
   }
+}
+
+function navigateToGrafic() {
+    router.push("/grafico");
 }
 
 function inici() {

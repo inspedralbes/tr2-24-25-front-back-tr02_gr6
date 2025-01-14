@@ -10,6 +10,7 @@
       <v-tabs v-model="activeTab" align="center">
         <v-tab class="tabtab" @click="navigateToAlum()">Alumnes Registrats</v-tab>
         <v-tab class="tabtab">Resultats</v-tab>
+        <v-tab class="tabtab" @click="navigateToGrafic()">Gràfics específics</v-tab>
       </v-tabs>
 
       <v-row>
@@ -50,6 +51,14 @@ async function getidClase() {
 function navigateToAlum() {
   if (esProfe(email)) {
     router.push("/classProf");
+  } else {
+    router.push("/classAlum");
+  }
+}
+
+function navigateToGrafic() {
+  if (esProfe(email)) {
+    router.push("/grafico");
   } else {
     router.push("/classAlum");
   }
@@ -105,6 +114,7 @@ onMounted(async () => {
   color: white;
   padding: 20px 0;
 }
+
 .tabtab {
   color: rgb(185, 122, 7);
   text-transform: uppercase;
@@ -145,5 +155,27 @@ onMounted(async () => {
 
 .link {
   pointer-events: none;
+}
+
+.node {
+  cursor: pointer;
+}
+
+.circle {
+  fill: lightblue;
+  stroke: #1f77b4;
+  stroke-width: 2px;
+}
+
+.label {
+  font-size: 14px;
+  text-anchor: middle;
+  fill: black;
+}
+
+.subcircle {
+  fill: lightcoral;
+  stroke: #ff6347;
+  stroke-width: 2px;
 }
 </style>
