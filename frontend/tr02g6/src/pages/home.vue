@@ -21,7 +21,6 @@
         <v-row class="mt-8">
           <v-col cols="12" md="4">
             <v-card outlined class="tutorial-card">
-              <iframe src="https://www.empresaiformacio.org/sBid/" frameborder="0" class="result-iframe"></iframe>
               <v-card-title class="card-title">Pas 1: Introduïu el codi</v-card-title>
               <v-card-text>
                 Els professors només han de proporcionar el codi de la classe als alumnes. Aquest codi connecta
@@ -31,7 +30,6 @@
           </v-col>
           <v-col cols="12" md="4">
             <v-card outlined class="tutorial-card">
-              <iframe src="https://www.empresaiformacio.org/sBid/" frameborder="0" class="result-iframe"></iframe>
               <v-card-title class="card-title">Pas 2: Realitza el Form</v-card-title>
               <v-card-text>
                 Els alumnes completen el formulari virtual amb preguntes dissenyades per analitzar les dinàmiques del
@@ -41,7 +39,6 @@
           </v-col>
           <v-col cols="12" md="4">
             <v-card outlined class="tutorial-card">
-              <iframe src="https://www.empresaiformacio.org/sBid/" frameborder="0" class="result-iframe"></iframe>
               <v-card-title class="card-title">Pas 3: Visualització automàtica</v-card-title>
               <v-card-text>
                 Els resultats es processen automàticament i es presenten amb gràfics interactius que expliquen clarament
@@ -60,8 +57,7 @@
                   Aquest gràfic mostra quins alumnes són més populars i quins estan
                   més aïllats en el grup.
                 </v-card-text>
-                <iframe src="https://www.empresaiformacio.org/sBid/" frameborder="0" class="result-iframe"></iframe>
-              </v-card>
+                </v-card>
             </v-col>
             <v-col cols="12" md="6">
               <v-card class="grafic-card">
@@ -70,8 +66,7 @@
                   Identifica els rols dins del grup: líder positiu, líder negatiu,
                   possibles casos de bullying, etc.
                 </v-card-text>
-                <iframe src="https://www.empresaiformacio.org/sBid/" frameborder="0" class="result-iframe"></iframe>
-              </v-card>
+                </v-card>
             </v-col>
           </v-row>
     </v-container>
