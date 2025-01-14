@@ -42,6 +42,17 @@
           <h3>IGNORAT</h3>
           <svg ref="ignoratSvg" class="sociograma-svg"></svg>
         </v-col>
+        <v-col cols="4">
+          <h3>AGRESSIVITAT</h3>
+          <svg ref="agresivitatSvg" class="sociograma-svg"></svg>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="4">
+          <h3>VICTIMITZACIÓ</h3>
+          <svg ref="vicitmitzacioSvg" class="sociograma-svg"></svg>
+        
+        </v-col>
       </v-row>
 
       <v-btn 
@@ -74,6 +85,8 @@ const controvertitSvg = ref(null);
 const normalSvg = ref(null);
 const rebutjatSvg = ref(null);
 const ignoratSvg = ref(null);
+const agresivitatSvg = ref(null);
+const vicitmitzacioSvg = ref(null);
 
 async function getidClase() {
   const data = await getClasse(email);
