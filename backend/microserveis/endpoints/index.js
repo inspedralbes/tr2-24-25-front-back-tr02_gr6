@@ -155,6 +155,32 @@ app.get("/alumnes", async (req, res) => {
     }
 });
 
+
+app.delete("/alumnes", async (req, res) => {
+    const id_alumne = req.query.id_alumne;
+    const sessionId = req.query.sessionId;
+    const userId = req.query.userId;
+
+    if (!sessionId || !userId) {
+        return res.status(401).json({ missatge: "No Autenticat" });
+    }
+    if (!isAuthProfe(sessionId, userId)) {
+        return res.status(401).json({ missatge: "No Autenticat" });
+    }
+    if (!id_alumne) {
+        return res.status(400).json({ missatge: "Falta el paràmetre id_alumne" });
+    }
+
+    try {
+        const alumnes = await deleteSQL("alumne", { id_alumne });
+        res.json(alumnes);
+    } catch (error) {
+        console.error('Error eliminant alumne:', error);
+        res.status(500).json({ missatge: "Error en eliminar alumne" });
+    }
+});
+
+
 app.get("/alumnesClasse", async (req, res) => {
     sessionId = req.query.sessionId;
     userId = req.query.userId;

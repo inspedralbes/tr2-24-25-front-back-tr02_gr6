@@ -41,8 +41,12 @@
                             <h3 class="mb-1">{{ alumne.nom }}</h3>
                             <p>{{ alumne.email }}</p>
                         </div> 
-                        <v-btn icon color="red darken-2" class="ms-auto"
-                            @click="deleteAlumne(alumne.id_alumne)"> <v-icon>mdi-delete</v-icon> </v-btn>
+
+                        <v-btn icon color="red darken-2" class="ms-auto" @click="eliminarAlumne(alumne.id_alumne)">
+                        <v-icon>mdi-delete</v-icon></v-btn>
+
+
+                            
                     </v-card-title> <v-card-subtitle> <v-chip
                             :color="alumne.formulari_fet ? 'green darken-5' : 'red darken-1'" dark> {{
                                 alumne.formulari_fet > 0 ? 'Formulari Completat' : 'Formulari Pendent' }} </v-chip>
@@ -53,9 +57,11 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useUserStore } from '@/stores/userStore';
-import { getAlumnes, getClasse, redirect } from '@/services/communicationManager';
+import { deleteAlumne, getAlumnes, getClasse, redirect } from '@/services/communicationManager';
 import { useRouter } from 'vue-router';
 import { io } from 'socket.io-client';
+
+
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -82,17 +88,19 @@ async function fetchAlumnes(email) {
         console.error("Error al realitzar la solicitud:", error.message);
     }
 };
-async function deleteAlumne(idAlumne) {
-  try {
-    await deleteAlumne(idAlumne, id_classe.value);
-    console.log(idAlumne)
-    alumnes.value = alumnes.value.filter(alumne => alumne.id_alumne !== idAlumne);
 
-    console.log(`Alumno con ID ${idAlumne} eliminado.`);
-  } catch (error) {
-    console.error(`Error al eliminar el alumno con ID ${idAlumne}:`, error.message);
-  }
+async function eliminarAlumne(id_alumne) {
+    console.log("ID recibido:", id_alumne); 
+    redirect();
+    try {
+        const data = await deleteAlumne(id_alumne); 
+        console.log(data);
+    } catch (error) {
+        console.error("Error al realitzar la solicitud:", error.message);
+    }
 }
+
+
 
 async function fetchClasse(email) {
     try {

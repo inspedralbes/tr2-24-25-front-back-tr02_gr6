@@ -667,6 +667,42 @@ app.delete("/classe", (req, res) => {
     });
 });
 
+
+app.delete("/alumnes", (req, res) => {
+    const id_alumne = req.query.id_alumne;
+  
+    if (!id_alumne) {
+        return res.status(400).json({ missatge: "Falta el paràmetre id_alumne" });
+    }
+  
+    pool.getConnection((err, connection) => {
+        if (err) {
+            console.error('Error obteniendo conexión del pool:', err);
+            return res.status(500).json({ missatge: "Error al obtenir connexió" });
+        }
+  
+        const query = "DELETE FROM Alumnes WHERE id_alumne = ?"; 
+  
+        connection.query(query, [id_alumne], (err, results) => {
+            connection.release();
+            if (err) {
+                console.error('Error eliminando alumno:', err);
+                return res.status(500).json({ missatge: "Error en eliminar alumne" });
+            }
+  
+            if (results.affectedRows > 0) {
+                res.json({ missatge: "Alumne eliminat correctament!" });
+                console.log(`Alumne: ${id_alumne} eliminat correctament!`);
+            } else {
+                res.status(404).json({ missatge: "No s'ha trobat l'alumne" });
+            }
+        });
+    });
+});
+
+
+
+
 app.put("/classe", (req, res) => {
     if (!req.query.nomClasse || !req.query.idClasse) {
         return res.status(400).send("Falta el paràmetre nomClasse o idClasse");
