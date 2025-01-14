@@ -1,6 +1,3 @@
-// Supongamos que pasas el idClasse por línea de comandos, por ejemplo:
-// node tuScript.js 123
-
 const idClasse = process.argv[2]; // 2 = primer argumento después de "node tuScript.js"
 if (!idClasse) {
   console.error("Debes indicar un id_classe, por ejemplo: node tuScript.js 123");
