@@ -1,0 +1,10 @@
+/backend/node_modules/
+/frontend/node_modules/
+/backend/.env
+/backend/.env.prod
+/backend/.env.local
+/backend/sessions/alumnes.json
+/backend/sessions/profes.json
+/frontend/tr02g6/dist
+/frontend/tr02g6/.env
+/frontend/tr02g6/.env.production
