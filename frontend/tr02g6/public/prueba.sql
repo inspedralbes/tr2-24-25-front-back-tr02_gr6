@@ -182,27 +182,14 @@ INSERT INTO Classes (classe, codi_random, id_curs) VALUES ('2A', 'TeDIEJPszh', 2
 INSERT INTO Classes (classe, codi_random, id_curs) VALUES ('2B', 'XfutUvmzKo', 2);
 
 INSERT INTO Tutors (email, contrassenya, nom, cognoms, id_classe) VALUES
-('tutor1A@example.com', 'password123', 'Joan', 'Pérez', 1),
+('bb', 'bb', 'Joan', 'Pérez', 1),
 ('tutor1B@example.com', 'password123', 'Anna', 'García', 2),
 ('tutor2A@example.com', 'password123', 'Carla', 'López', 3),
 ('tutor2B@example.com', 'password123', 'Marc', 'Sánchez', 4);
 
 
 INSERT INTO Alumnes (email, contrassenya, nom, cognoms, id_classe) VALUES
-('alumne1A1@example.com', 'alumne123', 'Laura', 'Martínez', 1),
-('alumne1A2@example.com', 'alumne123', 'Pau', 'Fernández', 1),
-('a23alechasan@inspedralbes.cat', 'a', 'Alex', 'Charles', 1),
-('alumne1A3@example.com', 'alumne123', 'Marta', 'García', 1),
-('alumne1A4@example.com', 'alumne123', 'Jordi', 'Roca', 1),
-('alumne1A5@example.com', 'alumne123', 'Sofia', 'Pujol', 1),
-('alumne1A6@example.com', 'alumne123', 'David', 'Salvat', 1),
-('alumne1A7@example.com', 'alumne123', 'Clara', 'Vila', 1),
-('alumne1A8@example.com', 'alumne123', 'Pol', 'Martí', 1),
-('alumne1A9@example.com', 'alumne123', 'Laia', 'Fernández', 1),
-('alumne1A10@example.com', 'alumne123', 'Marcel', 'Ramon', 1),
-('alumne1A11@example.com', 'alumne123', 'Núria', 'Torrens', 1),
-('alumne1A12@example.com', 'alumne123', 'Xavi', 'Soler', 1),
-('alumne1A13@example.com', 'alumne123', 'Àlex', 'Moreno', 1),
+
 ('alumne1A14@example.com', 'alumne123', 'Gemma', 'Nadal', 1),
 ('alumne1A15@example.com', 'alumne123', 'Oriol', 'Costa', 1),
 ('alumne1A16@example.com', 'alumne123', 'Marina', 'Bonet', 1),
