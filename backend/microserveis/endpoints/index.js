@@ -154,29 +154,44 @@ app.get("/alumnes", async (req, res) => {
         res.json(alumnes);
     }
 });
-
-
 app.delete("/alumnes", async (req, res) => {
     const id_alumne = req.query.id_alumne;
     const sessionId = req.query.sessionId;
     const userId = req.query.userId;
 
+    console.log("Parametros recibidos:", { id_alumne, sessionId, userId });
+
     if (!sessionId || !userId) {
         return res.status(401).json({ missatge: "No Autenticat" });
     }
+
     if (!isAuthProfe(sessionId, userId)) {
         return res.status(401).json({ missatge: "No Autenticat" });
     }
+
     if (!id_alumne) {
         return res.status(400).json({ missatge: "Falta el paràmetre id_alumne" });
     }
 
     try {
-        const alumnes = await deleteSQL("alumne", { id_alumne });
-        res.json(alumnes);
+        console.log("Buscando alumno con id_alumne:", id_alumne);
+        const [results] = await connection.query(`SELECT * FROM Alumnes WHERE id_alumne = ?`, [id_alumne]);
+
+        if (results.length === 0) {
+            console.log("No se encontró el alumno con id_alumne:", id_alumne);
+            return res.status(404).json({ missatge: "No s'ha trobat l'alumne" });
+        }
+
+        const [deleteResults] = await connection.query(`DELETE FROM Alumnes WHERE id_alumne = ?`, [id_alumne]);
+        if (deleteResults.affectedRows > 0) {
+            res.json({ missatge: "Alumne eliminat correctament!" });
+            console.log(`Alumne: ${id_alumne} eliminat correctament!`);
+        } else {
+            res.status(404).json({ missatge: "No s'ha trobat l'alumne" });
+        }
     } catch (error) {
-        console.error('Error eliminant alumne:', error);
-        res.status(500).json({ missatge: "Error en eliminar alumne" });
+        console.error("Error durante la eliminación:", error);
+        res.status(500).json({ missatge: "Error en eliminar alumne", error: error.message });
     }
 });
 
@@ -404,19 +419,29 @@ async function postSQL(endpoint, params = {}) {
     });
     return await resposta.json();
 }
-
 async function deleteSQL(endpoint, params = {}) {
     const queryParams = new URLSearchParams(params).toString();
-    const url = queryParams ? `${URL}:${portBBDD}/${endpoint}?${queryParams}` : `${URL}:${portBBDD}/${endpoint}`;
+    const url = queryParams ? `${URL}:${portBBDD}/alumnes?${queryParams}` : `${URL}:${portBBDD}/alumnes`;
 
-    const resposta = await fetch(url, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    });
-    const dades = await resposta.json();
-    return dades;
+    try {s
+        const resposta = await fetch(url, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!resposta.ok) {
+            const errorText = await resposta.text();
+            throw new Error(`Error en la solicitud DELETE: ${errorText}`);
+        }
+
+        const dades = await resposta.json();
+        return dades;
+    } catch (error) {
+        console.error("Error al realizar la solicitud DELETE:", error);
+        throw error;
+    }
 }
 
 async function putSQL(endpoint, params = {}) {

@@ -91,15 +91,23 @@ async function fetchAlumnes(email) {
 
 async function eliminarAlumne(id_alumne) {
     console.log("ID recibido:", id_alumne); 
-    redirect();
+    const sessionId = localStorage.getItem('sessionId'); 
+    const userId = localStorage.getItem('userId'); 
+    alumnes.value = alumnes.value.filter(alumne => alumne.id_alumne !== idAlumne);
+
+
+    if (!sessionId || !userId) {
+        console.error("No se ha encontrado la sesión o el ID de usuario.");
+        return;
+    }
+
     try {
-        const data = await deleteAlumne(id_alumne); 
+        const data = await deleteAlumne(id_alumne, sessionId, userId); 
         console.log(data);
     } catch (error) {
-        console.error("Error al realitzar la solicitud:", error.message);
+        console.error("Error al realizar la solicitud:", error.message);
     }
 }
-
 
 
 async function fetchClasse(email) {

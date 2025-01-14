@@ -112,27 +112,26 @@ console.log(email)
     throw error;
   }
 }
+export async function deleteAlumne(id_alumne, sessionId, userId) {
+  try {
+      const response = await fetch(`${URL}/alumnes?id_alumne=${id_alumne}&sessionId=${sessionId}&userId=${userId}`, {
+          method: "DELETE", 
+          headers: {
+              "Content-Type": "application/json",
+          },
+      });
 
-export async function deleteAlumne(id_alumne) {
-    try {
-        const response = await fetch(`${URL}/alumnes?id_alumne=${id_alumne}&sessionId=${sessionId}&userId=${userId}`, {
-            method: "DELETE", 
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
+      if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Error al eliminar alumno: ${errorText}`);
+      }
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Error al eliminar alumno: ${errorText}`);
-        }
-
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error("Error en deleteAlumne:", error);
-        throw error;
-    }
+      const data = await response.json();
+      return data;
+  } catch (error) {
+      console.error("Error en deleteAlumne:", error);
+      throw error;
+  }
 }
 
 
