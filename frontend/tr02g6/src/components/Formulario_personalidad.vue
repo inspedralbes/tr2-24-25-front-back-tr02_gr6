@@ -45,6 +45,18 @@ const listaarrays = [
 ];
 const id_classe=ref("")
 
+async function rellenarAutomatico() {
+  const getRandomAlumnos = () => {
+    const shuffled = [...alumnos.value].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, 3);
+  };
+
+  listaarrays.forEach((array) => {
+    array.value = getRandomAlumnos();
+  });
+}
+
+
 listaarrays.forEach((array) => {
   watch(array, (newVal) => {
     limitSelections(newVal);
@@ -201,6 +213,10 @@ async function fetchPostResultats() {
       <v-text-field disabled :label="amigos[1]" />
       <v-text-field disabled :label="amigos[2]" />
     </div>
+    <v-btn type="button" color="primary" @click="rellenarAutomatico">
+      Rellenar automáticamente
+    </v-btn>
+
     <v-btn type="submit" @click="fetchPostResultats">
       Enviar
     </v-btn>

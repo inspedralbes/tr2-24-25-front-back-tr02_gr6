@@ -1,3 +1,4 @@
+DROP DATABASE tr6;
 CREATE DATABASE tr6;
 
 USE tr6;
@@ -41,7 +42,15 @@ CREATE TABLE Alumnes (
 );
 
 CREATE TABLE `Respostes` (
+  `id_classe` int(11) NOT NULL,
   `id_alumne` int(11) NOT NULL,
+  `numero_alumno` int(11) DEFAULT NULL,
+  `nom` varchar(255) DEFAULT NULL, 
+  `genero` enum('Noi','Noia') DEFAULT NULL,
+  `clase` varchar(255) DEFAULT NULL,
+  `tutor` varchar(255) DEFAULT NULL,
+  `centro` varchar(255) DEFAULT NULL,
+  `poblacion` varchar(255) DEFAULT NULL,
   `soc_POS_1` int(11) DEFAULT NULL,
   `soc_POS_2` int(11) DEFAULT NULL,
   `soc_POS_3` int(11) DEFAULT NULL,
@@ -77,9 +86,122 @@ CREATE TABLE `Respostes` (
   `vr_3` int(11) DEFAULT NULL,
   `amics_1` int(11) DEFAULT NULL,
   `amics_2` int(11) DEFAULT NULL,
-  `amics_3` int(11) DEFAULT NULL,
-  FOREIGN KEY (id_alumne) REFERENCES Alumnes (id_alumne)
-);
+  `amics_3` int(11) DEFAULT NULL
+) 
+;
+
+
+CREATE TABLE `respostes_processades` (
+  `id_classe` int(11) NOT NULL,
+  `id_alumne` int(11) NOT NULL,
+  `nom_alumne` varchar(255) DEFAULT NULL,
+  `soc_POS` int(11) DEFAULT NULL,
+  `soc_NEG` int(11) DEFAULT NULL,
+  `ar_i` int(11) DEFAULT NULL,
+  `pros` int(11) DEFAULT NULL,
+  `af` int(11) DEFAULT NULL,
+  `ar_d` int(11) DEFAULT NULL,
+  `pros_2` int(11) DEFAULT NULL,
+  `av` int(11) DEFAULT NULL,
+  `vf` int(11) DEFAULT NULL,
+  `vv` int(11) DEFAULT NULL,
+  `vr` int(11) DEFAULT NULL,
+  `amics` int(11) DEFAULT NULL
+) 
+;
+CREATE TABLE `resultats` (
+  `id_classe` int(11) NOT NULL,
+  `id_alumne` int(11) NOT NULL,
+  `totalAgressivitat` int(11) DEFAULT NULL,
+  `agressivitatFisica` int(11) DEFAULT NULL,
+  `agressivitatVerbal` int(11) DEFAULT NULL,
+  `agressivitatRelacional` int(11) DEFAULT NULL,
+  `totalAgressivitat_SN` varchar(1) DEFAULT NULL,
+  `agressivitatFisica_SN` varchar(1) DEFAULT NULL,
+  `agressivitatVerbal_SN` varchar(1) DEFAULT NULL,
+  `agressivitatRelacional_SN` varchar(1) DEFAULT NULL,
+  `prosocialitat` int(11) DEFAULT NULL,
+  `prosocialitat_SN` varchar(1) DEFAULT NULL,
+  `totalVictimitzacio` int(11) DEFAULT NULL,
+  `victimitzacioFisica` int(11) DEFAULT NULL,
+  `victimitzacioVerbal` int(11) DEFAULT NULL,
+  `victimitzacioRelacional` int(11) DEFAULT NULL,
+  `totalVictimitzacio_SN` varchar(1) DEFAULT NULL,
+  `victimitzacioFisica_SN` varchar(1) DEFAULT NULL,
+  `victimitzacioVerbal_SN` varchar(1) DEFAULT NULL,
+  `victimitzacioRelacional_SN` varchar(1) DEFAULT NULL,
+  `popular_SN` varchar(1) DEFAULT NULL,
+  `rebutjat_SN` varchar(1) DEFAULT NULL,
+  `ignorat_SN` varchar(1) DEFAULT NULL,
+  `controvertit_SN` varchar(1) DEFAULT NULL,
+  `normal_SN` varchar(1) DEFAULT NULL,
+  `triesPositives` int(11) DEFAULT NULL,
+  `triesNegatives` int(11) DEFAULT NULL
+) 
+;
+INSERT INTO `resultats` (`id_classe`, `id_alumne`, `totalAgressivitat`, `agressivitatFisica`, `agressivitatVerbal`, `agressivitatRelacional`, `totalAgressivitat_SN`, `agressivitatFisica_SN`, `agressivitatVerbal_SN`, `agressivitatRelacional_SN`, `prosocialitat`, `prosocialitat_SN`, `totalVictimitzacio`, `victimitzacioFisica`, `victimitzacioVerbal`, `victimitzacioRelacional`, `totalVictimitzacio_SN`, `victimitzacioFisica_SN`, `victimitzacioVerbal_SN`, `victimitzacioRelacional_SN`, `popular_SN`, `rebutjat_SN`, `ignorat_SN`, `controvertit_SN`, `normal_SN`, `triesPositives`, `triesNegatives`) VALUES
+(1, 1, 12, 8, 0, 4, 'X', 'X', ' ', ' ', 4, 'X', 18, 2, 5, 11, 'X', ' ', ' ', 'X', ' ', ' ', ' ', ' ', ' ', 1, 4),
+(1, 2, 6, 1, 4, 1, ' ', ' ', ' ', ' ', 3, ' ', 0, 0, 0, 0, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 3, 2),
+(1, 3, 10, 2, 3, 5, ' ', ' ', ' ', ' ', 2, ' ', 2, 0, 2, 0, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 4, 1),
+(1, 4, 10, 2, 5, 3, ' ', ' ', 'X', ' ', 1, ' ', 21, 10, 10, 1, 'X', 'X', 'X', ' ', ' ', ' ', ' ', ' ', ' ', 2, 4),
+(1, 5, 6, 0, 5, 1, ' ', ' ', 'X', ' ', 6, 'X', 0, 0, 0, 0, ' ', ' ', ' ', ' ', 'X', ' ', ' ', ' ', ' ', 7, 1),
+(1, 6, 23, 13, 1, 9, 'X', 'X', ' ', 'X', 5, 'X', 50, 16, 15, 19, 'X', 'X', 'X', 'X', ' ', 'X', ' ', ' ', ' ', 0, 9),
+(1, 7, 5, 2, 0, 3, ' ', ' ', ' ', ' ', 1, ' ', 34, 9, 11, 14, 'X', 'X', 'X', 'X', ' ', 'X', ' ', ' ', ' ', 1, 8),
+(1, 8, 7, 1, 4, 2, ' ', ' ', ' ', ' ', 4, ' ', 1, 1, 0, 0, ' ', ' ', ' ', ' ', 'X', ' ', ' ', ' ', ' ', 5, 1),
+(1, 9, 17, 8, 4, 5, 'X', 'X', ' ', 'X', 7, 'X', 1, 0, 1, 0, ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X', ' ', 5, 4),
+(1, 10, 8, 2, 2, 4, ' ', ' ', ' ', ' ', 3, ' ', 18, 10, 7, 1, 'X', 'X', 'X', ' ', ' ', ' ', ' ', ' ', ' ', 4, 2),
+(1, 11, 12, 1, 9, 2, 'X', ' ', 'X', ' ', 4, 'X', 4, 3, 1, 0, ' ', ' ', ' ', ' ', 'X', ' ', ' ', ' ', ' ', 6, 0),
+(1, 12, 3, 0, 2, 1, ' ', ' ', ' ', ' ', 1, ' ', 0, 0, 0, 0, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 3, 2),
+(1, 13, 5, 0, 4, 1, ' ', ' ', ' ', ' ', 1, ' ', 1, 0, 0, 1, ' ', ' ', ' ', ' ', 'X', ' ', ' ', ' ', ' ', 4, 0),
+(1, 14, 8, 1, 7, 0, ' ', ' ', 'X', ' ', 3, ' ', 12, 1, 2, 9, ' ', ' ', ' ', 'X', ' ', 'X', ' ', ' ', ' ', 1, 6),
+(1, 15, 4, 1, 0, 3, ' ', ' ', ' ', ' ', 4, ' ', 7, 0, 6, 1, ' ', ' ', 'X', ' ', ' ', ' ', ' ', ' ', ' ', 1, 4),
+(1, 16, 26, 13, 0, 13, 'X', 'X', ' ', 'X', 7, 'X', 2, 1, 0, 1, ' ', ' ', ' ', ' ', ' ', 'X', ' ', ' ', ' ', 1, 1),
+(1, 17, 4, 0, 1, 3, ' ', ' ', ' ', ' ', 1, ' ', 3, 1, 1, 1, ' ', ' ', ' ', ' ', 'X', ' ', ' ', ' ', ' ', 4, 0),
+(1, 18, 11, 5, 4, 2, ' ', ' ', ' ', ' ', 5, 'X', 1, 1, 0, 0, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 2, 0),
+(1, 19, 6, 2, 2, 2, ' ', ' ', ' ', ' ', 2, ' ', 5, 4, 1, 0, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 5, 2),
+(1, 20, 5, 0, 5, 0, ' ', ' ', 'X', ' ', 5, 'X', 1, 0, 0, 1, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 2, 0),
+(1, 21, 5, 1, 1, 3, ' ', ' ', ' ', ' ', 1, ' ', 8, 4, 1, 3, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X', 2, 2),
+(6, 1, 0, 2, 0, 1, ' ', ' ', ' ', ' ', 1, ' ', 4, 0, 2, 2, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X', 2, 0),
+(6, 2, 2, 0, 0, 0, ' ', ' ', ' ', ' ', 2, 'X', 0, 0, 0, 0, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X', 0, 0),
+(6, 3, 2, 0, 0, 0, ' ', ' ', ' ', ' ', 2, 'X', 8, 2, 4, 2, 'X', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X', 0, 0),
+(6, 4, 0, 0, 2, 0, ' ', ' ', ' ', ' ', 1, ' ', 2, 0, 2, 0, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X', 0, 0),
+(6, 5, 0, 0, 0, 1, ' ', ' ', ' ', ' ', 0, ' ', 6, 4, 2, 0, 'X', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X', 2, 0),
+(6, 6, 1, 2, 2, 2, ' ', ' ', ' ', 'X', 2, 'X', 0, 0, 0, 0, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X', 2, 2),
+(6, 7, 1, 0, 2, 1, ' ', ' ', ' ', ' ', 2, 'X', 4, 0, 2, 2, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X', 0, 2),
+(6, 8, 2, 0, 0, 2, 'X', ' ', ' ', 'X', 2, 'X', 2, 0, 2, 0, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X', 0, 4),
+(6, 9, 1, 2, 2, 0, ' ', ' ', ' ', ' ', 2, 'X', 4, 2, 0, 2, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X', 2, 4),
+(6, 10, 0, 2, 0, 0, ' ', ' ', ' ', ' ', 0, ' ', 4, 0, 2, 2, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X', 0, 0),
+(6, 11, 0, 2, 2, 1, ' ', ' ', ' ', ' ', 1, ' ', 2, 2, 0, 0, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X', 4, 0),
+(6, 12, 0, 0, 0, 1, ' ', ' ', ' ', ' ', 0, ' ', 2, 0, 0, 2, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X', 0, 2),
+(6, 13, 1, 0, 0, 2, 'X', ' ', ' ', 'X', 1, ' ', 2, 2, 0, 0, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X', 4, 2),
+(6, 14, 2, 0, 0, 0, ' ', ' ', ' ', ' ', 2, 'X', 6, 2, 0, 4, 'X', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X', 0, 0),
+(6, 15, 0, 4, 0, 0, ' ', ' ', ' ', ' ', 0, ' ', 4, 2, 0, 2, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X', 2, 0),
+(6, 16, 0, 0, 2, 1, ' ', ' ', ' ', ' ', 1, ' ', 8, 2, 2, 4, 'X', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X', 0, 0),
+(6, 17, 0, 2, 2, 0, ' ', ' ', ' ', ' ', 0, ' ', 2, 0, 2, 0, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X', 0, 2),
+(6, 18, 0, 0, 2, 2, ' ', ' ', ' ', 'X', 0, ' ', 4, 2, 2, 0, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X', 0, 0),
+(6, 19, 0, 2, 2, 0, ' ', ' ', ' ', ' ', 0, ' ', 4, 2, 0, 2, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X', 0, 0),
+(6, 20, 0, 0, 2, 0, ' ', ' ', ' ', ' ', 1, ' ', 2, 2, 0, 0, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X', 2, 2),
+(6, 21, 0, 0, 0, 2, 'X', ' ', ' ', 'X', 0, ' ', 4, 0, 2, 2, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X', 0, 0),
+(6, 22, 0, 0, 2, 2, ' ', ' ', ' ', 'X', 1, ' ', 4, 2, 0, 2, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X', 2, 0),
+(6, 23, 1, 0, 4, 2, ' ', ' ', ' ', 'X', 2, 'X', 0, 0, 0, 0, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X', 0, 0),
+(6, 24, 0, 0, 2, 1, ' ', ' ', ' ', ' ', 0, ' ', 6, 2, 4, 0, 'X', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X', 0, 2),
+(6, 25, 2, 0, 0, 2, 'X', ' ', ' ', 'X', 2, 'X', 0, 0, 0, 0, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X', 2, 2),
+(6, 26, 0, 4, 0, 1, ' ', ' ', ' ', ' ', 1, ' ', 0, 0, 0, 0, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X', 2, 0),
+(6, 27, 1, 2, 0, 1, ' ', ' ', ' ', ' ', 2, 'X', 2, 0, 0, 2, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X', 0, 0),
+(6, 28, 0, 4, 0, 1, ' ', ' ', ' ', ' ', 1, ' ', 2, 2, 0, 0, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X', 0, 0),
+(6, 29, 0, 2, 2, 2, ' ', ' ', ' ', 'X', 0, ' ', 0, 0, 0, 0, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X', 2, 4),
+(6, 30, 1, 0, 0, 2, 'X', ' ', ' ', 'X', 1, ' ', 2, 0, 2, 0, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X', 2, 2);
+
+
+ALTER TABLE `respostes`
+  ADD PRIMARY KEY (`id_classe`,`id_alumne`);
+
+ALTER TABLE `respostes_processades`
+  ADD PRIMARY KEY (`id_classe`,`id_alumne`);
+
+ALTER TABLE `resultats`
+  ADD PRIMARY KEY (`id_classe`,`id_alumne`);
+COMMIT;
 
 INSERT INTO Cursos VALUES
 (1, '1ESO'),
