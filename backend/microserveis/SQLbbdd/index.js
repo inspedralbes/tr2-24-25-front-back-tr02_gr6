@@ -13,6 +13,7 @@ var alumnes = [];
 var tutorsContrassenya = [];
 var alumnesContrassenya = [];
 var respostes = [];
+var resultats = [];
 
 const dbNom = process.env.DB_NAME;
 const dbHost = process.env.DB_HOST;
@@ -776,6 +777,74 @@ app.put("/formulariAlumne", (req, res) => {
         });
     });
 });
+app.get("/resultats", (req, res) => {
+    const id_classe = req.query.id_classe;
+    
+    if (!id_classe) {
+        return res.status(400).json("Falta el parámetro id_classe");
+    }
+
+    pool.getConnection((err, connection) => {
+        if (err) {
+            console.error('Error al obtener la conexión:', err);
+            return res.status(500).json("Error al obtener conexión");
+        }
+
+        const query = `
+            SELECT
+                r.id_classe,
+                r.id_alumne,
+                r.totalAgressivitat,
+                r.agressivitatFisica,
+                r.agressivitatVerbal,
+                r.agressivitatRelacional,
+                r.totalAgressivitat_SN,
+                r.agressivitatFisica_SN,
+                r.agressivitatVerbal_SN,
+                r.agressivitatRelacional_SN,
+                r.prosocialitat,
+                r.prosocialitat_SN,
+                r.totalVictimitzacio,
+                r.victimitzacioFisica,
+                r.victimitzacioVerbal,
+                r.victimitzacioRelacional,
+                r.totalVictimitzacio_SN,
+                r.victimitzacioFisica_SN,
+                r.victimitzacioVerbal_SN,
+                r.victimitzacioRelacional_SN,
+                r.popular_SN,
+                r.rebutjat_SN,
+                r.ignorat_SN,
+                r.controvertit_SN,
+                r.normal_SN,
+                r.triesPositives,
+                r.triesNegatives,
+                a.nom,
+                a.cognoms
+            FROM
+                resultats AS r
+            INNER JOIN
+                alumnes AS a
+            ON
+                r.id_alumne = a.id_alumne
+            WHERE
+                r.id_classe = ?;
+        `;
+        
+        connection.query(query, [id_classe], (err, results) => {
+            connection.release(); 
+
+            if (err) {
+                console.error('Error en la consulta SQL:', err);
+                return res.status(500).json("Error al obtener los resultados");
+            }
+
+            console.log("RESULTADO DE SQL en /resultats:", results);
+            res.json(results); 
+        });
+    });
+});
+
 
 function convertirNomsAId(id_alumne, formulari) {
     var alumneResposta = null;
