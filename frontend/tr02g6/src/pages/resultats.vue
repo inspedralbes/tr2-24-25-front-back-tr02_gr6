@@ -10,6 +10,7 @@
       <v-tabs v-model="activeTab" align="center">
         <v-tab class="tabtab" @click="navigateToAlum()">Alumnes Registrats</v-tab>
         <v-tab class="tabtab">Resultats</v-tab>
+        <v-tab class="tabtab" @click="navigateToGrafic()">Gràfics específics</v-tab>
       </v-tabs>
 
       <v-row>
@@ -93,29 +94,29 @@ async function fetchSociograma() {
     const data = await getResultats(id_classe);
     sociogramaData.value = data;
 
-    console.log("bolas",data); 
+    console.log("bolas", data);
 
-  const charts = [
-  { category: "popular", svg: popularSvg.value, filterFn: d => d.popular_SN === "X" },
-  { category: "controvertit", svg: controvertitSvg.value, filterFn: d => d.controvertit_SN === "X" },
-  { category: "normal", svg: normalSvg.value, filterFn: d => d.normal_SN === "X" },
-  { category: "rebutjat", svg: rebutjatSvg.value, filterFn: d => d.rebutjat_SN === "X" },
-  { category: "ignorat", svg: ignoratSvg.value, filterFn: d => d.ignorat_SN === "X" },
-  { category: "agresivitat", svg: agresivitatSvg.value, filterFn: d => d.totalAgressivitat != null, sizeValueFn: d => d.totalAgressivitat },
-  { category: "victimitzacio", svg: vicitmitzacioSvg.value, filterFn: d => d.totalVictimitzacio != null, sizeValueFn: d => d.totalVictimitzacio }
-];
+    const charts = [
+      { category: "popular", svg: popularSvg.value, filterFn: d => d.popular_SN === "X" },
+      { category: "controvertit", svg: controvertitSvg.value, filterFn: d => d.controvertit_SN === "X" },
+      { category: "normal", svg: normalSvg.value, filterFn: d => d.normal_SN === "X" },
+      { category: "rebutjat", svg: rebutjatSvg.value, filterFn: d => d.rebutjat_SN === "X" },
+      { category: "ignorat", svg: ignoratSvg.value, filterFn: d => d.ignorat_SN === "X" },
+      { category: "agresivitat", svg: agresivitatSvg.value, filterFn: d => d.totalAgressivitat != null, sizeValueFn: d => d.totalAgressivitat },
+      { category: "victimitzacio", svg: vicitmitzacioSvg.value, filterFn: d => d.totalVictimitzacio != null, sizeValueFn: d => d.totalVictimitzacio }
+    ];
 
 
     nextTick(() => {
 
-  charts.forEach(chart => {
-    if (chart.sizeValueFn) {
-    initD3Chart(chart.category, chart.svg, chart.filterFn, chart.sizeValueFn);
-    } else {
-      initD3Chart(chart.category, chart.svg, chart.filterFn);
-    }
-  });
-});
+      charts.forEach(chart => {
+        if (chart.sizeValueFn) {
+          initD3Chart(chart.category, chart.svg, chart.filterFn, chart.sizeValueFn);
+        } else {
+          initD3Chart(chart.category, chart.svg, chart.filterFn);
+        }
+      });
+    });
 
   } catch (error) {
     console.error("Error al obtener sociograma:", error);
@@ -138,9 +139,9 @@ function initD3Chart(category, svgElement, filterFn, sizeValueFn = null) {
 
   const sizeScale = sizeValueFn
     ? d3.scaleLinear()
-        .domain(d3.extent(data, sizeValueFn)) 
-        .range([5, 30]) 
-    : null; 
+      .domain(d3.extent(data, sizeValueFn))
+      .range([5, 30])
+    : null;
 
   const simulation = d3.forceSimulation(data)
     .force('charge', d3.forceManyBody().strength(-10))
@@ -160,7 +161,7 @@ function initD3Chart(category, svgElement, filterFn, sizeValueFn = null) {
       .append("marker")
       .attr("id", `arrowhead-${category}`)
       .attr("viewBox", "0 -5 10 10")
-      .attr("refX", 10) 
+      .attr("refX", 10)
       .attr("refY", 0)
       .attr("markerWidth", 6)
       .attr("markerHeight", 6)
@@ -187,7 +188,10 @@ function initD3Chart(category, svgElement, filterFn, sizeValueFn = null) {
     .attr("r", (d) => (sizeScale ? sizeScale(sizeValueFn(d)) : 10)) // Asignar tamaño fijo si sizeValueFn no está definido
     .attr("fill", () => {
       const colors = ["pink", "blue", "green", "yellow", "purple", "orange", "red"];
-      return colors[Math.floor(Math.random() * colors.length)];
+      for (let i = 0; i < data.length; i++) {
+        return colors[i];
+      };
+
     })
     .call(d3.drag().on("start", dragstart).on("drag", dragged).on("end", dragend));
 
@@ -243,6 +247,14 @@ function navigateToAlum() {
   }
 }
 
+function navigateToGrafic() {
+  if (esProfe(email)) {
+    router.push("/grafico");
+  } else {
+    router.push("/classAlum");
+  }
+}
+
 function esProfe(email) {
   const teNumeros = /\d/;
   return !teNumeros.test(email);
@@ -270,6 +282,7 @@ onMounted(async () => {
   color: white;
   padding: 20px 0;
 }
+
 .tabtab {
   color: rgb(185, 122, 7);
   text-transform: uppercase;
@@ -310,5 +323,27 @@ onMounted(async () => {
 
 .link {
   pointer-events: none;
+}
+
+.node {
+  cursor: pointer;
+}
+
+.circle {
+  fill: lightblue;
+  stroke: #1f77b4;
+  stroke-width: 2px;
+}
+
+.label {
+  font-size: 14px;
+  text-anchor: middle;
+  fill: black;
+}
+
+.subcircle {
+  fill: lightcoral;
+  stroke: #ff6347;
+  stroke-width: 2px;
 }
 </style>

@@ -18,6 +18,7 @@
             <v-tabs v-model="activeTab" align="center">
                 <v-tab class="tabtab">Alumnes Registrats</v-tab>
                 <v-tab class="tabtab" @click="navigateToResult()">Resultats</v-tab>
+                <v-tab class="tabtab" @click="navigateToGrafic()">Gràfics específics</v-tab>
             </v-tabs>
 
         <v-row v-if="showCodiRandom" class="my-5">
@@ -120,6 +121,10 @@ const mostrarCodiRandom = () => {
 function navigateToResult (){
     router.push('/resultats');
 };
+
+function navigateToGrafic() {
+    router.push("/grafico");
+}
 
 function inici(){
     router.push('/home');
