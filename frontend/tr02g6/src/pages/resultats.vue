@@ -104,6 +104,8 @@ async function fetchSociograma() {
       initD3Chart('normal', normalSvg.value, d => d.normal_SN === 'X');
       initD3Chart('rebutjat', rebutjatSvg.value, d => d.rebutjat_SN === 'X');
       initD3Chart('ignorat', ignoratSvg.value, d => d.ignorat_SN === 'X');
+      initD3Chart('agressivitat', agresivitatSvg.value, d => d.totalAgressivitat > 0 );
+      initD3Chart('victimitzacio', vicitmitzacioSvg.value, d => d.vicitmitzacioSvg > 0 );
     });
   } catch (error) {
     console.error("Error al obtener sociograma:", error);
@@ -163,7 +165,10 @@ function initD3Chart(category, svgElement, filterFn) {
     .enter().append('circle')
     .attr('class', 'node')
     .attr('r', 15)
-    .attr('fill', 'steelblue')
+    .attr('fill', () => {
+      const colors = ["pink", "blue", "green", "yellow", "purple", "orange", "red"];
+      return colors[Math.floor(Math.random() * colors.length)];
+    })
     .call(d3.drag().on('start', dragstart).on('drag', dragged).on('end', dragend));
 
   const label = svg.selectAll('.label')
