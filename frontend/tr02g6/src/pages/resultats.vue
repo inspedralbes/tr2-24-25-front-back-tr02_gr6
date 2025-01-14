@@ -96,7 +96,6 @@ async function fetchSociograma() {
     console.error("Error al obtener sociograma:", error);
   }
 }
-
 function initD3Chart(category, svgElement, filterFn) {
   const data = sociogramaData.value.filter(filterFn);
 
@@ -112,9 +111,39 @@ function initD3Chart(category, svgElement, filterFn) {
   svg.selectAll('*').remove();
 
   const simulation = d3.forceSimulation(data)
-    .force('charge', d3.forceManyBody().strength(-100))
+    .force('charge', d3.forceManyBody().strength(-10))
     .force('center', d3.forceCenter(width / 2, height / 2))
     .force('collision', d3.forceCollide().radius(50));
+
+  let links = data
+    .map((source, i) =>
+      data
+        .slice(i + 1)
+        .map((target) => ({ source, target }))
+    )
+    .flat();
+
+  const link = svg.selectAll(".link")
+    .data(links)
+    .enter()
+    .append("line")
+    .attr("class", "link")
+    .attr("stroke", "gray")
+    .attr("stroke-width", 1)
+    .attr("marker-end", "url(#arrowhead)");
+
+  svg.append("defs")
+    .append("marker")
+    .attr("id", `arrowhead-${category}`)
+    .attr("viewBox", "0 -5 10 10")
+    .attr("refX", 10)
+    .attr("refY", 0)
+    .attr("markerWidth", 6)
+    .attr("markerHeight", 6)
+    .attr("orient", "auto")
+    .append("path")
+    .attr("d", "M0,-5L10,0L0,5")
+    .attr("fill", "gray");
 
   const node = svg.selectAll('.node')
     .data(data)
@@ -133,6 +162,12 @@ function initD3Chart(category, svgElement, filterFn) {
     .text(d => d.nom);
 
   simulation.on('tick', () => {
+    link
+      .attr("x1", d => d.source.x)
+      .attr("y1", d => d.source.y)
+      .attr("x2", d => d.target.x)
+      .attr("y2", d => d.target.y);
+
     node.attr('cx', d => d.x).attr('cy', d => d.y);
     label.attr('x', d => d.x).attr('y', d => d.y);
   });
@@ -154,6 +189,7 @@ function initD3Chart(category, svgElement, filterFn) {
     d.fy = null;
   }
 }
+
 
 function navegarapantalla() {
   router.push('/formPage');
