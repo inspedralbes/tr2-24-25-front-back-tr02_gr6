@@ -4,7 +4,7 @@
       <v-col cols="12" md="8" lg="6">
         <v-card color="#FFF8E1" class="elevation-6 mx-auto" max-width="600">
           <v-window v-model="step" class="pa-3">
-¡            <v-window-item :value="1">
+            <v-window-item :value="1">
               <v-row justify="center">
                 <v-col cols="12" sm="10">
                   <v-card-text>
@@ -71,7 +71,7 @@
               </v-row>
             </v-window-item>
 
-¡            <v-window-item :value="2">
+           <v-window-item :value="2">
               <v-row justify="center">
                 <v-col cols="12" sm="10">
                   <v-card-text>
