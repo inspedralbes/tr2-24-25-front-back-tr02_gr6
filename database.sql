@@ -194,13 +194,13 @@ INSERT INTO `resultats` (`id_classe`, `id_alumne`, `totalAgressivitat`, `agressi
 
 
 ALTER TABLE `respostes`
-  ADD PRIMARY KEY (`id_classe`,`id_alumne`);
+  ADD PRIMARY KEY (`id_alumne`);
 
 ALTER TABLE `respostes_processades`
-  ADD PRIMARY KEY (`id_classe`,`id_alumne`);
+  ADD PRIMARY KEY (`id_alumne`);
 
 ALTER TABLE `resultats`
-  ADD PRIMARY KEY (`id_classe`,`id_alumne`);
+  ADD PRIMARY KEY (`id_alumne`);
 COMMIT;
 
 INSERT INTO Cursos VALUES

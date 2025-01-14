@@ -20,44 +20,42 @@
       </v-row>
 
       <v-row>
-        <v-col cols="4">
+        <v-col cols="6">
           <h3>POPULAR</h3>
           <svg ref="popularSvg" class="sociograma-svg"></svg>
         </v-col>
-        <v-col cols="4">
+        <v-col cols="6">
           <h3>CONTROVERTIT</h3>
           <svg ref="controvertitSvg" class="sociograma-svg"></svg>
-        </v-col>
-        <v-col cols="4">
-          <h3>NORMAL</h3>
-          <svg ref="normalSvg" class="sociograma-svg"></svg>
         </v-col>
       </v-row>
 
       <v-row>
-        <v-col cols="4">
+        <v-col cols="6">
+          <h3>NORMAL</h3>
+          <svg ref="normalSvg" class="sociograma-svg"></svg>
+        </v-col>
+        <v-col cols="6">
           <h3>REBUTJAT</h3>
           <svg ref="rebutjatSvg" class="sociograma-svg"></svg>
         </v-col>
-        <v-col cols="4">
+      </v-row>
+      <v-row>
+        <v-col cols="6">
           <h3>IGNORAT</h3>
           <svg ref="ignoratSvg" class="sociograma-svg"></svg>
         </v-col>
-        <v-col cols="4">
+        <v-col cols="6">
           <h3>AGRESSIVITAT</h3>
           <svg ref="agresivitatSvg" class="sociograma-svg"></svg>
         </v-col>
       </v-row>
       <v-row>
-        <v-col cols="4">
+        <v-col cols="6">
           <h3>VICTIMITZACIÓ</h3>
           <svg ref="vicitmitzacioSvg" class="sociograma-svg"></svg>
         </v-col>
       </v-row>
-
-      <v-btn large class="form-button fixed-button" @click="navegarapantalla">
-        FORMULARI
-      </v-btn>
     </v-container>
   </v-app>
 </template>
@@ -83,6 +81,17 @@ const rebutjatSvg = ref(null);
 const ignoratSvg = ref(null);
 const agresivitatSvg = ref(null);
 const vicitmitzacioSvg = ref(null);
+const aparece = ref("")
+
+async function fetchProcessData() {
+    try {
+        const data = await getProcessData(id_classe.value);
+        aparece.value = data[0].id_classe;
+        console.log("PROCEEEEEEEEEEEEEES DAAAAAAAAAAAAAAAAAAAATAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",aparece.value)
+    } catch (error) {
+        console.error("Error al realitzar la solicitud:", error.message);
+    }
+};
 
 async function getidClase() {
   const data = await getClasse(email);
@@ -291,6 +300,7 @@ async function fetchClasse() {
 
 onMounted(async () => {
   await getidClase();
+  await fetchProcessData();
   await fetchSociograma();
   await fetchClasse();
 });

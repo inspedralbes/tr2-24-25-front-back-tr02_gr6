@@ -2,9 +2,7 @@
     <v-container>
         <v-row class="header-row">
             <v-col cols="12" class="d-flex align-center justify-space-between">
-                <v-btn icon class="home-button" @click="inici">
-                    <v-icon>mdi-arrow-left</v-icon>
-                </v-btn>
+               
                 <h1 class="header-title">BENVINGUT/DA {{ userStore.email }} a {{ classe }}!</h1>
             </v-col>
         </v-row>
@@ -24,9 +22,10 @@
   </v-col>
 </v-row>
 
-        <v-row>
+        <v-row class="d-flex justify-center">
           <div id="charts-container"></div>
         </v-row>
+
       </v-container>
   </template>
   
@@ -64,29 +63,26 @@ function filterAlumnes() {
 
 function renderGraphs(alumnes) {
   const container = d3.select("#charts-container");
-  container.html(""); // Limpiar gráficos existentes
+  container.html("");
 
   alumnes.forEach((alumno) => {
     const svg = container
       .append("div")
       .attr("class", "graph")
       .append("svg")
-      .attr("width", 500)
-      .attr("height", 500);
+      .attr("width", 800)  
+      .attr("height", 800); 
 
-    const centerX = 250;
-    const centerY = 250;
+    const centerX = 400;  
+    const centerY = 400; 
 
-    // Nodo principal con el nombre
-    svg
-      .append("circle")
+    svg.append("circle")
       .attr("cx", centerX)
       .attr("cy", centerY)
       .attr("r", radius)
       .style("fill", "#f285ce");
 
-    svg
-      .append("text")
+    svg.append("text")
       .attr("x", centerX)
       .attr("y", centerY)
       .attr("text-anchor", "middle")
@@ -94,63 +90,51 @@ function renderGraphs(alumnes) {
       .style("font-weight", "bold")
       .text(`${alumno.nom} ${alumno.cognoms}`);
 
-    // Nodo de Agresividad
-    svg
-      .append("circle")
-      .attr("cx", centerX - 170)
+    // Nodo Agressivitat 
+    svg.append("circle")
+      .attr("cx", centerX - 250) 
       .attr("cy", centerY)
       .attr("r", radius)
       .style("fill", "#a09fa3");
 
-    svg
-      .append("text")
-      .attr("x", centerX - 170)
+    svg.append("text")
+      .attr("x", centerX - 250)
       .attr("y", centerY)
       .attr("text-anchor", "middle")
       .attr("dy", ".3em")
       .style("font-weight", "bold")
       .text("Agressivitat");
 
-    const aggressivityKeys = [
-      "agressivitatFisica",
-      "agressivitatRelacional",
-      "agressivitatVerbal",
-    ];
+    const aggressivityKeys = ['agressivitatFisica', 'agressivitatRelacional', 'agressivitatVerbal'];
     let angleAggressivity = 0;
     const angleStepAggressivity = (2 * Math.PI) / aggressivityKeys.length;
 
-    aggressivityKeys.forEach((key) => {
+    aggressivityKeys.forEach(key => {
       const value = alumno[key];
-      if (value > 0) {
-        const subRadiusSize = subRadiusBase + Math.min(value * 2, 20);
-        const subX =
-          centerX - 170 + radius * 0.8 * Math.cos(angleAggressivity);
-        const subY =
-          centerY + radius * 0.8 * Math.sin(angleAggressivity);
 
-        svg
-          .append("circle")
+      if (value > 0) {
+        const subRadiusSize = subRadiusBase + value * 2;
+        const subX = centerX - 250 + radius * 0.9 * Math.cos(angleAggressivity);  
+        const subY = centerY + radius * 0.9 * Math.sin(angleAggressivity);  
+
+        svg.append("circle")
           .attr("cx", subX)
           .attr("cy", subY)
           .attr("r", subRadiusSize)
           .style("fill", "red");
 
-        svg
-          .append("text")
+        svg.append("text")
           .attr("x", subX)
           .attr("y", subY - 8)
           .attr("text-anchor", "middle")
-          .attr("dy", ".3em")
           .style("font-size", "10px")
           .style("font-weight", "bold")
-          .text(key.replace("agressivitat", ""));
+          .text(key.replace('agressivitat', ''));
 
-        svg
-          .append("text")
+        svg.append("text")
           .attr("x", subX)
           .attr("y", subY + 8)
           .attr("text-anchor", "middle")
-          .attr("dy", ".3em")
           .style("font-size", "10px")
           .text(value);
 
@@ -158,69 +142,130 @@ function renderGraphs(alumnes) {
       }
     });
 
-    // Nodo de Victimització
-    svg
-      .append("circle")
+    // Nodo Victimització 
+    svg.append("circle")
       .attr("cx", centerX)
-      .attr("cy", centerY - 165)
+      .attr("cy", centerY - 230)  
       .attr("r", radius)
       .style("fill", "#f1e872");
 
-    svg
-      .append("text")
+    svg.append("text")
       .attr("x", centerX)
-      .attr("y", centerY - 165)
+      .attr("y", centerY - 230)
       .attr("text-anchor", "middle")
       .attr("dy", ".3em")
       .style("font-weight", "bold")
       .text("Victimització");
 
-    const victimizationKeys = [
-      "victimitzacioFisica",
-      "victimitzacioVerbal",
-      "victimitzacioRelacional",
-    ];
+    const victimizationKeys = ['victimitzacioFisica', 'victimitzacioVerbal', 'victimitzacioRelacional'];
     let angleVictimization = 0;
     const angleStepVictimization = (2 * Math.PI) / victimizationKeys.length;
 
-    victimizationKeys.forEach((key) => {
+    victimizationKeys.forEach(key => {
       const value = alumno[key];
       if (value > 0) {
-        const subRadiusSize = subRadiusBase + Math.min(value * 2, 20);
-        const subX =
-          centerX + radius * 0.8 * Math.cos(angleVictimization);
-        const subY =
-          centerY - 165 + radius * 0.8 * Math.sin(angleVictimization);
+        const subRadiusSize = subRadiusBase + value * 2;
+        const subX = centerX + radius * 0.9 * Math.cos(angleVictimization);
+        const subY = centerY - 230 + radius * 0.9 * Math.sin(angleVictimization);
 
-        svg
-          .append("circle")
+        svg.append("circle")
           .attr("cx", subX)
           .attr("cy", subY)
           .attr("r", subRadiusSize)
           .style("fill", "green");
 
-        svg
-          .append("text")
+        svg.append("text")
           .attr("x", subX)
           .attr("y", subY - 8)
           .attr("text-anchor", "middle")
-          .attr("dy", ".3em")
           .style("font-size", "10px")
           .style("font-weight", "bold")
-          .text(key.replace("victimitzacio", ""));
+          .text(key.replace('victimitzacio', ''));
 
-        svg
-          .append("text")
+        svg.append("text")
           .attr("x", subX)
           .attr("y", subY + 8)
           .attr("text-anchor", "middle")
-          .attr("dy", ".3em")
           .style("font-size", "10px")
           .text(value);
 
         angleVictimization += angleStepVictimization;
       }
     });
+
+    // Nodo Prosocialitat 
+    const prosocialValue = alumno.prosocialitat_SN || 1;
+    const prosocialRadius = (prosocialValue / 7) * radius + 30;
+
+    svg.append("circle")
+      .attr("cx", centerX + 200)  
+      .attr("cy", centerY)
+      .attr("r", prosocialRadius)
+      .style("fill", "#5df99d");
+
+    svg.append("text")
+      .attr("x", centerX + 200)
+      .attr("y", centerY)
+      .attr("text-anchor", "middle")
+      .attr("dy", ".3em")
+      .style("font-weight", "bold")
+      .text("Prosocialitat");
+
+    const prosocialKeys = ['ajuda_SN', 'colaboracio_SN', 'respecte_SN'];
+    let angleProsocial = 0;
+    const angleStepProsocial = (2 * Math.PI) / prosocialKeys.length;
+
+    prosocialKeys.forEach(key => {
+      if (alumno[key] === 'X') {
+        const subX = centerX + 200 + prosocialRadius * 1.8 * Math.cos(angleProsocial);
+        const subY = centerY + prosocialRadius * 1.8 * Math.sin(angleProsocial);
+
+        svg.append("circle")
+          .attr("cx", subX)
+          .attr("cy", subY)
+          .attr("r", subRadiusBase)
+          .style("fill", "#8997ff");
+
+        svg.append("text")
+          .attr("x", subX)
+          .attr("y", subY)
+          .attr("text-anchor", "middle")
+          .style("font-size", "10px")
+          .text(key.replace('_SN', ''));
+
+        angleProsocial += angleStepProsocial;
+      }
+    });
+
+    // Nodo condicional
+    const conditions = {
+      'popular_SN': 'Popular',
+      'rebutjat_SN': 'Rebutjat',
+      'ignorat_SN': 'Ignorat',
+      'controvertit_SN': 'Controvertit',
+      'norma_SN': 'Normatiu'
+    };
+
+    const activeConditions = Object.entries(conditions)
+      .filter(([key, _]) => alumno[key] === 'X')
+      .map(([_, label]) => label);
+
+    if (activeConditions.length > 0) {
+      const condY = centerY + 230;
+      svg.append("circle")
+        .attr("cx", centerX)
+        .attr("cy", condY)
+        .attr("r", radius / 2)
+        .style("fill", "#8997ff");
+
+      svg.append("text")
+        .attr("x", centerX)
+        .attr("y", condY)
+        .attr("text-anchor", "middle")
+        .attr("dy", ".3em")
+        .style("font-size", "16px")
+        .text(activeConditions.join(', '));
+    }
   });
 }
 
@@ -242,9 +287,12 @@ function renderGraphs(alumnes) {
 }
 
 function navigateToResult() {
-    router.push("/resultats");
-}
- 
+  if (!aparece.value || aparece.value === "" || Number(aparece.value) < 1) {
+    router.push('/resultats');
+  } else {
+    router.push('/grafics');
+  }
+} 
   onMounted(async () => {
   await fetchClasse(); 
   await fetchSociograma(); 
