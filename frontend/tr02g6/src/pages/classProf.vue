@@ -53,22 +53,20 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useUserStore } from '@/stores/userStore';
-import { getAlumnes, getClasse, redirect } from '@/services/communicationManager';
+import { getAlumnes, getClasse, getProcessData, redirect } from '@/services/communicationManager';
 import { useRouter } from 'vue-router';
 import { io } from 'socket.io-client';
 
 const router = useRouter();
 const userStore = useUserStore();
-
+const aparece = ref("")
 const alumnes = ref([]);
 const email = userStore.email;
 const classe = ref("");
-const codiRandom = ref("");
 const socket = io(import.meta.env.VITE_API_ROUTE_SOCKET);
 const id_classe = ref("");
 const codi_random = ref("");
 const showCodiRandom = ref(false);
-const idAlumne = ref("");
 async function fetchAlumnes(email) {
     redirect()
     try {
@@ -100,23 +98,40 @@ async function fetchClasse(email) {
         classe.value = data[0].classe;
         id_classe.value = data[0].id_classe;
         codi_random.value = data[0].codi_random;
-        console.log("valores de getclasse", data)
+        console.log("valores de getclasse",id_classe.value)
     } catch (error) {
         console.error("Error al realitzar la solicitud:", error.message);
     }
 };
+
+async function fetchProcessData() {
+    try {
+        const data = await getProcessData(id_classe.value);
+        aparece.value = data[0].id_classe;
+        console.log("PROCEEEEEEEEEEEEEES DAAAAAAAAAAAAAAAAAAAATAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",aparece.value)
+    } catch (error) {
+        console.error("Error al realitzar la solicitud:", error.message);
+    }
+};
+
 
 const mostrarCodiRandom = () => {
     showCodiRandom.value = true;
 };
 
 function navigateToResult() {
+  if (!aparece.value || aparece.value === "" || Number(aparece.value) < 1) {
     router.push('/resultats');
-};
+  } else {
+    router.push('/grafics');
+  }
+}
 
 function inici() {
     router.push('/home');
 };
+
+console.log(aparece.value)
 
 socket.on('actualitzarAlumnes', () => {
     fetchAlumnes(email);
@@ -124,6 +139,7 @@ socket.on('actualitzarAlumnes', () => {
 
 onMounted(async () => {
     await fetchClasse(email);
+    await fetchProcessData();
     await fetchAlumnes(email);
 });
 </script>

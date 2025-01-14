@@ -19,194 +19,33 @@
       </v-row>
 
       <v-row>
-        <v-col cols="4">
-          <h3>POPULAR</h3>
-          <svg ref="popularSvg" class="sociograma-svg"></svg>
-        </v-col>
-        <v-col cols="4">
-          <h3>CONTROVERTIT</h3>
-          <svg ref="controvertitSvg" class="sociograma-svg"></svg>
-        </v-col>
-        <v-col cols="4">
-          <h3>NORMAL</h3>
-          <svg ref="normalSvg" class="sociograma-svg"></svg>
-        </v-col>
+        <v-btn  @click="spawnToGraphs">
+          OBTENIR RESULTATS
+        </v-btn>
       </v-row>
-
-      <v-row>
-        <v-col cols="4">
-          <h3>REBUTJAT</h3>
-          <svg ref="rebutjatSvg" class="sociograma-svg"></svg>
-        </v-col>
-        <v-col cols="4">
-          <h3>IGNORAT</h3>
-          <svg ref="ignoratSvg" class="sociograma-svg"></svg>
-        </v-col>
-        <v-col cols="4">
-          <h3>AGRESSIVITAT</h3>
-          <svg ref="agresivitatSvg" class="sociograma-svg"></svg>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col cols="4">
-          <h3>VICTIMITZACIÓ</h3>
-          <svg ref="vicitmitzacioSvg" class="sociograma-svg"></svg>
-        
-        </v-col>
-      </v-row>
-
-      <v-btn 
-        large
-        class="form-button fixed-button"
-        @click="navegarapantalla"
-      >
-        FORMULARI
-      </v-btn>
     </v-container>
   </v-app>
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/userStore';
-import * as d3 from 'd3';
-import { getClasse, getResultats } from '@/services/communicationManager';
-
+import { getClasse } from '@/services/communicationManager';
+const URL = import.meta.env.VITE_API_MAIN;
 const router = useRouter();
 const userStore = useUserStore();
 const email = userStore.email;
 const activeTab = ref(1);
 const classe = ref("");
-const sociogramaData = ref(null);
 const id_classe = ref("");
-const popularSvg = ref(null);
-const controvertitSvg = ref(null);
-const normalSvg = ref(null);
-const rebutjatSvg = ref(null);
-const ignoratSvg = ref(null);
-const agresivitatSvg = ref(null);
-const vicitmitzacioSvg = ref(null);
 
 async function getidClase() {
   const data = await getClasse(email);
   id_classe.value = data[0].id_classe;
+
 }
 
-async function fetchSociograma() {
-  try {
-    const data = await getResultats(id_classe);
-    sociogramaData.value = data;
-
-    nextTick(() => {
-      initD3Chart('popular', popularSvg.value, d => d.popular_SN === 'X');
-      initD3Chart('controvertit', controvertitSvg.value, d => d.controvertit_SN === 'X');
-      initD3Chart('normal', normalSvg.value, d => d.normal_SN === 'X');
-      initD3Chart('rebutjat', rebutjatSvg.value, d => d.rebutjat_SN === 'X');
-      initD3Chart('ignorat', ignoratSvg.value, d => d.ignorat_SN === 'X');
-    });
-  } catch (error) {
-    console.error("Error al obtener sociograma:", error);
-  }
-}
-function initD3Chart(category, svgElement, filterFn) {
-  const data = sociogramaData.value.filter(filterFn);
-
-  if (!data.length) {
-    console.warn(`No hay datos para la categoría "${category}".`);
-    return;
-  }
-
-  const svg = d3.select(svgElement);
-  const width = svg.node().getBoundingClientRect().width;
-  const height = svg.node().getBoundingClientRect().height;
-
-  svg.selectAll('*').remove();
-
-  const simulation = d3.forceSimulation(data)
-    .force('charge', d3.forceManyBody().strength(-10))
-    .force('center', d3.forceCenter(width / 2, height / 2))
-    .force('collision', d3.forceCollide().radius(50));
-
-  let links = data
-    .map((source, i) =>
-      data
-        .slice(i + 1)
-        .map((target) => ({ source, target }))
-    )
-    .flat();
-
-  const link = svg.selectAll(".link")
-    .data(links)
-    .enter()
-    .append("line")
-    .attr("class", "link")
-    .attr("stroke", "gray")
-    .attr("stroke-width", 1)
-    .attr("marker-end", "url(#arrowhead)");
-
-  svg.append("defs")
-    .append("marker")
-    .attr("id", `arrowhead-${category}`)
-    .attr("viewBox", "0 -5 10 10")
-    .attr("refX", 10)
-    .attr("refY", 0)
-    .attr("markerWidth", 6)
-    .attr("markerHeight", 6)
-    .attr("orient", "auto")
-    .append("path")
-    .attr("d", "M0,-5L10,0L0,5")
-    .attr("fill", "gray");
-
-  const node = svg.selectAll('.node')
-    .data(data)
-    .enter().append('circle')
-    .attr('class', 'node')
-    .attr('r', 15)
-    .attr('fill', 'steelblue')
-    .call(d3.drag().on('start', dragstart).on('drag', dragged).on('end', dragend));
-
-  const label = svg.selectAll('.label')
-    .data(data)
-    .enter().append('text')
-    .attr('class', 'label')
-    .attr('dx', 12)
-    .attr('dy', '.35em')
-    .text(d => d.nom);
-
-  simulation.on('tick', () => {
-    link
-      .attr("x1", d => d.source.x)
-      .attr("y1", d => d.source.y)
-      .attr("x2", d => d.target.x)
-      .attr("y2", d => d.target.y);
-
-    node.attr('cx', d => d.x).attr('cy', d => d.y);
-    label.attr('x', d => d.x).attr('y', d => d.y);
-  });
-
-  function dragstart(event, d) {
-    if (!event.active) simulation.alphaTarget(0.3).restart();
-    d.fx = d.x;
-    d.fy = d.y;
-  }
-
-  function dragged(event, d) {
-    d.fx = event.x;
-    d.fy = event.y;
-  }
-
-  function dragend(event, d) {
-    if (!event.active) simulation.alphaTarget(0);
-    d.fx = null;
-    d.fy = null;
-  }
-}
-
-
-function navegarapantalla() {
-  router.push('/formPage');
-}
 
 function navigateToAlum() {
   if (esProfe(email)) {
@@ -221,6 +60,30 @@ function esProfe(email) {
   return !teNumeros.test(email);
 }
 
+
+const spawnToGraphs = async () => {
+  try {
+    const response = await fetch(`${URL}/run-calculations`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id_classe: id_classe.value }), // Pasar el id_classe
+    });
+
+    if (!response.ok) {
+      throw new Error('Error al ejecutar el cálculo: ' + response.statusText);
+    }
+
+    const data = await response.json();
+    console.log('Resultado del cálculo:', data);
+
+    router.push('/grafics');
+  } catch (error) {
+    console.error('Error al ejecutar el cálculo:', error);
+  }
+};
+
 async function fetchClasse() {
   try {
     const data = await getClasse(email);
@@ -232,7 +95,6 @@ async function fetchClasse() {
 
 onMounted(async () => {
   await getidClase();
-  await fetchSociograma();
   await fetchClasse();
 });
 </script>

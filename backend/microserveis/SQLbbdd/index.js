@@ -155,6 +155,28 @@ app.get("/classeAlum", (req, res) => {
     });
 });
 
+app.get("/process", (req, res) => {
+    const id_classe = req.query.id_classe;
+    pool.getConnection((err, connection) => {
+        if (err) {
+            console.error('Error getting connection from pool:', err);
+            res.status(500).send("Error al obtenir connexió");
+            return;
+        }
+        const query = `SELECT * FROM resultats WHERE id_classe = ? `;
+        connection.query(query, [id_classe], (err, results) => {
+            if (err) {
+                console.error('Error:', err);
+            } else {
+                classes = results;
+            }
+
+            res.json(classes);
+        });
+    });
+});
+
+
 app.get("/classeProf", (req, res) => {
     const email = req.query.email;
     pool.getConnection((err, connection) => {
@@ -838,8 +860,6 @@ app.get("/resultats", (req, res) => {
                 console.error('Error en la consulta SQL:', err);
                 return res.status(500).json("Error al obtener los resultados");
             }
-
-            console.log("RESULTADO DE SQL en /resultats:", results);
             res.json(results); 
         });
     });

@@ -6,12 +6,6 @@
                     <h1 class="header-titol">BENVINGUT/DA {{ userStore.email }} a {{ classe }}!</h1>
                 </v-col>
             </v-row>
-
-            <v-tabs v-model="activeTab" align="center">
-                <v-tab class="tabtab">Alumnes Registrats</v-tab>
-                <v-tab class="tabtab" @click="navigateToResult()">Resultats</v-tab>
-            </v-tabs>
-
             <v-tabs-items v-model="activeTab">
 
                 <v-tab-item>

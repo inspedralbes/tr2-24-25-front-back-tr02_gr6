@@ -82,6 +82,29 @@ export async function callFetchClasses(course) {
     throw error;
   }
 }
+
+export async function getProcessData(id_classe) {
+ console.log("ID DE ÑA CÑASE MI LOKA 009 TK #BEFFA",id_classe)
+  try {
+    if (!sessionId || !userId) {
+      throw new Error('No hay sessionId o userId almacenado');
+    }
+
+    const response = await fetch(`${URL}/process/?id_classe=${id_classe}&sessionId=${sessionId}&userId=${userId}`);
+    console.log(response)
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Error al obtener datos de clases: ${errorText}`);
+    }
+
+    const data = await response.json();
+    console.log(data);
+    return data;
+  } catch (error) {
+    console.error("Error en Communication Manager:", error);
+    throw error;
+  }
+}
 export async function callAddClass(email,classeData) {
   try {
     const sessionStore = useSessionStore();
