@@ -43,7 +43,7 @@
                             <p>{{ alumne.email }}</p>
                         </div> 
                         <v-btn icon color="red darken-2" class="ms-auto"
-                            @click="deleteAlumne(alumne.id_alumne)"> <v-icon>mdi-delete</v-icon> </v-btn>
+                            @click="localDeleteAlumne(alumne.id_alumne)"> <v-icon>mdi-delete</v-icon> </v-btn>
                     </v-card-title> <v-card-subtitle> <v-chip
                             :color="alumne.formulari_fet ? 'green darken-5' : 'red darken-1'" dark> {{
                                 alumne.formulari_fet > 0 ? 'Formulari Completat' : 'Formulari Pendent' }} </v-chip>
@@ -54,7 +54,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useUserStore } from '@/stores/userStore';
-import { getAlumnes, getClasse, getProcessData, redirect } from '@/services/communicationManager';
+import { getAlumnes, getClasse, getProcessData, redirect,deleteAlumne } from '@/services/communicationManager';
 import { useRouter } from 'vue-router';
 import { io } from 'socket.io-client';
 const activeTab = ref(0);
@@ -82,9 +82,9 @@ async function fetchAlumnes(email) {
         console.error("Error al realitzar la solicitud:", error.message);
     }
 };
-async function deleteAlumne(idAlumne) {
+async function localDeleteAlumne(idAlumne) {
   try {
-    await deleteAlumne(idAlumne, id_classe.value);
+    await deleteAlumne(idAlumne);
     console.log(idAlumne)
     alumnes.value = alumnes.value.filter(alumne => alumne.id_alumne !== idAlumne);
 

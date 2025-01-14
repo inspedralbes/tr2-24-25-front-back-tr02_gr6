@@ -690,6 +690,35 @@ app.delete("/classe", (req, res) => {
     });
 });
 
+app.delete("/alumnes", (req, res) => {
+    const id_alumne = req.query.id_alumne;
+
+    pool.getConnection((err, connection) => {
+        if (err) {
+            console.error('Error getting connection from pool:', err);
+            res.status(500).send("Error al obtenir connexió");
+            return;
+        }
+
+        const query = `DELETE FROM Alumnes WHERE id_alumne = (?)`;
+
+
+        connection.query(query, [id_alumne], (err, results) => {
+            if (err) {
+                console.error('Error:', err);
+                res.status(500).json({ error: "Error en eliminar la classe" });
+            } else {
+                getAlumnes(connection);
+                res.json({ missatge: "classe eliminada" });
+                console.log(`Classe: ${id_alumne} eliminada correctament!`)
+            }
+            connection.release();
+        });
+    });
+});
+
+
+
 app.put("/classe", (req, res) => {
     if (!req.query.nomClasse || !req.query.idClasse) {
         return res.status(400).send("Falta el paràmetre nomClasse o idClasse");

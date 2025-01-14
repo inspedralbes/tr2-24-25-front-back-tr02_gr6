@@ -175,6 +175,31 @@ export async function callGetProf(email, password) {
   }
 }
 
+export async function deleteAlumne(id_alumne) {
+  console.log(id_alumne)
+  try {
+      const response = await fetch(`${URL}/alumnes?id_alumne=${id_alumne}&sessionId=${sessionId}&userId=${userId}`, {
+          method: "DELETE", 
+          headers: {
+              "Content-Type": "application/json",
+          },
+      });
+
+      if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Error al eliminar alumno: ${errorText}`);
+      }
+
+      const data = await response.json();
+      return data;
+  } catch (error) {
+      console.error("Error en deleteAlumne:", error);
+      throw error;
+  }
+}
+
+
+
 export async function callGetClasseFormaPart(email) {
   console.log(email)
   try {
