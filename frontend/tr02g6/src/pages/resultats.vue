@@ -181,11 +181,15 @@ function initD3Chart(category, svgElement, filterFn, sizeValueFn = null) {
 
   const node = svg.selectAll('.node')
     .data(data)
-    .enter().append('circle')
-    .attr('class', 'node')
-    .attr('r', d => sizeScale ? sizeScale(sizeValueFn(d)) : 15) 
-    .attr('fill', 'steelblue')
-    .call(d3.drag().on('start', dragstart).on('drag', dragged).on('end', dragend));
+    .enter()
+    .append("circle")
+    .attr("class", "node")
+    .attr("r", (d) => (sizeScale ? sizeScale(sizeValueFn(d)) : 10)) // Asignar tamaño fijo si sizeValueFn no está definido
+    .attr("fill", () => {
+      const colors = ["pink", "blue", "green", "yellow", "purple", "orange", "red"];
+      return colors[Math.floor(Math.random() * colors.length)];
+    })
+    .call(d3.drag().on("start", dragstart).on("drag", dragged).on("end", dragend));
 
   const label = svg.selectAll('.label')
     .data(data)
