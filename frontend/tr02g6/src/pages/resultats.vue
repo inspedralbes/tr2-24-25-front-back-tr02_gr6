@@ -51,15 +51,10 @@
         <v-col cols="4">
           <h3>VICTIMITZACIÓ</h3>
           <svg ref="vicitmitzacioSvg" class="sociograma-svg"></svg>
-        
         </v-col>
       </v-row>
 
-      <v-btn 
-        large
-        class="form-button fixed-button"
-        @click="navegarapantalla"
-      >
+      <v-btn large class="form-button fixed-button" @click="navegarapantalla">
         FORMULARI
       </v-btn>
     </v-container>
@@ -67,11 +62,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick } from 'vue';
-import { useRouter } from 'vue-router';
-import { useUserStore } from '@/stores/userStore';
-import * as d3 from 'd3';
-import { getClasse, getResultats } from '@/services/communicationManager';
+import { ref, onMounted, nextTick } from "vue";
+import { useRouter } from "vue-router";
+import { useUserStore } from "@/stores/userStore";
+import * as d3 from "d3";
+import { getClasse, getResultats } from "@/services/communicationManager";
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -98,18 +93,35 @@ async function fetchSociograma() {
     const data = await getResultats(id_classe);
     sociogramaData.value = data;
 
+    console.log("bolas",data); 
+
+    const charts = [
+  { category: "popular", svg: popularSvg.value, filterFn: d => d.popular_SN === "X" },
+  { category: "controvertit", svg: controvertitSvg.value, filterFn: d => d.controvertit_SN === "X" },
+  { category: "normal", svg: normalSvg.value, filterFn: d => d.normal_SN === "X" },
+  { category: "rebutjat", svg: rebutjatSvg.value, filterFn: d => d.rebutjat_SN === "X" },
+  { category: "ignorat", svg: ignoratSvg.value, filterFn: d => d.ignorat_SN === "X" },
+  { category: "agresivitat", svg: agresivitatSvg.value, filterFn: d => d.totalAgressivitat != null, sizeValueFn: d => d.totalAgressivitat },
+  { category: "victimitzacio", svg: vicitmitzacioSvg.value, filterFn: d => d.totalVictimitzacio != null, sizeValueFn: d => d.totalVictimitzacio }
+];
+
     nextTick(() => {
-      initD3Chart('popular', popularSvg.value, d => d.popular_SN === 'X');
-      initD3Chart('controvertit', controvertitSvg.value, d => d.controvertit_SN === 'X');
-      initD3Chart('normal', normalSvg.value, d => d.normal_SN === 'X');
-      initD3Chart('rebutjat', rebutjatSvg.value, d => d.rebutjat_SN === 'X');
-      initD3Chart('ignorat', ignoratSvg.value, d => d.ignorat_SN === 'X');
-    });
+
+  charts.forEach(chart => {
+    if (chart.sizeValueFn) {
+    initD3Chart(chart.category, chart.svg, chart.filterFn, chart.sizeValueFn);
+    } else {
+      initD3Chart(chart.category, chart.svg, chart.filterFn);
+    }
+  });
+});
+
   } catch (error) {
     console.error("Error al obtener sociograma:", error);
   }
 }
-function initD3Chart(category, svgElement, filterFn) {
+
+function initD3Chart(category, svgElement, filterFn, sizeValueFn = null) {
   const data = sociogramaData.value.filter(filterFn);
 
   if (!data.length) {
@@ -121,68 +133,49 @@ function initD3Chart(category, svgElement, filterFn) {
   const width = svg.node().getBoundingClientRect().width;
   const height = svg.node().getBoundingClientRect().height;
 
-  svg.selectAll('*').remove();
+  svg.selectAll("*").remove();
 
-  const simulation = d3.forceSimulation(data)
-    .force('charge', d3.forceManyBody().strength(-10))
-    .force('center', d3.forceCenter(width / 2, height / 2))
-    .force('collision', d3.forceCollide().radius(50));
+  // Escala para el tamaño de las bolitas
+  const sizeScale = sizeValueFn
+    ? d3
+        .scaleLinear()
+        .domain(d3.extent(data, sizeValueFn)) // Extent obtiene [min, max] del valor
+        .range([5, 30]) // Rango deseado para el radio
+    : null; // Si no hay sizeValueFn, no se usa escala
 
-  let links = data
-    .map((source, i) =>
-      data
-        .slice(i + 1)
-        .map((target) => ({ source, target }))
-    )
-    .flat();
+  const simulation = d3
+    .forceSimulation(data)
+    .force("charge", d3.forceManyBody().strength(-10))
+    .force("center", d3.forceCenter(width / 2, height / 2))
+    .force(
+      "collision",
+      d3.forceCollide().radius((d) => (sizeScale ? sizeScale(sizeValueFn(d)) : 10)) // Radio fijo si no hay sizeValueFn
+    );
+    
 
-  const link = svg.selectAll(".link")
-    .data(links)
+  const node = svg
+    .selectAll(".node")
+    .data(data)
     .enter()
-    .append("line")
-    .attr("class", "link")
-    .attr("stroke", "gray")
-    .attr("stroke-width", 1)
-    .attr("marker-end", "url(#arrowhead)");
+    .append("circle")
+    .attr("class", "node")
+    .attr("r", (d) => (sizeScale ? sizeScale(sizeValueFn(d)) : 10)) // Asignar tamaño fijo si sizeValueFn no está definido
+    .attr("fill", "steelblue")
+    .call(d3.drag().on("start", dragstart).on("drag", dragged).on("end", dragend));
 
-  svg.append("defs")
-    .append("marker")
-    .attr("id", `arrowhead-${category}`)
-    .attr("viewBox", "0 -5 10 10")
-    .attr("refX", 10)
-    .attr("refY", 0)
-    .attr("markerWidth", 6)
-    .attr("markerHeight", 6)
-    .attr("orient", "auto")
-    .append("path")
-    .attr("d", "M0,-5L10,0L0,5")
-    .attr("fill", "gray");
-
-  const node = svg.selectAll('.node')
+  const label = svg
+    .selectAll(".label")
     .data(data)
-    .enter().append('circle')
-    .attr('class', 'node')
-    .attr('r', 15)
-    .attr('fill', 'steelblue')
-    .call(d3.drag().on('start', dragstart).on('drag', dragged).on('end', dragend));
+    .enter()
+    .append("text")
+    .attr("class", "label")
+    .attr("dx", 12)
+    .attr("dy", ".35em")
+    .text((d) => d.nom);
 
-  const label = svg.selectAll('.label')
-    .data(data)
-    .enter().append('text')
-    .attr('class', 'label')
-    .attr('dx', 12)
-    .attr('dy', '.35em')
-    .text(d => d.nom);
-
-  simulation.on('tick', () => {
-    link
-      .attr("x1", d => d.source.x)
-      .attr("y1", d => d.source.y)
-      .attr("x2", d => d.target.x)
-      .attr("y2", d => d.target.y);
-
-    node.attr('cx', d => d.x).attr('cy', d => d.y);
-    label.attr('x', d => d.x).attr('y', d => d.y);
+  simulation.on("tick", () => {
+    node.attr("cx", (d) => d.x).attr("cy", (d) => d.y);
+    label.attr("x", (d) => d.x).attr("y", (d) => d.y);
   });
 
   function dragstart(event, d) {
@@ -205,14 +198,14 @@ function initD3Chart(category, svgElement, filterFn) {
 
 
 function navegarapantalla() {
-  router.push('/formPage');
+  router.push("/formPage");
 }
 
 function navigateToAlum() {
   if (esProfe(email)) {
-    router.push('/classProf');
+    router.push("/classProf");
   } else {
-    router.push('/classAlum');
+    router.push("/classAlum");
   }
 }
 
@@ -238,43 +231,50 @@ onMounted(async () => {
 </script>
 
 <style scoped>
- .header-row {
-    background-color: orange;
-    color: white;
-    padding: 20px 0;
-  }
-  .tabtab {
-    color: rgb(185, 122, 7);
-    text-transform: uppercase;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  .header-title {
-    font-weight: bold;
-  }
-  
-  .form-button {
-    background-color: orange;
-    color: white;
-    font-size: 1.2em;
-    font-weight: bold;
-    width: 250px;
-    height: 60px;
-    border-radius: 30px;
-  }
-  
+.header-row {
+  background-color: orange;
+  color: white;
+  padding: 20px 0;
+}
+.tabtab {
+  color: rgb(185, 122, 7);
+  text-transform: uppercase;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.header-title {
+  font-weight: bold;
+}
+
+.form-button {
+  background-color: orange;
+  color: white;
+  font-size: 1.2em;
+  font-weight: bold;
+  width: 250px;
+  height: 60px;
+  border-radius: 30px;
+}
+
+.sociograma-svg {
+  width: 100%;
+  height: 600px;
+  border: 1px solid #ddd;
+}
+
+@media (max-width: 768px) {
   .sociograma-svg {
-    width: 100%;
-    height: 600px;
-    border: 1px solid #ddd;
+    height: 300px;
   }
-  
-  .node {
-    cursor: pointer;
-  }
-  
-  .link {
-    pointer-events: none;
-  }</style>
+}
+
+.node {
+  cursor: pointer;
+}
+
+.link {
+  pointer-events: none;
+}
+</style>
