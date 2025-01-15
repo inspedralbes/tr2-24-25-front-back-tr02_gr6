@@ -875,7 +875,7 @@ SELECT
 FROM
     resultats AS r
 INNER JOIN
-    alumnes AS a
+    Alumnes AS a
 ON
     r.id_alumne = a.id_alumne
 WHERE
